@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/empty-state";
 import { catalogService } from "@/lib/container";
+import { rupeesToPaise } from "@/models/entities/money";
 import type { Product } from "@/models/entities/product";
 import type { ProductSort } from "@/services/catalog-service";
 import { ProductGrid } from "./product-grid";
@@ -41,8 +42,8 @@ export function ProductBrowser({ products }: { products: Product[] }) {
     const range = priceRanges.find((r) => r.id === priceRange)!;
     const filtered = catalogService.filter(
       {
-        minPrice: "min" in range ? range.min : undefined,
-        maxPrice: "max" in range ? range.max : undefined,
+        minPrice: "min" in range ? rupeesToPaise(range.min) : undefined,
+        maxPrice: "max" in range ? rupeesToPaise(range.max) : undefined,
         brand: brand || undefined,
         available: inStockOnly,
       },

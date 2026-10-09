@@ -1,5 +1,5 @@
-import { formatPrice } from "@/lib/format";
 import type { CartItem, PricingSummary } from "@/models/entities/cart";
+import { formatPrice } from "@/models/entities/money";
 import type { Order } from "@/models/entities/order";
 import type { CartStorage, OrderStorage } from "@/models/repositories/interfaces";
 import type { ActionResult } from "@/types/action";

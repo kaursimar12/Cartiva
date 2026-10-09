@@ -80,10 +80,11 @@ Manual UI ──┐                                    │                │
 
 Pricing exists in TypeScript (for the UI) and Python (for payment). To prevent drift:
 
-- Keep pricing rules simple and data-driven (offers and delivery thresholds come from `frontend/data/offers.json`, not hard-coded).
+- Keep pricing rules simple and data-driven (offers from `frontend/data/offers.json`, delivery fee/threshold from `frontend/data/delivery.json`, never hard-coded).
 - Create shared golden test cases in `frontend/data/pricing-cases.json` (`items` → expected `subtotal`, `discount`, `deliveryFee`, `total`).
 - Both Vitest and pytest run against the same file. If either fails, the implementations have diverged.
-- Work in integer paise in both languages to avoid float rounding differences.
+- Work in integer paise in both languages to avoid float rounding differences. JSON stays in rupees and is converted once on load.
+- Percentage discounts round **down** to the paise (`Math.floor` / Python `//`). Never use Python `round()` — it rounds half to even.
 
 ## API Routing
 
@@ -131,6 +132,7 @@ cartiva-ai/
 │   │   ├── products.json
 │   │   ├── categories.json
 │   │   ├── offers.json
+│   │   ├── delivery.json     # delivery fee + free-delivery threshold
 │   │   └── pricing-cases.json  # shared golden pricing tests
 │   ├── public/
 │   └── package.json
@@ -270,7 +272,8 @@ Create:
 frontend/data/
 ├── products.json
 ├── categories.json
-└── offers.json
+├── offers.json
+└── delivery.json
 ```
 
 ## Product Requirements

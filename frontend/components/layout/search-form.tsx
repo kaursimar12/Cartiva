@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 
-export function SearchForm({ className = "" }: { className?: string }) {
+/** `id` must be unique per page: the header renders one form for desktop and one for mobile. */
+export function SearchForm({ id, className = "" }: { id: string; className?: string }) {
   const router = useRouter();
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -14,14 +15,14 @@ export function SearchForm({ className = "" }: { className?: string }) {
 
   return (
     <form role="search" onSubmit={handleSubmit} className={`relative ${className}`}>
-      <label htmlFor="site-search" className="sr-only">
+      <label htmlFor={id} className="sr-only">
         Search products
       </label>
       <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400" aria-hidden>
         🔍
       </span>
       <input
-        id="site-search"
+        id={id}
         name="q"
         type="search"
         placeholder='Search "tomato", "milk", "Surf Excel"…'

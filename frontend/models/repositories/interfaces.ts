@@ -1,4 +1,5 @@
 import type { CartItem } from "@/models/entities/cart";
+import type { DeliveryPolicy } from "@/models/entities/delivery";
 import type { Offer } from "@/models/entities/offer";
 import type { Order } from "@/models/entities/order";
 import type { Category, Product } from "@/models/entities/product";
@@ -15,7 +16,12 @@ export interface CategoryRepository {
 }
 
 export interface OfferRepository {
+  findAll(): Offer[];
   findActive(): Offer[];
+}
+
+export interface DeliveryPolicyRepository {
+  get(): DeliveryPolicy;
 }
 
 /** Where cart items live at runtime (Zustand in the browser). */

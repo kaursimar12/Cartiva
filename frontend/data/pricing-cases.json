@@ -1,0 +1,91 @@
+{
+  "description": "Golden pricing cases shared by the TypeScript (Vitest) and Python (pytest) pricing implementations. Fixture money is in rupees, exactly like the real data files; every expected amount is in paise. Rules: line total = price x quantity; an offer applies when its eligible amount (category subtotal, or cart subtotal when category is null) is >= minimumAmount; percentage discounts round DOWN to the paise; total discount is capped at the subtotal; delivery is free when the subtotal (before discount) is >= freeAbove or the cart is empty; unknown product ids are ignored; total = subtotal - discount + deliveryFee.",
+  "fixture": {
+    "products": [
+      { "id": "tomato", "category": "vegetables", "price": 40 },
+      { "id": "potato", "category": "vegetables", "price": 35 },
+      { "id": "avocado", "category": "vegetables", "price": 133.35 },
+      { "id": "chips", "category": "snacks", "price": 20 },
+      { "id": "milk", "category": "dairy", "price": 49.9 },
+      { "id": "apple", "category": "fruits", "price": 60 },
+      { "id": "detergent", "category": "laundry", "price": 275 },
+      { "id": "softener", "category": "laundry", "price": 249.75 }
+    ],
+    "offers": [
+      { "id": "veg10", "category": "vegetables", "minimumAmount": 300, "discountType": "percentage", "discountValue": 10, "active": true },
+      { "id": "laundry15", "category": "laundry", "minimumAmount": 500, "discountType": "percentage", "discountValue": 15, "active": true },
+      { "id": "flat50", "category": null, "minimumAmount": 999, "discountType": "flat", "discountValue": 50, "active": true },
+      { "id": "fruit20", "category": "fruits", "minimumAmount": 200, "discountType": "percentage", "discountValue": 20, "active": false }
+    ],
+    "delivery": { "fee": 30, "freeAbove": 499 }
+  },
+  "cases": [
+    {
+      "name": "empty cart costs nothing, not even delivery",
+      "items": [],
+      "expected": { "subtotal": 0, "discount": 0, "deliveryFee": 0, "total": 0, "appliedOfferIds": [] }
+    },
+    {
+      "name": "small cart pays delivery",
+      "items": [{ "productId": "chips", "quantity": 2 }],
+      "expected": { "subtotal": 4000, "discount": 0, "deliveryFee": 3000, "total": 7000, "appliedOfferIds": [] }
+    },
+    {
+      "name": "just below the free-delivery threshold pays delivery",
+      "items": [{ "productId": "chips", "quantity": 24 }],
+      "expected": { "subtotal": 48000, "discount": 0, "deliveryFee": 3000, "total": 51000, "appliedOfferIds": [] }
+    },
+    {
+      "name": "exactly at the free-delivery threshold is free (decimal price 49.90)",
+      "items": [{ "productId": "milk", "quantity": 10 }],
+      "expected": { "subtotal": 49900, "discount": 0, "deliveryFee": 0, "total": 49900, "appliedOfferIds": [] }
+    },
+    {
+      "name": "category offer just below its minimum does not apply",
+      "items": [{ "productId": "tomato", "quantity": 7 }],
+      "expected": { "subtotal": 28000, "discount": 0, "deliveryFee": 3000, "total": 31000, "appliedOfferIds": [] }
+    },
+    {
+      "name": "category offer exactly at its minimum applies",
+      "items": [
+        { "productId": "tomato", "quantity": 4 },
+        { "productId": "potato", "quantity": 4 }
+      ],
+      "expected": { "subtotal": 30000, "discount": 3000, "deliveryFee": 3000, "total": 30000, "appliedOfferIds": ["veg10"] }
+    },
+    {
+      "name": "percentage discount rounds down to the paise (4000.5 -> 4000)",
+      "items": [{ "productId": "avocado", "quantity": 3 }],
+      "expected": { "subtotal": 40005, "discount": 4000, "deliveryFee": 3000, "total": 39005, "appliedOfferIds": ["veg10"] }
+    },
+    {
+      "name": "category offer and cart-wide flat offer stack",
+      "items": [
+        { "productId": "detergent", "quantity": 2 },
+        { "productId": "softener", "quantity": 2 }
+      ],
+      "expected": { "subtotal": 104950, "discount": 20742, "deliveryFee": 0, "total": 84208, "appliedOfferIds": ["laundry15", "flat50"] }
+    },
+    {
+      "name": "category offer only counts its own category; flat offer counts the whole cart",
+      "items": [
+        { "productId": "tomato", "quantity": 10 },
+        { "productId": "chips", "quantity": 30 }
+      ],
+      "expected": { "subtotal": 100000, "discount": 9000, "deliveryFee": 0, "total": 91000, "appliedOfferIds": ["veg10", "flat50"] }
+    },
+    {
+      "name": "inactive offer is ignored",
+      "items": [{ "productId": "apple", "quantity": 4 }],
+      "expected": { "subtotal": 24000, "discount": 0, "deliveryFee": 3000, "total": 27000, "appliedOfferIds": [] }
+    },
+    {
+      "name": "unknown product ids are ignored",
+      "items": [
+        { "productId": "ghost", "quantity": 3 },
+        { "productId": "chips", "quantity": 1 }
+      ],
+      "expected": { "subtotal": 2000, "discount": 0, "deliveryFee": 3000, "total": 5000, "appliedOfferIds": [] }
+    }
+  ]
+}

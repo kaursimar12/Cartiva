@@ -5,13 +5,12 @@ import { useState } from "react";
 import { EmptyState } from "@/components/common/empty-state";
 import { cartController } from "@/controllers/cart-controller";
 import { useCart } from "@/hooks/use-cart";
-import { pricingService } from "@/lib/container";
 import { CartHints } from "./cart-hints";
 import { CartLineRow } from "./cart-line-row";
 import { PricingSummary } from "./pricing-summary";
 
 export function CartView() {
-  const { hydrated, lines, pricing, offerHints } = useCart();
+  const { hydrated, lines, pricing, offerHints, freeDeliveryRemaining } = useCart();
   const [confirmingClear, setConfirmingClear] = useState(false);
 
   if (!hydrated) return <CartSkeleton />;
@@ -65,7 +64,7 @@ export function CartView() {
       </section>
 
       <aside className="space-y-4 lg:sticky lg:top-36 lg:self-start">
-        <CartHints hints={offerHints} pricing={pricing} freeDeliveryAbove={pricingService.delivery.freeAbove} />
+        <CartHints hints={offerHints} freeDeliveryRemaining={freeDeliveryRemaining} />
         <section aria-labelledby="bill-details" className="rounded-2xl border border-zinc-300 bg-surface p-5">
           <h2 id="bill-details" className="mb-4 font-semibold">
             Bill details

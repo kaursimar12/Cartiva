@@ -1,3 +1,4 @@
+import type { Paise } from "@/models/entities/money";
 import type { Offer } from "@/models/entities/offer";
 import type { Category, Product } from "@/models/entities/product";
 import type { CategoryRepository, OfferRepository, ProductRepository } from "@/models/repositories/interfaces";
@@ -5,13 +6,18 @@ import type { CategoryRepository, OfferRepository, ProductRepository } from "@/m
 export interface ProductFilters {
   query?: string;
   category?: string;
-  minPrice?: number;
-  maxPrice?: number;
+  /** Paise. Callers working in rupees (UI ranges, voice) convert with rupeesToPaise. */
+  minPrice?: Paise;
+  maxPrice?: Paise;
   brand?: string;
   available?: boolean;
 }
 
 export type ProductSort = "relevance" | "price-asc" | "price-desc" | "name";
+
+export type StockStatus = "out-of-stock" | "low-stock" | "in-stock";
+
+const LOW_STOCK_THRESHOLD = 3;
 
 function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
@@ -96,6 +102,11 @@ export class CatalogService {
     if (sort === "price-desc") sorted.sort((a, b) => b.price - a.price);
     if (sort === "name") sorted.sort((a, b) => a.name.localeCompare(b.name));
     return sorted;
+  }
+
+  getStockStatus(product: Product): StockStatus {
+    if (!product.stock) return "out-of-stock";
+    return product.availableQuantity <= LOW_STOCK_THRESHOLD ? "low-stock" : "in-stock";
   }
 
   getBrands(products: Product[]): string[] {

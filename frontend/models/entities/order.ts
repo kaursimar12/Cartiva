@@ -1,10 +1,11 @@
 import type { PricingSummary } from "./cart";
+import type { Paise } from "./money";
 
 export interface OrderLine {
   productId: string;
   name: string;
   unit: string;
-  price: number;
+  price: Paise;
   quantity: number;
 }
 

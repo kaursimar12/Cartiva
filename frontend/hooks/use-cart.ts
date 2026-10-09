@@ -16,6 +16,7 @@ export function useCart() {
       lines: pricingService.getLines(items),
       pricing: pricingService.calculate(items),
       offerHints: pricingService.getOfferHints(items),
+      freeDeliveryRemaining: pricingService.getFreeDeliveryRemaining(items),
     }),
     [items, hydrated],
   );

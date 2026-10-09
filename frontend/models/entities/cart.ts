@@ -1,3 +1,4 @@
+import type { Paise } from "./money";
 import type { Offer } from "./offer";
 import type { Product } from "./product";
 
@@ -11,25 +12,25 @@ export interface CartItem {
 export interface CartLine {
   product: Product;
   quantity: number;
-  lineTotal: number;
+  lineTotal: Paise;
 }
 
 export interface AppliedOffer {
   offer: Offer;
-  amount: number;
+  amount: Paise;
 }
 
 export interface OfferHint {
   offer: Offer;
-  /** Rupees still needed in the eligible basket to unlock the offer. */
-  remaining: number;
+  /** Amount still needed in the eligible basket to unlock the offer. */
+  remaining: Paise;
 }
 
 export interface PricingSummary {
   itemCount: number;
-  subtotal: number;
-  discount: number;
+  subtotal: Paise;
+  discount: Paise;
   appliedOffers: AppliedOffer[];
-  deliveryFee: number;
-  total: number;
+  deliveryFee: Paise;
+  total: Paise;
 }

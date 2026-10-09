@@ -95,8 +95,14 @@ export class CartService {
     return this.add(productId, 1);
   }
 
+  /**
+   * Steps down by one. Always allowed: if stock dropped below the cart quantity,
+   * it snaps down to what is available (0 removes the item).
+   */
   decrease(productId: string): ActionResult<CartItem> {
-    return this.updateQuantity(productId, this.quantityOf(productId) - 1);
+    const current = this.quantityOf(productId);
+    const available = this.products.findById(productId)?.availableQuantity ?? 0;
+    return this.updateQuantity(productId, Math.max(0, Math.min(current - 1, available)));
   }
 
   clear(): ActionResult<null> {

@@ -1,3 +1,5 @@
+import type { Paise } from "./money";
+
 export type CategoryId =
   | "vegetables"
   | "fruits"
@@ -21,8 +23,8 @@ export interface Product {
   name: string;
   category: CategoryId;
   description: string;
-  /** Price in whole rupees (INR) per unit. */
-  price: number;
+  /** Price per unit, in paise (JSON stores rupees). */
+  price: Paise;
   /** Pack size sold as one unit, e.g. "1 kg", "500 ml". Cart quantity counts these units. */
   unit: string;
   brand: string | null;

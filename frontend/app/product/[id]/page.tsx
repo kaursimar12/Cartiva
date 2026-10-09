@@ -52,7 +52,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
           <div className="mt-4 flex items-center gap-3">
             <p className="text-3xl font-extrabold">{formatPrice(product.price)}</p>
             <StockBadge product={product} />
-            {product.stock && product.availableQuantity > 3 && (
+            {catalogService.getStockStatus(product) === "in-stock" && (
               <span className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">In stock</span>
             )}
           </div>

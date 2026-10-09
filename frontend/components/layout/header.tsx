@@ -15,14 +15,14 @@ export function Header({ categories }: { categories: Category[] }) {
           </span>
           <span className="text-xl font-extrabold tracking-tight text-white">Cartiva</span>
         </Link>
-        <SearchForm className="hidden flex-1 md:block" />
+        <SearchForm id="site-search" className="hidden flex-1 md:block" />
         <div className="ml-auto flex items-center gap-2">
           <VoiceButton />
           <CartLink />
         </div>
       </div>
       <div className="px-4 pb-3 md:hidden">
-        <SearchForm />
+        <SearchForm id="site-search-mobile" />
       </div>
       <CategoryNav categories={categories} />
     </header>

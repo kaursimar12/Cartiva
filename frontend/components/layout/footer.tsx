@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { pricingService } from "@/lib/container";
+import { formatPrice } from "@/lib/format";
 import type { Category } from "@/models/entities/product";
 
 export function Footer({ categories }: { categories: Category[] }) {
@@ -31,7 +33,7 @@ export function Footer({ categories }: { categories: Category[] }) {
                 My cart
               </Link>
             </li>
-            <li>Free delivery on orders above ₹499</li>
+            <li>Free delivery on orders of {formatPrice(pricingService.delivery.freeAbove)} or more</li>
           </ul>
         </div>
       </div>
