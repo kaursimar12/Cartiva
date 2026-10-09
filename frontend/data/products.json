@@ -1,0 +1,1184 @@
+[
+  {
+    "id": "p001",
+    "name": "Tomato",
+    "category": "vegetables",
+    "description": "Fresh, firm red tomatoes ideal for curries, salads and chutneys.",
+    "price": 40,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 50,
+    "image": "/products/p001.jpg",
+    "tags": [
+      "tomato",
+      "tamatar",
+      "fresh"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p002",
+    "name": "Tomato Cherry",
+    "category": "vegetables",
+    "description": "Sweet bite-sized cherry tomatoes, perfect for salads.",
+    "price": 60,
+    "unit": "250 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p002.jpg",
+    "tags": [
+      "tomato",
+      "cherry tomato",
+      "salad"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p003",
+    "name": "Tomato Puree",
+    "category": "vegetables",
+    "description": "Smooth tomato puree for quick gravies and sauces.",
+    "price": 45,
+    "unit": "200 g",
+    "brand": "Del Monte",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p003.jpg",
+    "tags": [
+      "tomato",
+      "puree",
+      "packaged"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p004",
+    "name": "Potato",
+    "category": "vegetables",
+    "description": "Versatile everyday potatoes for frying, boiling and curries.",
+    "price": 35,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 60,
+    "image": "/products/p004.jpg",
+    "tags": [
+      "potato",
+      "aloo",
+      "fresh"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p005",
+    "name": "Onion",
+    "category": "vegetables",
+    "description": "Red onions with a sharp flavour, a kitchen essential.",
+    "price": 45,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 60,
+    "image": "/products/p005.jpg",
+    "tags": [
+      "onion",
+      "pyaz",
+      "fresh"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p006",
+    "name": "Carrot",
+    "category": "vegetables",
+    "description": "Crunchy orange carrots, great raw or cooked.",
+    "price": 30,
+    "unit": "500 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p006.jpg",
+    "tags": [
+      "carrot",
+      "gajar",
+      "fresh"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p007",
+    "name": "Spinach",
+    "category": "vegetables",
+    "description": "Fresh green spinach leaves, washed and bunched.",
+    "price": 25,
+    "unit": "250 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p007.jpg",
+    "tags": [
+      "spinach",
+      "palak",
+      "leafy greens"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p008",
+    "name": "Cauliflower",
+    "category": "vegetables",
+    "description": "Compact white cauliflower, approx. 500–700 g.",
+    "price": 40,
+    "unit": "1 pc",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 12,
+    "image": "/products/p008.jpg",
+    "tags": [
+      "cauliflower",
+      "gobi",
+      "fresh"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p009",
+    "name": "Capsicum Green",
+    "category": "vegetables",
+    "description": "Glossy green capsicum for stir-fries and stuffing.",
+    "price": 50,
+    "unit": "500 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 18,
+    "image": "/products/p009.jpg",
+    "tags": [
+      "capsicum",
+      "shimla mirch",
+      "bell pepper"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p010",
+    "name": "Cucumber",
+    "category": "vegetables",
+    "description": "Cool, crisp cucumbers for salads and raita.",
+    "price": 30,
+    "unit": "500 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p010.jpg",
+    "tags": [
+      "cucumber",
+      "kheera",
+      "salad"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p011",
+    "name": "Coriander Leaves",
+    "category": "vegetables",
+    "description": "Fragrant fresh coriander for garnishing.",
+    "price": 15,
+    "unit": "100 g",
+    "brand": null,
+    "stock": false,
+    "availableQuantity": 0,
+    "image": "/products/p011.jpg",
+    "tags": [
+      "coriander",
+      "dhaniya",
+      "herbs"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p012",
+    "name": "Banana Robusta",
+    "category": "fruits",
+    "description": "Naturally sweet, energy-rich bananas.",
+    "price": 60,
+    "unit": "1 dozen",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p012.jpg",
+    "tags": [
+      "banana",
+      "kela"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p013",
+    "name": "Apple Shimla",
+    "category": "fruits",
+    "description": "Crisp and juicy apples from Shimla.",
+    "price": 180,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p013.jpg",
+    "tags": [
+      "apple",
+      "seb"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p014",
+    "name": "Orange Nagpur",
+    "category": "fruits",
+    "description": "Tangy-sweet Nagpur oranges, rich in vitamin C.",
+    "price": 120,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p014.jpg",
+    "tags": [
+      "orange",
+      "santra",
+      "citrus"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p015",
+    "name": "Mango Alphonso",
+    "category": "fruits",
+    "description": "Premium Ratnagiri Alphonso mangoes. Limited stock.",
+    "price": 450,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 2,
+    "image": "/products/p015.jpg",
+    "tags": [
+      "mango",
+      "aam",
+      "alphonso",
+      "seasonal"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p016",
+    "name": "Grapes Green",
+    "category": "fruits",
+    "description": "Seedless green grapes, sweet and juicy.",
+    "price": 80,
+    "unit": "500 g",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p016.jpg",
+    "tags": [
+      "grapes",
+      "angoor"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p017",
+    "name": "Pomegranate",
+    "category": "fruits",
+    "description": "Ruby-red pomegranates packed with juicy arils.",
+    "price": 200,
+    "unit": "1 kg",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 10,
+    "image": "/products/p017.jpg",
+    "tags": [
+      "pomegranate",
+      "anar"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p018",
+    "name": "Papaya",
+    "category": "fruits",
+    "description": "Ripe papaya, approx. 800 g – 1 kg.",
+    "price": 70,
+    "unit": "1 pc",
+    "brand": null,
+    "stock": false,
+    "availableQuantity": 0,
+    "image": "/products/p018.jpg",
+    "tags": [
+      "papaya",
+      "papita"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p019",
+    "name": "Amul Taaza Toned Milk",
+    "category": "dairy",
+    "description": "Pasteurised toned milk with 3% fat.",
+    "price": 56,
+    "unit": "1 L",
+    "brand": "Amul",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "/products/p019.jpg",
+    "tags": [
+      "milk",
+      "toned milk",
+      "doodh"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p020",
+    "name": "Amul Gold Full Cream Milk",
+    "category": "dairy",
+    "description": "Rich and creamy full cream milk with 6% fat.",
+    "price": 68,
+    "unit": "1 L",
+    "brand": "Amul",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p020.jpg",
+    "tags": [
+      "milk",
+      "full cream",
+      "doodh"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p021",
+    "name": "Amul Butter",
+    "category": "dairy",
+    "description": "Utterly butterly delicious salted butter.",
+    "price": 58,
+    "unit": "100 g",
+    "brand": "Amul",
+    "stock": true,
+    "availableQuantity": 35,
+    "image": "/products/p021.jpg",
+    "tags": [
+      "butter",
+      "makhan"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p022",
+    "name": "Amul Masti Dahi",
+    "category": "dairy",
+    "description": "Thick and fresh set curd.",
+    "price": 35,
+    "unit": "400 g",
+    "brand": "Amul",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p022.jpg",
+    "tags": [
+      "curd",
+      "dahi",
+      "yogurt"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p023",
+    "name": "Mother Dairy Paneer",
+    "category": "dairy",
+    "description": "Soft, fresh malai paneer.",
+    "price": 90,
+    "unit": "200 g",
+    "brand": "Mother Dairy",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p023.jpg",
+    "tags": [
+      "paneer",
+      "cottage cheese"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p024",
+    "name": "Amul Cheese Slices",
+    "category": "dairy",
+    "description": "Processed cheese slices for sandwiches and burgers.",
+    "price": 145,
+    "unit": "200 g",
+    "brand": "Amul",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p024.jpg",
+    "tags": [
+      "cheese",
+      "slices"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p025",
+    "name": "Farm Fresh Eggs",
+    "category": "dairy",
+    "description": "Farm-fresh white eggs, pack of 6.",
+    "price": 54,
+    "unit": "6 pcs",
+    "brand": null,
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p025.jpg",
+    "tags": [
+      "eggs",
+      "anda"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p026",
+    "name": "Coca-Cola",
+    "category": "beverages",
+    "description": "Classic refreshing cola.",
+    "price": 40,
+    "unit": "750 ml",
+    "brand": "Coca-Cola",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "/products/p026.jpg",
+    "tags": [
+      "cola",
+      "soft drink",
+      "cold drink"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p027",
+    "name": "Tropicana Orange Juice",
+    "category": "beverages",
+    "description": "100% orange juice with no added sugar.",
+    "price": 130,
+    "unit": "1 L",
+    "brand": "Tropicana",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p027.jpg",
+    "tags": [
+      "juice",
+      "orange"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p028",
+    "name": "Real Mixed Fruit Juice",
+    "category": "beverages",
+    "description": "A blend of fruit juices in every sip.",
+    "price": 120,
+    "unit": "1 L",
+    "brand": "Real",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p028.jpg",
+    "tags": [
+      "juice",
+      "mixed fruit"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p029",
+    "name": "Paper Boat Aam Panna",
+    "category": "beverages",
+    "description": "Tangy raw mango drink, a summer classic.",
+    "price": 30,
+    "unit": "250 ml",
+    "brand": "Paper Boat",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p029.jpg",
+    "tags": [
+      "juice",
+      "aam panna",
+      "mango"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p030",
+    "name": "Bisleri Mineral Water",
+    "category": "beverages",
+    "description": "Packaged drinking water.",
+    "price": 20,
+    "unit": "1 L",
+    "brand": "Bisleri",
+    "stock": true,
+    "availableQuantity": 60,
+    "image": "/products/p030.jpg",
+    "tags": [
+      "water",
+      "mineral water"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p031",
+    "name": "Tata Tea Gold",
+    "category": "beverages",
+    "description": "Rich, aromatic blend of long-leaf and CTC tea.",
+    "price": 285,
+    "unit": "500 g",
+    "brand": "Tata Tea",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p031.jpg",
+    "tags": [
+      "tea",
+      "chai"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p032",
+    "name": "Nescafe Classic Coffee",
+    "category": "beverages",
+    "description": "Pure instant coffee with a strong aroma.",
+    "price": 330,
+    "unit": "100 g",
+    "brand": "Nescafe",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p032.jpg",
+    "tags": [
+      "coffee",
+      "instant coffee"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p033",
+    "name": "Lay's Classic Salted Chips",
+    "category": "snacks",
+    "description": "Crispy potato chips with a pinch of salt.",
+    "price": 20,
+    "unit": "52 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 50,
+    "image": "/products/p033.jpg",
+    "tags": [
+      "chips",
+      "salted"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p034",
+    "name": "Lay's Magic Masala Chips",
+    "category": "snacks",
+    "description": "Potato chips with India's favourite masala.",
+    "price": 20,
+    "unit": "52 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 50,
+    "image": "/products/p034.jpg",
+    "tags": [
+      "chips",
+      "masala"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p035",
+    "name": "Kurkure Masala Munch",
+    "category": "snacks",
+    "description": "Crunchy corn puffs with a tangy masala.",
+    "price": 20,
+    "unit": "90 g",
+    "brand": "Kurkure",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "/products/p035.jpg",
+    "tags": [
+      "namkeen",
+      "masala"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p036",
+    "name": "Haldiram's Aloo Bhujia",
+    "category": "snacks",
+    "description": "Spicy, crispy potato and gram flour sev.",
+    "price": 110,
+    "unit": "400 g",
+    "brand": "Haldiram's",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p036.jpg",
+    "tags": [
+      "namkeen",
+      "bhujia"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p037",
+    "name": "Parle-G Biscuits",
+    "category": "snacks",
+    "description": "India's favourite glucose biscuits, family pack.",
+    "price": 90,
+    "unit": "800 g",
+    "brand": "Parle",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p037.jpg",
+    "tags": [
+      "biscuits",
+      "glucose"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p038",
+    "name": "Britannia Good Day Cashew",
+    "category": "snacks",
+    "description": "Buttery cookies loaded with cashew bits.",
+    "price": 40,
+    "unit": "200 g",
+    "brand": "Britannia",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p038.jpg",
+    "tags": [
+      "biscuits",
+      "cookies",
+      "cashew"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p039",
+    "name": "Cadbury Dairy Milk",
+    "category": "snacks",
+    "description": "Smooth and creamy milk chocolate.",
+    "price": 50,
+    "unit": "50 g",
+    "brand": "Cadbury",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "/products/p039.jpg",
+    "tags": [
+      "chocolate"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p040",
+    "name": "Kellogg's Corn Flakes",
+    "category": "breakfast",
+    "description": "Crispy golden corn flakes, fortified with iron.",
+    "price": 199,
+    "unit": "475 g",
+    "brand": "Kellogg's",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p040.jpg",
+    "tags": [
+      "cereal",
+      "corn flakes"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p041",
+    "name": "Quaker Oats",
+    "category": "breakfast",
+    "description": "100% wholegrain rolled oats.",
+    "price": 199,
+    "unit": "1 kg",
+    "brand": "Quaker",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p041.jpg",
+    "tags": [
+      "oats",
+      "cereal",
+      "healthy"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p042",
+    "name": "Britannia Brown Bread",
+    "category": "breakfast",
+    "description": "Soft brown bread made with whole wheat.",
+    "price": 55,
+    "unit": "400 g",
+    "brand": "Britannia",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p042.jpg",
+    "tags": [
+      "bread",
+      "brown bread"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p043",
+    "name": "Kissan Mixed Fruit Jam",
+    "category": "breakfast",
+    "description": "Real fruit jam made with mixed fruits.",
+    "price": 160,
+    "unit": "500 g",
+    "brand": "Kissan",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p043.jpg",
+    "tags": [
+      "jam",
+      "spread"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p044",
+    "name": "Kissan Tomato Ketchup",
+    "category": "breakfast",
+    "description": "Classic tomato ketchup made from fresh tomatoes.",
+    "price": 150,
+    "unit": "950 g",
+    "brand": "Kissan",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p044.jpg",
+    "tags": [
+      "ketchup",
+      "tomato",
+      "sauce"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p045",
+    "name": "Vim Dishwash Liquid Gel Lemon",
+    "category": "cleaning",
+    "description": "Lemon-powered gel that cuts through tough grease.",
+    "price": 55,
+    "unit": "250 ml",
+    "brand": "Vim",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p045.jpg",
+    "tags": [
+      "dishwashing liquid",
+      "dishwash",
+      "dish soap",
+      "lemon"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p046",
+    "name": "Vim Dishwash Liquid Gel Lemon",
+    "category": "cleaning",
+    "description": "Lemon-powered gel that cuts through tough grease. Value pack.",
+    "price": 165,
+    "unit": "750 ml",
+    "brand": "Vim",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p046.jpg",
+    "tags": [
+      "dishwashing liquid",
+      "dishwash",
+      "dish soap",
+      "lemon"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p047",
+    "name": "Pril Dishwashing Liquid Lime",
+    "category": "cleaning",
+    "description": "Removes grease and leaves utensils sparkling.",
+    "price": 99,
+    "unit": "425 ml",
+    "brand": "Pril",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p047.jpg",
+    "tags": [
+      "dishwashing liquid",
+      "dishwash",
+      "dish soap",
+      "lime"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p048",
+    "name": "Exo Dishwash Liquid",
+    "category": "cleaning",
+    "description": "Anti-bacterial dishwash liquid with ginger twist.",
+    "price": 120,
+    "unit": "500 ml",
+    "brand": "Exo",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p048.jpg",
+    "tags": [
+      "dishwashing liquid",
+      "dishwash",
+      "dish soap"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p049",
+    "name": "Pril Dishwashing Liquid Lime",
+    "category": "cleaning",
+    "description": "Removes grease and leaves utensils sparkling. Jumbo pack.",
+    "price": 299,
+    "unit": "1.5 L",
+    "brand": "Pril",
+    "stock": true,
+    "availableQuantity": 10,
+    "image": "/products/p049.jpg",
+    "tags": [
+      "dishwashing liquid",
+      "dishwash",
+      "dish soap",
+      "lime"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p050",
+    "name": "Lizol Floor Cleaner Citrus",
+    "category": "cleaning",
+    "description": "Kills 99.9% germs and leaves a fresh citrus fragrance.",
+    "price": 229,
+    "unit": "975 ml",
+    "brand": "Lizol",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p050.jpg",
+    "tags": [
+      "floor cleaner",
+      "disinfectant"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p051",
+    "name": "Harpic Toilet Cleaner",
+    "category": "cleaning",
+    "description": "Thick liquid toilet cleaner for tough stains.",
+    "price": 199,
+    "unit": "1 L",
+    "brand": "Harpic",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p051.jpg",
+    "tags": [
+      "toilet cleaner",
+      "bathroom"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p052",
+    "name": "Colin Glass Cleaner",
+    "category": "cleaning",
+    "description": "Streak-free shine for glass and surfaces.",
+    "price": 109,
+    "unit": "500 ml",
+    "brand": "Colin",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p052.jpg",
+    "tags": [
+      "glass cleaner",
+      "surface cleaner"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p053",
+    "name": "Scotch-Brite Scrub Pad",
+    "category": "cleaning",
+    "description": "Long-lasting scrub pads for utensils.",
+    "price": 60,
+    "unit": "3 pcs",
+    "brand": "Scotch-Brite",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p053.jpg",
+    "tags": [
+      "scrubber",
+      "scrub pad"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p054",
+    "name": "Surf Excel Matic",
+    "category": "laundry",
+    "description": "Machine-wash detergent powder for front-load washers.",
+    "price": 245,
+    "unit": "1 kg",
+    "brand": "Surf Excel",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p054.jpg",
+    "tags": [
+      "detergent",
+      "detergent powder",
+      "washing powder",
+      "front load"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p055",
+    "name": "Surf Excel Matic",
+    "category": "laundry",
+    "description": "Machine-wash detergent powder for front-load washers. Value pack.",
+    "price": 470,
+    "unit": "2 kg",
+    "brand": "Surf Excel",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p055.jpg",
+    "tags": [
+      "detergent",
+      "detergent powder",
+      "washing powder",
+      "front load"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p056",
+    "name": "Surf Excel Easy Wash",
+    "category": "laundry",
+    "description": "Removes tough stains easily in bucket washes.",
+    "price": 140,
+    "unit": "1 kg",
+    "brand": "Surf Excel",
+    "stock": true,
+    "availableQuantity": 2,
+    "image": "/products/p056.jpg",
+    "tags": [
+      "detergent",
+      "detergent powder",
+      "washing powder"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p057",
+    "name": "Ariel Matic Top Load",
+    "category": "laundry",
+    "description": "Detergent powder designed for top-load machines.",
+    "price": 260,
+    "unit": "1 kg",
+    "brand": "Ariel",
+    "stock": false,
+    "availableQuantity": 0,
+    "image": "/products/p057.jpg",
+    "tags": [
+      "detergent",
+      "detergent powder",
+      "washing powder",
+      "top load"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p058",
+    "name": "Tide Plus Double Power",
+    "category": "laundry",
+    "description": "Lemon and mint detergent powder for brilliant whiteness.",
+    "price": 125,
+    "unit": "1 kg",
+    "brand": "Tide",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p058.jpg",
+    "tags": [
+      "detergent",
+      "detergent powder",
+      "washing powder"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p059",
+    "name": "Rin Detergent Bar",
+    "category": "laundry",
+    "description": "Detergent bars for brighter whites.",
+    "price": 72,
+    "unit": "4 x 250 g",
+    "brand": "Rin",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p059.jpg",
+    "tags": [
+      "detergent",
+      "detergent bar",
+      "soap bar"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p060",
+    "name": "Comfort Fabric Conditioner",
+    "category": "laundry",
+    "description": "Keeps clothes soft and fragrant for longer.",
+    "price": 230,
+    "unit": "860 ml",
+    "brand": "Comfort",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p060.jpg",
+    "tags": [
+      "fabric conditioner",
+      "softener"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p061",
+    "name": "Dove Cream Beauty Bar",
+    "category": "personal-care",
+    "description": "Moisturising beauty bar with ¼ moisturising cream.",
+    "price": 165,
+    "unit": "3 x 100 g",
+    "brand": "Dove",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p061.jpg",
+    "tags": [
+      "soap",
+      "bath",
+      "body"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p062",
+    "name": "Colgate Strong Teeth Toothpaste",
+    "category": "personal-care",
+    "description": "Calcium-boost toothpaste for strong teeth.",
+    "price": 110,
+    "unit": "200 g",
+    "brand": "Colgate",
+    "stock": true,
+    "availableQuantity": 30,
+    "image": "/products/p062.jpg",
+    "tags": [
+      "toothpaste",
+      "oral care"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p063",
+    "name": "Head & Shoulders Anti-Dandruff Shampoo",
+    "category": "personal-care",
+    "description": "Clinically proven anti-dandruff shampoo.",
+    "price": 360,
+    "unit": "340 ml",
+    "brand": "Head & Shoulders",
+    "stock": true,
+    "availableQuantity": 15,
+    "image": "/products/p063.jpg",
+    "tags": [
+      "shampoo",
+      "hair care",
+      "anti-dandruff"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p064",
+    "name": "Dettol Original Handwash",
+    "category": "personal-care",
+    "description": "Germ-protection liquid handwash.",
+    "price": 99,
+    "unit": "200 ml",
+    "brand": "Dettol",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p064.jpg",
+    "tags": [
+      "handwash",
+      "hygiene"
+    ],
+    "featured": true
+  },
+  {
+    "id": "p065",
+    "name": "Nivea Soft Light Moisturising Cream",
+    "category": "personal-care",
+    "description": "Light, non-greasy cream for face, hands and body.",
+    "price": 175,
+    "unit": "100 ml",
+    "brand": "Nivea",
+    "stock": true,
+    "availableQuantity": 20,
+    "image": "/products/p065.jpg",
+    "tags": [
+      "cream",
+      "moisturiser",
+      "skin care"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p066",
+    "name": "Gillette Mach3 Razor",
+    "category": "personal-care",
+    "description": "3-blade razor for a close, comfortable shave.",
+    "price": 249,
+    "unit": "1 pc",
+    "brand": "Gillette",
+    "stock": true,
+    "availableQuantity": 10,
+    "image": "/products/p066.jpg",
+    "tags": [
+      "razor",
+      "shaving"
+    ],
+    "featured": false
+  },
+  {
+    "id": "p067",
+    "name": "Parachute Coconut Oil",
+    "category": "personal-care",
+    "description": "100% pure coconut oil.",
+    "price": 115,
+    "unit": "250 ml",
+    "brand": "Parachute",
+    "stock": true,
+    "availableQuantity": 25,
+    "image": "/products/p067.jpg",
+    "tags": [
+      "coconut oil",
+      "hair oil",
+      "hair care"
+    ],
+    "featured": false
+  }
+]

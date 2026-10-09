@@ -1,0 +1,42 @@
+[
+  {
+    "id": "offer001",
+    "title": "10% OFF",
+    "description": "10% off on vegetables when vegetables in your cart total ₹300 or more.",
+    "category": "vegetables",
+    "minimumAmount": 300,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "offer002",
+    "title": "15% OFF Laundry",
+    "description": "15% off on laundry products when laundry items in your cart total ₹500 or more.",
+    "category": "laundry",
+    "minimumAmount": 500,
+    "discountType": "percentage",
+    "discountValue": 15,
+    "active": true
+  },
+  {
+    "id": "offer003",
+    "title": "₹50 OFF",
+    "description": "Flat ₹50 off on orders of ₹999 or more.",
+    "category": null,
+    "minimumAmount": 999,
+    "discountType": "flat",
+    "discountValue": 50,
+    "active": true
+  },
+  {
+    "id": "offer004",
+    "title": "20% OFF Fruits",
+    "description": "Expired seasonal offer on fruits.",
+    "category": "fruits",
+    "minimumAmount": 200,
+    "discountType": "percentage",
+    "discountValue": 20,
+    "active": false
+  }
+]

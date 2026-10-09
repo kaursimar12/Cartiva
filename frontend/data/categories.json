@@ -1,0 +1,56 @@
+[
+  {
+    "id": "vegetables",
+    "name": "Vegetables",
+    "description": "Fresh vegetables sourced daily.",
+    "image": "/categories/vegetables.jpg"
+  },
+  {
+    "id": "fruits",
+    "name": "Fruits",
+    "description": "Seasonal and everyday fresh fruits.",
+    "image": "/categories/fruits.jpg"
+  },
+  {
+    "id": "dairy",
+    "name": "Dairy",
+    "description": "Milk, curd, butter, paneer, cheese and eggs.",
+    "image": "/categories/dairy.jpg"
+  },
+  {
+    "id": "beverages",
+    "name": "Beverages",
+    "description": "Juices, soft drinks, tea, coffee and water.",
+    "image": "/categories/beverages.jpg"
+  },
+  {
+    "id": "snacks",
+    "name": "Snacks",
+    "description": "Chips, namkeen, biscuits and chocolates.",
+    "image": "/categories/snacks.jpg"
+  },
+  {
+    "id": "breakfast",
+    "name": "Breakfast",
+    "description": "Cereals, oats, bread and spreads.",
+    "image": "/categories/breakfast.jpg"
+  },
+  {
+    "id": "cleaning",
+    "name": "Cleaning",
+    "description": "Dishwash, floor, toilet and glass cleaners.",
+    "image": "/categories/cleaning.jpg"
+  },
+  {
+    "id": "laundry",
+    "name": "Laundry",
+    "description": "Detergents, bars and fabric conditioners.",
+    "image": "/categories/laundry.jpg"
+  },
+  {
+    "id": "personal-care",
+    "name": "Personal Care",
+    "description": "Soaps, oral care, hair care and skin care.",
+    "image": "/categories/personal-care.jpg"
+  }
+]
