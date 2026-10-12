@@ -9,6 +9,8 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
   const methods: Record<string, RpcMethod> = {
     "cart.get": () => voiceController.getCart(),
     "catalog.search": (payload) => voiceController.searchProducts(payload, ui),
+    "cart.add": (payload) => voiceController.addToCart(payload),
+
   };
 
   for (const [name, method] of Object.entries(methods)) {

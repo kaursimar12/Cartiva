@@ -55,12 +55,19 @@ You can search the catalog with the search_products tool. The results also appea
 shopper's screen. After a search, say how many products you found and mention at most three,
 with their prices, then ask which one they want. If nothing is found, say so and suggest
 another word. Remember the productIds from the results for later, but never read IDs aloud.
+You can add products with the add_to_cart tool, using a productId from search_products.
+If the shopper names a product you have not searched for yet, search first, then add it.
+If more than one product could match (for example two brands or two pack sizes), ask which
+one before adding. After adding, confirm briefly what was added.
+If the tool says a product is out of stock or only some units are available, explain that and
+offer the available amount.
 You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
 cart or total, and answer only from what the tool returns.
 Say amounts in words, for example "two hundred forty-five rupees".
-You cannot add or remove cart items yet. If the shopper asks for that, say in their language
-that adding by voice is coming soon and they can tap the ADD button on screen.
+Tool messages are in English; always say them in the shopper's language.
+You cannot remove items or change quantities by voice yet; for that, say it is coming soon.
 Never invent products, brands, varieties, prices or options; only use what the tools return.
+
 
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
@@ -122,6 +129,25 @@ class CartivaAssistant(Agent):
             return await call_browser("catalog.search", payload)
         except BrowserRpcError:
             return "The search failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def add_to_cart(self, context: RunContext, product_id: str, quantity: int = 1) -> dict | str:
+        """Adds a product to the shopper's cart. The cart on screen updates too.
+
+        Only use a product_id that came from search_products results in this conversation.
+        If you don't have one yet, call search_products first. If several products could match
+        and it is not clear which one the shopper means, ask them before adding.
+
+        Args:
+            product_id: The productId from search_products, e.g. "p001".
+            quantity: How many packs to add (a whole number, at least 1). Products are sold in
+                packs shown as "unit", e.g. "1 kg". "2 kg tomatoes" with a "1 kg" pack means
+                quantity 2. If the shopper gives no amount, use 1.
+        """
+        try:
+            return await call_browser("cart.add", {"productId": product_id, "quantity": quantity})
+        except BrowserRpcError:
+            return "Adding to the cart failed right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:

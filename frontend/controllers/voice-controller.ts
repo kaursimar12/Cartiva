@@ -2,6 +2,7 @@ import { catalogService } from "@/lib/container";
 import { cartService } from "@/lib/client-container";
 import { formatPrice } from "@/lib/format";
 import { rupeesToPaise } from "@/models/entities/money";
+import { cartController } from "@/controllers/cart-controller";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
@@ -78,4 +79,18 @@ export const voiceController = {
       })),
     };
   },
+    /** Adds a product to the cart, exactly like pressing its ADD button (same rules, same toast). */
+  addToCart(input: { productId?: unknown; quantity?: unknown }) {
+    const productId = typeof input.productId === "string" ? input.productId : "";
+    const quantity = input.quantity ?? 1;
+    if (typeof quantity !== "number") {
+      return { ok: false, error: { code: "INVALID_QUANTITY", message: "Quantity must be a whole number above zero." } };
+    }
+
+    const result = cartController.add(productId, quantity);
+    return result.ok
+      ? { ok: true, message: result.message, quantityInCart: result.data.quantity }
+      : { ok: false, error: result.error };
+  },
+
 };
