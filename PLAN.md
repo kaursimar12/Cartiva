@@ -88,7 +88,7 @@ Pricing exists in TypeScript (for the UI) and Python (for payment). To prevent d
 
 ## API Routing
 
-Use a Next.js rewrite so the browser calls same-origin `/api/livekit/*` and `/api/payment/*`, proxied to FastAPI (`BACKEND_URL`). This avoids CORS in development. Also configure FastAPI `CORSMiddleware` with an explicit allowlist as a fallback. (Verify the rewrite API against `frontend/node_modules/next/dist/docs/` before implementing — this Next.js version has breaking changes.)
+The browser calls FastAPI directly at `NEXT_PUBLIC_BACKEND_URL` (e.g. `http://127.0.0.1:8000/api/livekit/token`). FastAPI's `CORSMiddleware` allows only the origins listed in `CORS_ORIGINS` (`http://localhost:3000` in development; the deployed frontend URL in production). No Next.js rewrite/proxy.
 
 ## Shared Error Codes
 
@@ -515,8 +515,8 @@ Only begin this phase after the manual application works.
 - [ ] CORS allowlist.
 - [ ] pytest + ruff.
 - [ ] `backend/.env.example`: `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, STT/LLM/TTS provider keys, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `CORS_ORIGINS`, `DATA_DIR` — placeholders only.
-- [ ] Frontend `.env.example`: `BACKEND_URL`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`.
-- [ ] Add Next.js rewrite for `/api/livekit/*` and `/api/payment/*` → FastAPI.
+- [ ] Frontend `.env.example`: `NEXT_PUBLIC_BACKEND_URL`, `NEXT_PUBLIC_RAZORPAY_KEY_ID`.
+- [ ] FastAPI `CORSMiddleware` allowing `CORS_ORIGINS`; frontend calls `NEXT_PUBLIC_BACKEND_URL` directly.
 - [ ] README: how to run all three processes (`npm run dev` in `frontend/`; `uv run fastapi dev app/main.py` and `uv run python -m agent.worker dev` in `backend/`).
 - [ ] `DATA_DIR` defaults to `../frontend/data` so FastAPI reads the same JSON files.
 
@@ -1114,7 +1114,7 @@ Make the voice interaction visually obvious:
 - [ ] Frontend production build succeeds.
 - [ ] FastAPI starts with production settings (`fastapi run`, no reload).
 - [ ] Environment variables configured for all three services.
-- [ ] CORS allowlist and `BACKEND_URL` set to production URLs.
+- [ ] `CORS_ORIGINS` (backend) and `NEXT_PUBLIC_BACKEND_URL` (frontend) set to production URLs.
 - [ ] `frontend/data/*.json` available to the FastAPI deployment (copied into the image or `DATA_DIR` set).
 - [ ] No secrets in repository.
 - [ ] Payment test mode verified.
