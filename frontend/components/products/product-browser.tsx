@@ -27,7 +27,7 @@ const sortOptions: { id: ProductSort; label: string }[] = [
 ];
 
 const selectClass =
-  "rounded-lg border border-zinc-300 bg-surface px-3 py-2 text-sm focus:border-brand-500 focus:outline-none";
+  "rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800 hover:border-zinc-300 focus:border-brand-500 focus:outline-none";
 
 /** Filterable, sortable product listing (SRS FR-05). Filtering rules live in CatalogService. */
 export function ProductBrowser({ products }: { products: Product[] }) {
@@ -62,7 +62,7 @@ export function ProductBrowser({ products }: { products: Product[] }) {
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-300 bg-surface p-3">
+      <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-200 bg-surface p-3 shadow-sm">
         <label className="sr-only" htmlFor="filter-price">
           Price range
         </label>
@@ -90,7 +90,7 @@ export function ProductBrowser({ products }: { products: Product[] }) {
           </>
         )}
 
-        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-300 px-3 py-2 text-sm">
+        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800">
           <input
             type="checkbox"
             checked={inStockOnly}

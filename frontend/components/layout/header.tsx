@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { BoltIcon } from "@/components/common/icons";
 import { VoiceButton } from "@/components/voice/voice-button";
+import { pricingService } from "@/lib/container";
+import { formatPrice } from "@/lib/format";
 import type { Category } from "@/models/entities/product";
 import { CartLink } from "./cart-link";
 import { CategoryNav } from "./category-nav";
@@ -7,16 +10,25 @@ import { SearchForm } from "./search-form";
 
 export function Header({ categories }: { categories: Category[] }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-900 text-zinc-100">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur">
+      <div className="mx-auto flex max-w-[1920px] items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 lg:px-10">
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Cartiva home">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-700 text-lg" aria-hidden>
-            🛍
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-lg font-black text-white" aria-hidden>
+            c
           </span>
-          <span className="text-xl font-extrabold tracking-tight text-white">Cartiva</span>
+          <span className="text-[22px] font-extrabold tracking-tight text-zinc-900">cartiva</span>
         </Link>
+
+        <div className="hidden shrink-0 border-l border-zinc-200 pl-6 lg:block">
+          <p className="flex items-center gap-1 text-sm font-semibold text-zinc-900">
+            <BoltIcon className="h-4 w-4 text-zinc-500" />
+            Groceries in minutes
+          </p>
+          <p className="text-xs text-zinc-500">Free delivery above {formatPrice(pricingService.delivery.freeAbove)}</p>
+        </div>
+
         <SearchForm id="site-search" className="hidden flex-1 md:block" />
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <VoiceButton />
           <CartLink />
         </div>

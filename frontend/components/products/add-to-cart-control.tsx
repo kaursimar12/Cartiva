@@ -11,8 +11,8 @@ export function AddToCartControl({ product }: { product: Product }) {
 
   if (!product.stock) {
     return (
-      <span className="flex h-8 items-center rounded-lg border border-zinc-300 px-3 text-xs font-medium text-zinc-500">
-        Out of stock
+      <span className="flex h-8 items-center rounded-lg bg-zinc-100 px-2.5 text-[11px] font-semibold text-zinc-500">
+        Sold out
       </span>
     );
   }
@@ -22,7 +22,7 @@ export function AddToCartControl({ product }: { product: Product }) {
       <button
         type="button"
         onClick={() => cartController.add(product.id)}
-        className="h-8 rounded-lg border border-brand-600 bg-brand-50 px-4 text-sm font-semibold text-brand-700 hover:bg-brand-100"
+        className="h-8 min-w-[4.25rem] rounded-lg border border-brand-600 bg-white px-4 text-xs font-bold tracking-wide text-brand-700 uppercase transition hover:bg-brand-600 hover:text-white"
         aria-label={`Add ${product.name} ${product.unit} to cart`}
       >
         Add

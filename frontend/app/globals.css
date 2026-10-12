@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #dcdcdf;
-  --foreground: #09090b;
+  --background: #f7f7f8;
+  --foreground: #18181b;
 }
 
 @theme inline {
@@ -12,22 +12,22 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Grey surfaces (no pure white): cards sit on the grey page canvas. */
+/* Cards are white on a soft neutral page canvas. */
 @theme {
-  --color-surface: #ececee;
-  --color-surface-muted: #e0e0e3;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4f4f5;
 }
 
-/* Monochrome brand scale: primary actions are near-black. */
+/* Restrained green, used only for primary actions and savings. */
 @theme {
-  --color-brand-50: #e0e0e3;
-  --color-brand-100: #d4d4d8;
-  --color-brand-200: #d4d4d8;
-  --color-brand-500: #52525b;
-  --color-brand-600: #18181b;
-  --color-brand-700: #09090b;
-  --color-brand-800: #000000;
-  --color-brand-900: #000000;
+  --color-brand-50: #ecf8ef;
+  --color-brand-100: #d3f0da;
+  --color-brand-200: #a8e0b6;
+  --color-brand-500: #1a9c3a;
+  --color-brand-600: #0c831f;
+  --color-brand-700: #0a6e1a;
+  --color-brand-800: #085a15;
+  --color-brand-900: #064210;
 }
 
 body {

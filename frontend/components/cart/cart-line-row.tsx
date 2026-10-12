@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { TrashIcon } from "@/components/common/icons";
 import { ProductImage } from "@/components/products/product-image";
 import { QuantityStepper } from "@/components/products/quantity-stepper";
 import { cartController } from "@/controllers/cart-controller";
@@ -45,7 +46,7 @@ export function CartLineRow({ line }: { line: CartLine }) {
             className="rounded-lg p-2 text-zinc-400 hover:bg-red-50 hover:text-red-600"
             aria-label={`Remove ${product.name} from cart`}
           >
-            🗑
+            <TrashIcon className="h-[18px] w-[18px]" />
           </button>
         </div>
       </div>

@@ -26,7 +26,7 @@ export function OrderSuccessView() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="rounded-2xl border border-zinc-300 bg-surface p-6 text-center sm:p-8">
+      <div className="rounded-2xl border border-zinc-200 bg-surface shadow-sm p-6 text-center sm:p-8">
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-3xl text-brand-700" aria-hidden>
           ✓
         </span>
@@ -42,11 +42,11 @@ export function OrderSuccessView() {
         </dl>
       </div>
 
-      <section aria-labelledby="order-items" className="mt-4 rounded-2xl border border-zinc-300 bg-surface p-6">
+      <section aria-labelledby="order-items" className="mt-4 rounded-2xl border border-zinc-200 bg-surface shadow-sm p-6">
         <h2 id="order-items" className="font-semibold">
           Items
         </h2>
-        <ul className="mt-3 divide-y divide-zinc-300 text-sm">
+        <ul className="mt-3 divide-y divide-zinc-100 text-sm">
           {order.lines.map((line) => (
             <li key={line.productId} className="flex justify-between gap-4 py-2.5">
               <span>
@@ -56,7 +56,7 @@ export function OrderSuccessView() {
             </li>
           ))}
         </ul>
-        <dl className="mt-3 space-y-1.5 border-t border-zinc-300 pt-3 text-sm">
+        <dl className="mt-3 space-y-1.5 border-t border-zinc-200 pt-3 text-sm">
           <div className="flex justify-between">
             <dt className="text-zinc-600">Subtotal</dt>
             <dd>{formatPrice(pricing.subtotal)}</dd>

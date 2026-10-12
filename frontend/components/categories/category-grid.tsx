@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { categoryEmoji, imageSurface } from "@/components/products/visuals";
 import type { Category } from "@/models/entities/product";
 
 export function CategoryGrid({ categories }: { categories: Category[] }) {
@@ -7,14 +7,17 @@ export function CategoryGrid({ categories }: { categories: Category[] }) {
     <ul className="grid grid-cols-3 gap-3 sm:grid-cols-5 lg:grid-cols-9">
       {categories.map((category) => (
         <li key={category.id}>
-          <Link
-            href={`/category/${category.id}`}
-            className="flex h-full flex-col items-center gap-2 rounded-2xl border border-zinc-300 bg-surface p-3 text-center transition-shadow hover:border-zinc-400 hover:shadow-md"
-          >
-            <span className={`flex h-14 w-14 items-center justify-center rounded-xl text-3xl ${imageSurface}`} aria-hidden>
-              {categoryEmoji[category.id]}
+          <Link href={`/category/${category.id}`} className="group flex h-full flex-col items-center gap-2 text-center">
+            <span className="relative aspect-square w-full overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 transition group-hover:shadow-md">
+              <Image
+                src={category.image}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 130px, (min-width: 640px) 18vw, 30vw"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+              />
             </span>
-            <span className="text-xs font-semibold sm:text-sm">{category.name}</span>
+            <span className="text-xs leading-tight font-semibold text-zinc-800 sm:text-sm">{category.name}</span>
           </Link>
         </li>
       ))}

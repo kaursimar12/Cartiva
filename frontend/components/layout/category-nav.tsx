@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { categoryEmoji } from "@/components/products/visuals";
 import type { Category } from "@/models/entities/product";
 
 export function CategoryNav({ categories }: { categories: Category[] }) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Categories" className="border-t border-zinc-800">
-      <ul className="scrollbar-none mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6">
+    <nav aria-label="Categories" className="border-t border-zinc-100">
+      <ul className="scrollbar-none mx-auto flex max-w-[1920px] gap-1 overflow-x-auto px-4 sm:gap-2 sm:px-6 lg:px-10">
         {categories.map((category) => {
           const href = `/category/${category.id}`;
           const active = pathname === href;
@@ -19,11 +18,12 @@ export function CategoryNav({ categories }: { categories: Category[] }) {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm whitespace-nowrap ${
-                  active ? "bg-zinc-200 font-semibold text-zinc-900" : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                className={`flex items-center border-b-2 px-2.5 py-2.5 text-sm whitespace-nowrap transition-colors ${
+                  active
+                    ? "border-zinc-900 font-semibold text-zinc-900"
+                    : "border-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900"
                 }`}
               >
-                <span aria-hidden>{categoryEmoji[category.id]}</span>
                 {category.name}
               </Link>
             </li>

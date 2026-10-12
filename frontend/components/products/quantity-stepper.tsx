@@ -15,13 +15,17 @@ export function QuantityStepper({
   canIncrease = true,
   size = "sm",
 }: QuantityStepperProps) {
-  const button = size === "sm" ? "h-8 w-8" : "h-10 w-10 text-lg";
+  const button = size === "sm" ? "h-8 w-7" : "h-11 w-11 text-lg";
   return (
-    <div className="flex items-center rounded-lg bg-brand-600 text-white" role="group" aria-label={`Quantity of ${label}`}>
+    <div
+      className="flex items-center rounded-lg bg-brand-600 text-white shadow-sm"
+      role="group"
+      aria-label={`Quantity of ${label}`}
+    >
       <button type="button" onClick={onDecrease} className={`${button} rounded-l-lg font-bold hover:bg-brand-700`} aria-label={`Decrease ${label}`}>
         −
       </button>
-      <span className="min-w-8 text-center text-sm font-semibold" aria-live="polite">
+      <span className={`${size === "sm" ? "min-w-6" : "min-w-10"} text-center text-sm font-bold`} aria-live="polite">
         {quantity}
       </span>
       <button

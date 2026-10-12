@@ -3,54 +3,54 @@
     "id": "vegetables",
     "name": "Vegetables",
     "description": "Fresh vegetables sourced daily.",
-    "image": "/categories/vegetables.jpg"
+    "image": "https://images.unsplash.com/photo-1597362925123-77861d3fbac7"
   },
   {
     "id": "fruits",
     "name": "Fruits",
     "description": "Seasonal and everyday fresh fruits.",
-    "image": "/categories/fruits.jpg"
+    "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b"
   },
   {
     "id": "dairy",
     "name": "Dairy",
     "description": "Milk, curd, butter, paneer, cheese and eggs.",
-    "image": "/categories/dairy.jpg"
+    "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150"
   },
   {
     "id": "beverages",
     "name": "Beverages",
     "description": "Juices, soft drinks, tea, coffee and water.",
-    "image": "/categories/beverages.jpg"
+    "image": "https://images.unsplash.com/photo-1497534446932-c925b458314e"
   },
   {
     "id": "snacks",
     "name": "Snacks",
     "description": "Chips, namkeen, biscuits and chocolates.",
-    "image": "/categories/snacks.jpg"
+    "image": "https://images.unsplash.com/photo-1621939514649-280e2ee25f60"
   },
   {
     "id": "breakfast",
     "name": "Breakfast",
     "description": "Cereals, oats, bread and spreads.",
-    "image": "/categories/breakfast.jpg"
+    "image": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0"
   },
   {
     "id": "cleaning",
     "name": "Cleaning",
     "description": "Dishwash, floor, toilet and glass cleaners.",
-    "image": "/categories/cleaning.jpg"
+    "image": "https://images.unsplash.com/photo-1759846866217-e627e4478f82"
   },
   {
     "id": "laundry",
     "name": "Laundry",
     "description": "Detergents, bars and fabric conditioners.",
-    "image": "/categories/laundry.jpg"
+    "image": "https://images.unsplash.com/photo-1582735689369-4fe89db7114c"
   },
   {
     "id": "personal-care",
     "name": "Personal Care",
     "description": "Soaps, oral care, hair care and skin care.",
-    "image": "/categories/personal-care.jpg"
+    "image": "https://images.unsplash.com/photo-1649073005971-37babef31983"
   }
 ]

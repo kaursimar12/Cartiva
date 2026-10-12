@@ -28,8 +28,8 @@ export function CartView() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-      <section aria-labelledby="cart-items" className="rounded-2xl border border-zinc-300 bg-surface px-4 sm:px-6">
-        <div className="flex items-center justify-between border-b border-zinc-300 py-4">
+      <section aria-labelledby="cart-items" className="rounded-2xl border border-zinc-200 bg-surface shadow-sm px-4 sm:px-6">
+        <div className="flex items-center justify-between border-b border-zinc-200 py-4">
           <h2 id="cart-items" className="font-semibold">
             Items ({pricing.itemCount})
           </h2>
@@ -56,7 +56,7 @@ export function CartView() {
             </button>
           )}
         </div>
-        <ul className="divide-y divide-zinc-300">
+        <ul className="divide-y divide-zinc-100">
           {lines.map((line) => (
             <CartLineRow key={line.product.id} line={line} />
           ))}
@@ -65,7 +65,7 @@ export function CartView() {
 
       <aside className="space-y-4 lg:sticky lg:top-36 lg:self-start">
         <CartHints hints={offerHints} freeDeliveryRemaining={freeDeliveryRemaining} />
-        <section aria-labelledby="bill-details" className="rounded-2xl border border-zinc-300 bg-surface p-5">
+        <section aria-labelledby="bill-details" className="rounded-2xl border border-zinc-200 bg-surface shadow-sm p-5">
           <h2 id="bill-details" className="mb-4 font-semibold">
             Bill details
           </h2>

@@ -50,11 +50,11 @@ export function CheckoutView() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
-      <section aria-labelledby="order-summary" className="rounded-2xl border border-zinc-300 bg-surface p-5 sm:p-6">
+      <section aria-labelledby="order-summary" className="rounded-2xl border border-zinc-200 bg-surface shadow-sm p-5 sm:p-6">
         <h2 id="order-summary" className="font-semibold">
           Order summary
         </h2>
-        <ul className="mt-4 divide-y divide-zinc-300 text-sm">
+        <ul className="mt-4 divide-y divide-zinc-100 text-sm">
           {lines.map(({ product, quantity, lineTotal }) => (
             <li key={product.id} className="flex justify-between gap-4 py-3">
               <span>
@@ -70,7 +70,7 @@ export function CheckoutView() {
       </section>
 
       <aside className="space-y-4 lg:sticky lg:top-36 lg:self-start">
-        <section aria-labelledby="payment" className="rounded-2xl border border-zinc-300 bg-surface p-5">
+        <section aria-labelledby="payment" className="rounded-2xl border border-zinc-200 bg-surface shadow-sm p-5">
           <h2 id="payment" className="mb-4 font-semibold">
             Payment
           </h2>
@@ -112,7 +112,7 @@ export function CheckoutView() {
                 <button
                   type="button"
                   onClick={() => setStep({ name: "review" })}
-                  className="rounded-lg border border-zinc-300 bg-surface px-4 py-2.5 text-sm font-semibold hover:bg-surface-muted"
+                  className="rounded-lg border border-zinc-200 bg-surface shadow-sm px-4 py-2.5 text-sm font-semibold hover:bg-surface-muted"
                 >
                   Cancel
                 </button>
@@ -139,7 +139,7 @@ export function CheckoutView() {
                 >
                   Retry payment
                 </button>
-                <Link href="/cart" className="rounded-lg border border-zinc-300 bg-surface px-4 py-2.5 text-sm font-semibold hover:bg-surface-muted">
+                <Link href="/cart" className="rounded-lg border border-zinc-200 bg-surface shadow-sm px-4 py-2.5 text-sm font-semibold hover:bg-surface-muted">
                   Back to cart
                 </Link>
               </div>
@@ -147,7 +147,7 @@ export function CheckoutView() {
           )}
         </section>
 
-        <section className="rounded-2xl border border-dashed border-zinc-300 bg-surface-muted p-4 text-sm text-zinc-700">
+        <section className="rounded-2xl border border-dashed border-zinc-200 bg-surface shadow-sm-muted p-4 text-sm text-zinc-700">
           <p className="font-semibold">Test mode</p>
           <p className="mt-1">Mock payment — no real money is charged. Razorpay is connected in a later phase.</p>
           <label className="mt-3 flex cursor-pointer items-center gap-2">

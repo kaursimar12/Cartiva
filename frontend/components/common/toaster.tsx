@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckIcon, CloseIcon } from "./icons";
 import { dismissToast, useToastStore } from "@/store/toast-store";
 
 const toneStyles = {
@@ -22,8 +23,9 @@ export function Toaster() {
           role={toast.tone === "error" ? "alert" : "status"}
           className={`pointer-events-auto flex w-full max-w-sm items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm shadow-lg ${toneStyles[toast.tone]}`}
         >
-          <span>
-            {toast.tone === "success" ? "✓ " : toast.tone === "error" ? "⚠ " : ""}
+          <span className="flex items-center gap-2">
+            {toast.tone === "success" && <CheckIcon className="h-4 w-4 shrink-0" />}
+            {toast.tone === "error" ? "⚠ " : ""}
             {toast.message}
           </span>
           <button
@@ -32,7 +34,7 @@ export function Toaster() {
             className="shrink-0 rounded px-1 text-white/80 hover:text-white"
             aria-label="Dismiss notification"
           >
-            ✕
+            <CloseIcon className="h-4 w-4" />
           </button>
         </div>
       ))}

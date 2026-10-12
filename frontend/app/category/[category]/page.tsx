@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductBrowser } from "@/components/products/product-browser";
-import { categoryEmoji, imageSurface } from "@/components/products/visuals";
 import { catalogService } from "@/lib/container";
 
 export function generateStaticParams() {
@@ -23,19 +23,19 @@ export default async function CategoryPage(props: PageProps<"/category/[category
 
   return (
     <div>
-      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-zinc-500">
+      <nav aria-label="Breadcrumb" className="mb-4 text-xs text-zinc-500 sm:text-sm">
         <Link href="/" className="hover:text-brand-700">
           Home
         </Link>{" "}
         / <span className="text-zinc-800">{category.name}</span>
       </nav>
       <header className="mb-6 flex items-center gap-4">
-        <span className={`flex h-14 w-14 items-center justify-center rounded-2xl text-3xl ${imageSurface}`} aria-hidden>
-          {categoryEmoji[category.id]}
+        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 sm:h-20 sm:w-20">
+          <Image src={category.image} alt="" fill sizes="80px" className="object-cover" priority />
         </span>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{category.name}</h1>
-          <p className="text-sm text-zinc-600">{category.description}</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">{category.name}</h1>
+          <p className="mt-0.5 text-sm text-zinc-600">{category.description}</p>
         </div>
       </header>
       <ProductBrowser products={products} />

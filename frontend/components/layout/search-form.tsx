@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
+import { SearchIcon } from "@/components/common/icons";
 
 /** `id` must be unique per page: the header renders one form for desktop and one for mobile. */
 export function SearchForm({ id, className = "" }: { id: string; className?: string }) {
@@ -18,8 +19,8 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
       <label htmlFor={id} className="sr-only">
         Search products
       </label>
-      <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-zinc-400" aria-hidden>
-        🔍
+      <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-zinc-500" aria-hidden>
+        <SearchIcon className="h-[18px] w-[18px]" />
       </span>
       <input
         id={id}
@@ -27,7 +28,7 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
         type="search"
         placeholder='Search "tomato", "milk", "Surf Excel"…'
         autoComplete="off"
-        className="w-full rounded-xl border border-zinc-700 bg-zinc-800 py-2.5 pl-10 pr-4 text-sm text-zinc-100 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-zinc-400 focus:bg-white focus:ring-2 focus:ring-zinc-100 focus:outline-none"
       />
     </form>
   );

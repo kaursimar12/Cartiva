@@ -9,7 +9,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 50,
-    "image": "/products/p001.jpg",
+    "image": "https://images.unsplash.com/photo-1582284540020-8acbe03f4924",
     "tags": [
       "tomato",
       "tamatar",
@@ -27,7 +27,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p002.jpg",
+    "image": "https://images.unsplash.com/photo-1524593166156-312f362cada0",
     "tags": [
       "tomato",
       "cherry tomato",
@@ -45,7 +45,7 @@
     "brand": "Del Monte",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p003.jpg",
+    "image": "https://images.unsplash.com/photo-1472476443507-c7a5948772fc",
     "tags": [
       "tomato",
       "puree",
@@ -63,7 +63,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 60,
-    "image": "/products/p004.jpg",
+    "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655",
     "tags": [
       "potato",
       "aloo",
@@ -81,7 +81,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 60,
-    "image": "/products/p005.jpg",
+    "image": "https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31",
     "tags": [
       "onion",
       "pyaz",
@@ -99,7 +99,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p006.jpg",
+    "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5da37",
     "tags": [
       "carrot",
       "gajar",
@@ -117,7 +117,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p007.jpg",
+    "image": "https://images.unsplash.com/photo-1574316071802-0d684efa7bf5",
     "tags": [
       "spinach",
       "palak",
@@ -135,7 +135,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 12,
-    "image": "/products/p008.jpg",
+    "image": "https://images.unsplash.com/photo-1510627498534-cf7e9002facc",
     "tags": [
       "cauliflower",
       "gobi",
@@ -153,7 +153,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 18,
-    "image": "/products/p009.jpg",
+    "image": "https://images.unsplash.com/photo-1611746985643-358d75ed70fe",
     "tags": [
       "capsicum",
       "shimla mirch",
@@ -171,7 +171,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p010.jpg",
+    "image": "https://images.unsplash.com/photo-1449300079323-02e209d9d3a6",
     "tags": [
       "cucumber",
       "kheera",
@@ -189,7 +189,7 @@
     "brand": null,
     "stock": false,
     "availableQuantity": 0,
-    "image": "/products/p011.jpg",
+    "image": "https://images.unsplash.com/photo-1776089770931-e422e57f760c",
     "tags": [
       "coriander",
       "dhaniya",
@@ -207,7 +207,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p012.jpg",
+    "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e",
     "tags": [
       "banana",
       "kela"
@@ -224,7 +224,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p013.jpg",
+    "image": "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6",
     "tags": [
       "apple",
       "seb"
@@ -241,7 +241,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p014.jpg",
+    "image": "https://images.unsplash.com/photo-1547514701-42782101795e",
     "tags": [
       "orange",
       "santra",
@@ -259,7 +259,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 2,
-    "image": "/products/p015.jpg",
+    "image": "https://images.unsplash.com/photo-1553279768-865429fa0078",
     "tags": [
       "mango",
       "aam",
@@ -278,7 +278,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p016.jpg",
+    "image": "https://images.unsplash.com/photo-1725195398648-f3454b552b20",
     "tags": [
       "grapes",
       "angoor"
@@ -295,7 +295,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 10,
-    "image": "/products/p017.jpg",
+    "image": "https://images.unsplash.com/photo-1615485925600-97237c4fc1ec",
     "tags": [
       "pomegranate",
       "anar"
@@ -312,7 +312,7 @@
     "brand": null,
     "stock": false,
     "availableQuantity": 0,
-    "image": "/products/p018.jpg",
+    "image": "https://images.unsplash.com/photo-1517282009859-f000ec3b26fe",
     "tags": [
       "papaya",
       "papita"
@@ -329,7 +329,7 @@
     "brand": "Amul",
     "stock": true,
     "availableQuantity": 40,
-    "image": "/products/p019.jpg",
+    "image": "https://images.unsplash.com/photo-1601436423474-51738541c1b1",
     "tags": [
       "milk",
       "toned milk",
@@ -347,7 +347,7 @@
     "brand": "Amul",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p020.jpg",
+    "image": "https://images.unsplash.com/photo-1601436423474-51738541c1b1",
     "tags": [
       "milk",
       "full cream",
@@ -365,7 +365,7 @@
     "brand": "Amul",
     "stock": true,
     "availableQuantity": 35,
-    "image": "/products/p021.jpg",
+    "image": "https://images.unsplash.com/photo-1603596310923-dbb12732f9c7",
     "tags": [
       "butter",
       "makhan"
@@ -382,7 +382,7 @@
     "brand": "Amul",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p022.jpg",
+    "image": "https://images.unsplash.com/photo-1571212515416-fef01fc43637",
     "tags": [
       "curd",
       "dahi",
@@ -400,7 +400,7 @@
     "brand": "Mother Dairy",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p023.jpg",
+    "image": "https://images.unsplash.com/photo-1722635940350-d1b2e5129379",
     "tags": [
       "paneer",
       "cottage cheese"
@@ -417,7 +417,7 @@
     "brand": "Amul",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p024.jpg",
+    "image": "https://images.unsplash.com/photo-1635407723462-10c0871194a1",
     "tags": [
       "cheese",
       "slices"
@@ -434,7 +434,7 @@
     "brand": null,
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p025.jpg",
+    "image": "https://images.unsplash.com/photo-1506976785307-8732e854ad03",
     "tags": [
       "eggs",
       "anda"
@@ -451,7 +451,7 @@
     "brand": "Coca-Cola",
     "stock": true,
     "availableQuantity": 40,
-    "image": "/products/p026.jpg",
+    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97",
     "tags": [
       "cola",
       "soft drink",
@@ -469,7 +469,7 @@
     "brand": "Tropicana",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p027.jpg",
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba",
     "tags": [
       "juice",
       "orange"
@@ -486,7 +486,7 @@
     "brand": "Real",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p028.jpg",
+    "image": "https://images.unsplash.com/photo-1603569283847-aa295f0d016a",
     "tags": [
       "juice",
       "mixed fruit"
@@ -503,7 +503,7 @@
     "brand": "Paper Boat",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p029.jpg",
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696",
     "tags": [
       "juice",
       "aam panna",
@@ -521,7 +521,7 @@
     "brand": "Bisleri",
     "stock": true,
     "availableQuantity": 60,
-    "image": "/products/p030.jpg",
+    "image": "https://images.unsplash.com/photo-1616118132534-381148898bb4",
     "tags": [
       "water",
       "mineral water"
@@ -538,7 +538,7 @@
     "brand": "Tata Tea",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p031.jpg",
+    "image": "https://images.unsplash.com/photo-1563822249366-3efb23b8e0c9",
     "tags": [
       "tea",
       "chai"
@@ -555,7 +555,7 @@
     "brand": "Nescafe",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p032.jpg",
+    "image": "https://images.unsplash.com/photo-1610632380989-680fe40816c6",
     "tags": [
       "coffee",
       "instant coffee"
@@ -572,7 +572,7 @@
     "brand": "Lay's",
     "stock": true,
     "availableQuantity": 50,
-    "image": "/products/p033.jpg",
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
     "tags": [
       "chips",
       "salted"
@@ -589,7 +589,7 @@
     "brand": "Lay's",
     "stock": true,
     "availableQuantity": 50,
-    "image": "/products/p034.jpg",
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
     "tags": [
       "chips",
       "masala"
@@ -606,7 +606,7 @@
     "brand": "Kurkure",
     "stock": true,
     "availableQuantity": 40,
-    "image": "/products/p035.jpg",
+    "image": "https://images.unsplash.com/photo-1754088605508-4148fefd8a43",
     "tags": [
       "namkeen",
       "masala"
@@ -623,7 +623,7 @@
     "brand": "Haldiram's",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p036.jpg",
+    "image": "https://images.unsplash.com/photo-1767877609689-beff32b9c0ac",
     "tags": [
       "namkeen",
       "bhujia"
@@ -640,7 +640,7 @@
     "brand": "Parle",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p037.jpg",
+    "image": "https://images.unsplash.com/photo-1558961363-fa8fdf82db35",
     "tags": [
       "biscuits",
       "glucose"
@@ -657,7 +657,7 @@
     "brand": "Britannia",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p038.jpg",
+    "image": "https://images.unsplash.com/photo-1622296999725-fd6600a7603c",
     "tags": [
       "biscuits",
       "cookies",
@@ -675,7 +675,7 @@
     "brand": "Cadbury",
     "stock": true,
     "availableQuantity": 40,
-    "image": "/products/p039.jpg",
+    "image": "https://images.unsplash.com/photo-1623660053975-cf75a8be0908",
     "tags": [
       "chocolate"
     ],
@@ -691,7 +691,7 @@
     "brand": "Kellogg's",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p040.jpg",
+    "image": "https://images.unsplash.com/photo-1788601690871-f0fe193ec0bc",
     "tags": [
       "cereal",
       "corn flakes"
@@ -708,7 +708,7 @@
     "brand": "Quaker",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p041.jpg",
+    "image": "https://images.unsplash.com/photo-1722882270575-f437c338a4de",
     "tags": [
       "oats",
       "cereal",
@@ -726,7 +726,7 @@
     "brand": "Britannia",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p042.jpg",
+    "image": "https://images.unsplash.com/photo-1638788449271-9bb9121c1bfc",
     "tags": [
       "bread",
       "brown bread"
@@ -743,7 +743,7 @@
     "brand": "Kissan",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p043.jpg",
+    "image": "https://images.unsplash.com/photo-1695088956481-6c46b7714537",
     "tags": [
       "jam",
       "spread"
@@ -760,7 +760,7 @@
     "brand": "Kissan",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p044.jpg",
+    "image": "https://images.unsplash.com/photo-1611100369029-c0d5ddb80a51",
     "tags": [
       "ketchup",
       "tomato",
@@ -778,7 +778,7 @@
     "brand": "Vim",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p045.jpg",
+    "image": "https://images.unsplash.com/photo-1647577746559-c9a28c0d0870",
     "tags": [
       "dishwashing liquid",
       "dishwash",
@@ -797,7 +797,7 @@
     "brand": "Vim",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p046.jpg",
+    "image": "https://images.unsplash.com/photo-1647577746559-c9a28c0d0870",
     "tags": [
       "dishwashing liquid",
       "dishwash",
@@ -816,7 +816,7 @@
     "brand": "Pril",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p047.jpg",
+    "image": "https://images.unsplash.com/photo-1647577746559-c9a28c0d0870",
     "tags": [
       "dishwashing liquid",
       "dishwash",
@@ -835,7 +835,7 @@
     "brand": "Exo",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p048.jpg",
+    "image": "https://images.unsplash.com/photo-1647577746559-c9a28c0d0870",
     "tags": [
       "dishwashing liquid",
       "dishwash",
@@ -853,7 +853,7 @@
     "brand": "Pril",
     "stock": true,
     "availableQuantity": 10,
-    "image": "/products/p049.jpg",
+    "image": "https://images.unsplash.com/photo-1647577746559-c9a28c0d0870",
     "tags": [
       "dishwashing liquid",
       "dishwash",
@@ -872,7 +872,7 @@
     "brand": "Lizol",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p050.jpg",
+    "image": "https://images.unsplash.com/photo-1563453392212-326f5e854473",
     "tags": [
       "floor cleaner",
       "disinfectant"
@@ -889,7 +889,7 @@
     "brand": "Harpic",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p051.jpg",
+    "image": "https://images.unsplash.com/photo-1737372805905-be0b91ec86fb",
     "tags": [
       "toilet cleaner",
       "bathroom"
@@ -906,7 +906,7 @@
     "brand": "Colin",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p052.jpg",
+    "image": "https://images.unsplash.com/photo-1628177142898-93e36e4e3a50",
     "tags": [
       "glass cleaner",
       "surface cleaner"
@@ -923,7 +923,7 @@
     "brand": "Scotch-Brite",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p053.jpg",
+    "image": "https://images.unsplash.com/photo-1577369117918-7e3785e39cb7",
     "tags": [
       "scrubber",
       "scrub pad"
@@ -940,7 +940,7 @@
     "brand": "Surf Excel",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p054.jpg",
+    "image": "https://images.unsplash.com/photo-1673799693346-03e0fe79f58e",
     "tags": [
       "detergent",
       "detergent powder",
@@ -959,7 +959,7 @@
     "brand": "Surf Excel",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p055.jpg",
+    "image": "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce",
     "tags": [
       "detergent",
       "detergent powder",
@@ -978,7 +978,7 @@
     "brand": "Surf Excel",
     "stock": true,
     "availableQuantity": 2,
-    "image": "/products/p056.jpg",
+    "image": "https://images.unsplash.com/photo-1645972071523-2b5b41e377ec",
     "tags": [
       "detergent",
       "detergent powder",
@@ -996,7 +996,7 @@
     "brand": "Ariel",
     "stock": false,
     "availableQuantity": 0,
-    "image": "/products/p057.jpg",
+    "image": "https://images.unsplash.com/photo-1624372635310-01d078c05dd9",
     "tags": [
       "detergent",
       "detergent powder",
@@ -1015,7 +1015,7 @@
     "brand": "Tide",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p058.jpg",
+    "image": "https://images.unsplash.com/photo-1624372635310-01d078c05dd9",
     "tags": [
       "detergent",
       "detergent powder",
@@ -1033,7 +1033,7 @@
     "brand": "Rin",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p059.jpg",
+    "image": "https://images.unsplash.com/photo-1672736810221-611f53c1fc47",
     "tags": [
       "detergent",
       "detergent bar",
@@ -1051,7 +1051,7 @@
     "brand": "Comfort",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p060.jpg",
+    "image": "https://images.unsplash.com/photo-1699797467199-6bdf301649e8",
     "tags": [
       "fabric conditioner",
       "softener"
@@ -1068,7 +1068,7 @@
     "brand": "Dove",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p061.jpg",
+    "image": "https://images.unsplash.com/photo-1650189608237-db034f45e552",
     "tags": [
       "soap",
       "bath",
@@ -1086,7 +1086,7 @@
     "brand": "Colgate",
     "stock": true,
     "availableQuantity": 30,
-    "image": "/products/p062.jpg",
+    "image": "https://images.unsplash.com/photo-1550985543-f1ea83691cd8",
     "tags": [
       "toothpaste",
       "oral care"
@@ -1103,7 +1103,7 @@
     "brand": "Head & Shoulders",
     "stock": true,
     "availableQuantity": 15,
-    "image": "/products/p063.jpg",
+    "image": "https://images.unsplash.com/photo-1747858989102-cca0f4dc4a11",
     "tags": [
       "shampoo",
       "hair care",
@@ -1121,7 +1121,7 @@
     "brand": "Dettol",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p064.jpg",
+    "image": "https://images.unsplash.com/photo-1616622236995-cb00e537365e",
     "tags": [
       "handwash",
       "hygiene"
@@ -1138,7 +1138,7 @@
     "brand": "Nivea",
     "stock": true,
     "availableQuantity": 20,
-    "image": "/products/p065.jpg",
+    "image": "https://images.unsplash.com/photo-1737100917895-eee7006cdbbb",
     "tags": [
       "cream",
       "moisturiser",
@@ -1156,7 +1156,7 @@
     "brand": "Gillette",
     "stock": true,
     "availableQuantity": 10,
-    "image": "/products/p066.jpg",
+    "image": "https://images.unsplash.com/photo-1563635707357-edc8f574fd01",
     "tags": [
       "razor",
       "shaving"
@@ -1173,7 +1173,7 @@
     "brand": "Parachute",
     "stock": true,
     "availableQuantity": 25,
-    "image": "/products/p067.jpg",
+    "image": "https://images.unsplash.com/photo-1588413333412-82148535db53",
     "tags": [
       "coconut oil",
       "hair oil",

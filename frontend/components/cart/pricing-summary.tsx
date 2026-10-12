@@ -24,7 +24,7 @@ export function PricingSummary({ pricing }: { pricing: Pricing }) {
         <dt className="text-zinc-600">Delivery fee</dt>
         <dd>{pricing.deliveryFee === 0 ? <span className="font-medium text-brand-700">FREE</span> : formatPrice(pricing.deliveryFee)}</dd>
       </div>
-      <div className="flex justify-between border-t border-zinc-300 pt-3 text-base font-bold">
+      <div className="flex justify-between border-t border-zinc-200 pt-3 text-base font-bold">
         <dt>Total</dt>
         <dd>{formatPrice(pricing.total)}</dd>
       </div>
