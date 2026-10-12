@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Literal
 
 from dotenv import load_dotenv
 from livekit.agents import (
@@ -16,7 +17,6 @@ from livekit.agents import (
     get_job_context,
     inference,
 )
-from typing import Literal
 
 from agent.rpc import BrowserRpcError, call_browser
 
@@ -74,6 +74,11 @@ and open_product for one product ("show me that one"). After opening, say briefl
 screen, for example how many products the category has and one or two examples.
 Never invent products, brands, varieties, prices or options; only use what the tools return.
 
+# Checkout and payment
+When the shopper wants to check out or pay, call start_checkout. Then read out the total and
+ask clearly whether to pay now. Only call confirm_payment if their answer is a clear yes.
+If they say no, wait, or change their mind, call cancel_pending_action. If the cart changes,
+checkout must be started again. Never say a payment succeeded unless confirm_payment says so.
 
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
@@ -92,10 +97,12 @@ Do not end the call if they only pause or say "wait" or "रुको".
 
 
 class CartivaAssistant(Agent):
-    """The agent's personality and tools. Search and cart tools come in Phase 7."""
+    """The agent's personality and its shopping tools."""
 
     def __init__(self) -> None:
         super().__init__(instructions=INSTRUCTIONS)
+        # ★ Set by start_checkout; required by confirm_payment; cleared by cancel or any cart change.
+        self._pending_checkout_total: str | None = None
 
     @function_tool
     async def get_cart(self, context: RunContext) -> dict | str:
@@ -150,6 +157,7 @@ class CartivaAssistant(Agent):
                 packs shown as "unit", e.g. "1 kg". "2 kg tomatoes" with a "1 kg" pack means
                 quantity 2. If the shopper gives no amount, use 1.
         """
+        self._pending_checkout_total = None  # ★ cart changed → any old total is no longer valid
         try:
             return await call_browser("cart.add", {"productId": product_id, "quantity": quantity})
         except BrowserRpcError:
@@ -164,6 +172,7 @@ class CartivaAssistant(Agent):
         Args:
             product_id: The productId of the cart item to remove, e.g. "p001".
         """
+        self._pending_checkout_total = None  # ★ cart changed → any old total is no longer valid
         try:
             return await call_browser("cart.remove", {"productId": product_id})
         except BrowserRpcError:
@@ -181,6 +190,7 @@ class CartivaAssistant(Agent):
             product_id: The productId of the cart item, e.g. "p001".
             quantity: The new total number of packs (a whole number, 0 or more).
         """
+        self._pending_checkout_total = None  # ★ cart changed → any old total is no longer valid
         try:
             return await call_browser("cart.update", {"productId": product_id, "quantity": quantity})
         except BrowserRpcError:
@@ -218,6 +228,51 @@ class CartivaAssistant(Agent):
             return await call_browser("ui.openProduct", {"productId": product_id})
         except BrowserRpcError:
             return "Opening the product failed right now. Apologise briefly and ask the shopper to try again."
+
+    # ★ ---------- checkout (never pays without an explicit "yes") ----------
+
+    @function_tool
+    async def start_checkout(self, context: RunContext) -> dict | str:
+        """Starts checkout: checks the cart, opens the checkout page and returns the final total.
+        This does NOT take payment. After calling it, tell the shopper the total and ask them
+        clearly whether to pay now.
+        """
+        try:
+            result = await call_browser("checkout.start")
+        except BrowserRpcError:
+            return "Checkout could not be started right now. Apologise briefly and ask the shopper to try again."
+
+        if result.get("ok"):
+            self._pending_checkout_total = result["total"]
+        return result
+
+    @function_tool
+    async def confirm_payment(self, context: RunContext) -> dict | str:
+        """Pays for the order. Call this ONLY right after start_checkout, and only when the shopper
+        has clearly said yes to the total you read out (for example "yes", "pay now", "confirm",
+        "हाँ", "कर दो").
+        """
+        if self._pending_checkout_total is None:
+            return (
+                "No checkout is waiting for confirmation, so nothing was paid. "
+                "Call start_checkout first, read out the total and ask the shopper to confirm."
+            )
+
+        self._pending_checkout_total = None  # one "yes" allows exactly one payment attempt
+        try:
+            return await call_browser("checkout.confirm")
+        except BrowserRpcError:
+            return "The payment could not be completed. Nothing was charged. Apologise and ask the shopper to try again."
+
+    @function_tool
+    async def cancel_pending_action(self, context: RunContext) -> str:
+        """Cancels a checkout that is waiting for confirmation. Call this when the shopper says no,
+        cancel, wait, not now, or never mind (also "नहीं", "रुको", "रहने दो").
+        """
+        self._pending_checkout_total = None
+        return "Checkout cancelled. Nothing was paid. Tell the shopper briefly and ask what else they need."
+
+    # ★ ---------- end checkout ----------
 
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:

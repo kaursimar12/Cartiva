@@ -4,6 +4,8 @@ import { formatPrice } from "@/lib/format";
 import { rupeesToPaise } from "@/models/entities/money";
 import { cartController } from "@/controllers/cart-controller";
 import type { Product } from "@/models/entities/product";
+import { checkoutController } from "@/controllers/checkout-controller";
+import { checkoutService } from "@/lib/client-container";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
@@ -147,6 +149,33 @@ export const voiceController = {
 
     ui.navigate(`/product/${product.id}`);
     return { ok: true, shownOnScreen: true, product: { ...toAgentProduct(product), description: product.description } };
+  },
+  /** Voice checkout step 1: checks the cart and opens the checkout page. Never takes payment. */
+  startCheckout(ui: VoiceUi) {
+    const result = checkoutService.validate();
+    if (!result.ok) return { ok: false, error: result.error };
+
+    ui.navigate("/checkout");
+    return {
+      ok: true,
+      itemCount: result.data.itemCount,
+      total: formatPrice(result.data.total),
+      message: result.message,
+    };
+  },
+
+  /** Voice checkout step 2: pays, exactly like the Pay button. The agent only calls it after an explicit "yes". */
+  async confirmPayment(ui: VoiceUi) {
+    const result = await checkoutController.confirmAndPay({ simulateFailure: false });
+    if (!result.ok) return { ok: false, error: result.error };
+
+    ui.navigate("/order-success");
+    return {
+      ok: true,
+      message: result.message,
+      orderId: result.data.id,
+      total: formatPrice(result.data.pricing.total),
+    };
   },
 
 };
