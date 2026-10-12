@@ -3,6 +3,7 @@ import { cartService } from "@/lib/client-container";
 import { formatPrice } from "@/lib/format";
 import { rupeesToPaise } from "@/models/entities/money";
 import { cartController } from "@/controllers/cart-controller";
+import type { Product } from "@/models/entities/product";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
@@ -15,6 +16,18 @@ const MAX_RESULTS_FOR_AGENT = 8;
 /** Accepts a rupee amount only if it is a real, non-negative number. */
 function rupees(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : undefined;
+}
+
+/** The product fields the agent needs, with the price already formatted. */
+function toAgentProduct(p: Product) {
+  return {
+    productId: p.id,
+    name: p.name,
+    brand: p.brand,
+    unit: p.unit,
+    price: formatPrice(p.price),
+    inStock: p.stock,
+  };
 }
 
 /**
@@ -69,14 +82,7 @@ export const voiceController = {
       ok: true,
       count: results.length,
       shownOnScreen: true,
-      products: results.slice(0, MAX_RESULTS_FOR_AGENT).map((p) => ({
-        productId: p.id,
-        name: p.name,
-        brand: p.brand,
-        unit: p.unit,
-        price: formatPrice(p.price),
-        inStock: p.stock,
-      })),
+            products: results.slice(0, MAX_RESULTS_FOR_AGENT).map(toAgentProduct),
     };
   },
     /** Adds a product to the cart, exactly like pressing its ADD button (same rules, same toast). */
@@ -91,6 +97,56 @@ export const voiceController = {
     return result.ok
       ? { ok: true, message: result.message, quantityInCart: result.data.quantity }
       : { ok: false, error: result.error };
+  },
+    /** Removes a product from the cart, exactly like pressing its bin button. */
+  removeFromCart(input: { productId?: unknown }) {
+    const productId = typeof input.productId === "string" ? input.productId : "";
+    const result = cartController.remove(productId);
+    return result.ok ? { ok: true, message: result.message } : { ok: false, error: result.error };
+  },
+
+  /** Sets an exact quantity for a product already in the cart. 0 removes it. */
+  updateCartQuantity(input: { productId?: unknown; quantity?: unknown }) {
+    const productId = typeof input.productId === "string" ? input.productId : "";
+    if (typeof input.quantity !== "number") {
+      return { ok: false, error: { code: "INVALID_QUANTITY", message: "Quantity must be a whole number." } };
+    }
+
+    const result = cartController.updateQuantity(productId, input.quantity);
+    return result.ok
+      ? { ok: true, message: result.message, quantityInCart: result.data.quantity }
+      : { ok: false, error: result.error };
+  },
+    /** Opens a category page (e.g. "go to fruits") and returns the products shown there. */
+  openCategory(input: { category?: unknown }, ui: VoiceUi) {
+    const wanted = typeof input.category === "string" ? input.category.trim().toLowerCase() : "";
+    const category = catalogService
+      .getCategories()
+      .find((c) => c.id === wanted || c.name.toLowerCase() === wanted);
+    if (!category) {
+      return { ok: false, error: { code: "NOT_FOUND", message: "That category doesn't exist." } };
+    }
+
+    ui.navigate(`/category/${category.id}`);
+    const products = catalogService.getProductsByCategory(category.id);
+    return {
+      ok: true,
+      shownOnScreen: true,
+      category: category.name,
+      count: products.length,
+      products: products.slice(0, MAX_RESULTS_FOR_AGENT).map(toAgentProduct),
+    };
+  },
+
+  /** Opens one product's detail page (e.g. "show me that one"). */
+  openProduct(input: { productId?: unknown }, ui: VoiceUi) {
+    const product = typeof input.productId === "string" ? catalogService.getProduct(input.productId) : undefined;
+    if (!product) {
+      return { ok: false, error: { code: "NOT_FOUND", message: "That product couldn't be found." } };
+    }
+
+    ui.navigate(`/product/${product.id}`);
+    return { ok: true, shownOnScreen: true, product: { ...toAgentProduct(product), description: product.description } };
   },
 
 };

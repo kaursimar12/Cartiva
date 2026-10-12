@@ -10,6 +10,10 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     "cart.get": () => voiceController.getCart(),
     "catalog.search": (payload) => voiceController.searchProducts(payload, ui),
     "cart.add": (payload) => voiceController.addToCart(payload),
+    "cart.remove": (payload) => voiceController.removeFromCart(payload),
+    "cart.update": (payload) => voiceController.updateCartQuantity(payload),
+    "ui.openCategory": (payload) => voiceController.openCategory(payload, ui),
+    "ui.openProduct": (payload) => voiceController.openProduct(payload, ui),
 
   };
 

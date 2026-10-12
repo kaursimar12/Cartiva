@@ -16,6 +16,7 @@ from livekit.agents import (
     get_job_context,
     inference,
 )
+from typing import Literal
 
 from agent.rpc import BrowserRpcError, call_browser
 
@@ -65,7 +66,12 @@ You can read the shopper's cart with the get_cart tool. Use it whenever they ask
 cart or total, and answer only from what the tool returns.
 Say amounts in words, for example "two hundred forty-five rupees".
 Tool messages are in English; always say them in the shopper's language.
-You cannot remove items or change quantities by voice yet; for that, say it is coming soon.
+You can remove items with remove_from_cart and change quantities with update_cart. For these,
+call get_cart first to find the right productId and the current quantity. If more than one cart
+item could match what the shopper said, ask which one. Confirm briefly after each change.
+You can open pages on the shopper's screen: navigate_category for a category ("go to fruits")
+and open_product for one product ("show me that one"). After opening, say briefly what is on
+screen, for example how many products the category has and one or two examples.
 Never invent products, brands, varieties, prices or options; only use what the tools return.
 
 
@@ -148,6 +154,70 @@ class CartivaAssistant(Agent):
             return await call_browser("cart.add", {"productId": product_id, "quantity": quantity})
         except BrowserRpcError:
             return "Adding to the cart failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def remove_from_cart(self, context: RunContext, product_id: str) -> dict | str:
+        """Removes a product completely from the shopper's cart. The cart on screen updates too.
+
+        Get the product_id from get_cart first (or from recent search results).
+
+        Args:
+            product_id: The productId of the cart item to remove, e.g. "p001".
+        """
+        try:
+            return await call_browser("cart.remove", {"productId": product_id})
+        except BrowserRpcError:
+            return "Removing the item failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def update_cart(self, context: RunContext, product_id: str, quantity: int) -> dict | str:
+        """Sets the exact quantity of a product that is already in the shopper's cart.
+
+        Call get_cart first to see the current quantity. "Make it 3" means quantity 3.
+        "One more" means the current quantity plus 1; "one less" means minus 1.
+        Quantity 0 removes the item.
+
+        Args:
+            product_id: The productId of the cart item, e.g. "p001".
+            quantity: The new total number of packs (a whole number, 0 or more).
+        """
+        try:
+            return await call_browser("cart.update", {"productId": product_id, "quantity": quantity})
+        except BrowserRpcError:
+            return "Updating the cart failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def navigate_category(
+        self,
+        context: RunContext,
+        category: Literal[
+            "vegetables", "fruits", "dairy", "beverages", "snacks",
+            "breakfast", "cleaning", "laundry", "personal-care",
+        ],
+    ) -> dict | str:
+        """Opens a category page on the shopper's screen, e.g. "go to fruits", "show me dairy",
+        "डेयरी दिखाओ". Returns the products now visible on that page.
+
+        Args:
+            category: The category to open.
+        """
+        try:
+            return await call_browser("ui.openCategory", {"category": category})
+        except BrowserRpcError:
+            return "Opening the category failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def open_product(self, context: RunContext, product_id: str) -> dict | str:
+        """Opens one product's detail page on the shopper's screen, e.g. "show me that one",
+        "open the Vim one". Use a productId from search_products, navigate_category or get_cart.
+
+        Args:
+            product_id: The productId of the product to open, e.g. "p001".
+        """
+        try:
+            return await call_browser("ui.openProduct", {"productId": product_id})
+        except BrowserRpcError:
+            return "Opening the product failed right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:
