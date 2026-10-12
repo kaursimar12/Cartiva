@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1166" viewBox="0 0 1040 1166">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="1166" fill="#ffffff"/>
+<text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">4 · Voice adds to the cart (Phase 7)</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: the shopper says “Add 2 kg tomatoes”</text>
+<rect x="40" y="96" width="580" height="40" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🎤 “Add 2 kg tomatoes”</text>
+<line x1="330.0" y1="136" x2="330.0" y2="174" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="176" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="204" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">STT → text, then the LLM chooses a tool</text>
+<text x="56" y="224" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">“I need to find tomatoes first”</text>
+<line x1="330.0" y1="236" x2="330.0" y2="274" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="276" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="56" y="304" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Tool: search_products(&quot;tomatoes&quot;)</text>
+<text x="56" y="324" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Tools only forward — no business logic</text>
+<text x="56" y="344" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">🔜 agent/tools.py</text>
+<line x1="330.0" y1="356" x2="330.0" y2="394" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="396" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="56" y="424" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC → browser: catalog.search</text>
+<text x="56" y="444" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#2563eb">🔜 agent/rpc.py → lib/voice/</text>
+<line x1="330.0" y1="456" x2="330.0" y2="494" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="496" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="524" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">catalogService.search(&quot;tomatoes&quot;)</text>
+<text x="56" y="544" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">→ Tomato · 1 kg · ₹40 · id p001</text>
+<text x="56" y="564" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 services/catalog-service.ts + data/products.json</text>
+<line x1="330.0" y1="576" x2="330.0" y2="614" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="616" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="56" y="644" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">LLM: 1 kg pack, user wants 2 kg → quantity 2</text>
+<text x="56" y="664" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Tool: add_to_cart(&quot;p001&quot;, 2)</text>
+<text x="56" y="684" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">🔜 agent/tools.py</text>
+<line x1="330.0" y1="696" x2="330.0" y2="734" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="736" width="580" height="40" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="56" y="764" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC → browser: cart.add</text>
+<line x1="330.0" y1="776" x2="330.0" y2="814" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="816" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="3"/>
+<text x="56" y="844" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ cartController.add → cartService.add</text>
+<text x="56" y="864" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">The SAME code as the “Add” button · stock check</text>
+<text x="56" y="884" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 controllers/cart-controller.ts + services/cart-service.ts</text>
+<rect x="690" y="826.0" width="320" height="60" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="854.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Result: PARTIAL_STOCK / OUT_OF_STOCK</text>
+<text x="706" y="874.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Agent explains the problem aloud</text>
+<line x1="620" y1="856.0" x2="688" y2="856.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="848.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">fails</text>
+<line x1="330.0" y1="896" x2="330.0" y2="934" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="920.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">ok</text>
+<rect x="40" y="936" width="580" height="60" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="964" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Cart updates on screen + toast</text>
+<text x="56" y="984" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 store/cart-store.ts</text>
+<line x1="330.0" y1="996" x2="330.0" y2="1034" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1036" width="580" height="40" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="1064" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 “Done! I&#x27;ve added two kilos of tomatoes.”</text>
+<rect x="40" y="1106" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="62" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<rect x="119" y="1106" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="141" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
+<rect x="289" y="1106" width="16" height="16" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="311" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">LiveKit Cloud</text>
+<rect x="410" y="1106" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="432" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
+<rect x="566" y="1106" width="16" height="16" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="588" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Error / alternative</text>
+<rect x="729" y="1106" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="751" y="1119" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<text x="40" y="1144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+</svg>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1346" viewBox="0 0 1040 1346">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="1346" fill="#ffffff"/>
+<text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">2 · Voice test in the terminal (step 6.5)</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: uv run python -m agent.worker console → “Hi, what can you do?”</text>
+<rect x="40" y="96" width="580" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Run the agent in console mode</text>
+<text x="56" y="144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">uv run python -m agent.worker console</text>
+<line x1="330.0" y1="156" x2="330.0" y2="194" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="196" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="224" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Load LiveKit settings</text>
+<text x="56" y="244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">LIVEKIT_URL · LIVEKIT_API_KEY · LIVEKIT_API_SECRET</text>
+<text x="56" y="264" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 agent/worker.py → load_dotenv() → backend/.env</text>
+<line x1="330.0" y1="276" x2="330.0" y2="314" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="316" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="344" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Console mode</text>
+<text x="56" y="364" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Uses this PC&#x27;s mic and speakers — no website, no room</text>
+<text x="56" y="384" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 agent/worker.py → cli.run_app(server)</text>
+<line x1="330.0" y1="396" x2="330.0" y2="434" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="436" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="464" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Build the voice pipeline</text>
+<text x="56" y="484" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">AgentSession + CartivaAssistant (INSTRUCTIONS = “You are Cartiva…”)</text>
+<text x="56" y="504" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 agent/worker.py → entrypoint()</text>
+<line x1="330.0" y1="516" x2="330.0" y2="554" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="556" width="580" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="584" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Agent greets you</text>
+<text x="56" y="604" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">🔊 “Hi! Welcome to Cartiva. What do you need today?”</text>
+<line x1="330.0" y1="616" x2="330.0" y2="654" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="656" width="580" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="684" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">You speak</text>
+<text x="56" y="704" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">🎤 “Hi, what can you do?”</text>
+<line x1="330.0" y1="716" x2="330.0" y2="754" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="756" width="580" height="80" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="784" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">STT — AssemblyAI (the ears)</text>
+<text x="56" y="804" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">speech → text: “hi what can you do”</text>
+<text x="56" y="824" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#2563eb">📄 LiveKit Inference (cloud)</text>
+<line x1="330.0" y1="836" x2="330.0" y2="874" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="876" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="904" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Turn detector</text>
+<text x="56" y="924" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Decides: “the user finished speaking — reply now”</text>
+<line x1="330.0" y1="936" x2="330.0" y2="974" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="976" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="1004" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">LLM — Gemma (the brain)</text>
+<text x="56" y="1024" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">INSTRUCTIONS + conversation → reply text</text>
+<line x1="330.0" y1="1036" x2="330.0" y2="1074" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1076" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="1104" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">TTS — Fish Audio (the voice)</text>
+<text x="56" y="1124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">text → speech</text>
+<line x1="330.0" y1="1136" x2="330.0" y2="1174" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1176" width="580" height="80" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="1204" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">You hear the reply</text>
+<text x="56" y="1224" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">🔊 “I&#x27;m Cartiva, I can help you shop for groceries…”</text>
+<text x="56" y="1244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Dashed arrow: talk again · Ctrl + C to stop</text>
+<path d="M40,1216.0 L22,1216.0 L22,686.0 L38,686.0" fill="none" stroke="#16a34a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-16a34a)"/>
+<rect x="40" y="1286" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="62" y="1299" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<rect x="119" y="1286" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="141" y="1299" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
+<rect x="289" y="1286" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="311" y="1299" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<rect x="368" y="1286" width="16" height="16" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="390" y="1299" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">LiveKit Cloud</text>
+<text x="40" y="1324" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+</svg>

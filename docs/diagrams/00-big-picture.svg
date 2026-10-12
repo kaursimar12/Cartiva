@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="560" viewBox="0 0 1040 560">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="560" fill="#ffffff"/>
+<text x="30" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">0 · The big picture</text>
+<text x="30" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">The agent decides · the browser does (same code as the buttons) · FastAPI guards the secrets</text>
+<rect x="20" y="200" width="120" height="80" rx="40" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="80" y="236" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22">🧑</text>
+<text x="80" y="262" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Shopper</text>
+<rect x="170" y="90" width="300" height="440" rx="16" fill="#ecfdf5" stroke="#059669" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="184" y="116" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" fill="#059669">frontend/ · Next.js · :3000</text>
+<rect x="190" y="130" width="260" height="62" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.6"/>
+<text x="202" y="156" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Pages &amp; components</text>
+<text x="202" y="176" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#059669">app/ · components/</text>
+<rect x="190" y="230" width="260" height="62" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.6"/>
+<text x="202" y="256" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Controllers</text>
+<text x="202" y="276" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#059669">controllers/</text>
+<rect x="190" y="330" width="260" height="62" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.6"/>
+<text x="202" y="356" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Services</text>
+<text x="202" y="376" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#059669">catalog · cart · pricing</text>
+<rect x="190" y="430" width="260" height="62" rx="10" fill="#ffffff" stroke="#059669" stroke-width="1.6"/>
+<text x="202" y="456" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">JSON data</text>
+<text x="202" y="476" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#059669">data/*.json</text>
+<rect x="510" y="90" width="240" height="230" rx="16" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="524" y="116" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" fill="#2563eb">LiveKit Cloud</text>
+<rect x="530" y="130" width="200" height="62" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="542" y="156" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Room</text>
+<text x="542" y="176" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#2563eb">live audio + RPC</text>
+<rect x="530" y="230" width="200" height="62" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="542" y="256" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Inference</text>
+<text x="542" y="276" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#2563eb">STT · LLM · TTS</text>
+<rect x="790" y="90" width="230" height="440" rx="16" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="804" y="116" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="800" fill="#ea580c">backend/ · Python · :8000</text>
+<rect x="810" y="130" width="190" height="62" rx="10" fill="#ffffff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="822" y="156" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">Voice agent</text>
+<text x="822" y="176" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#c026d3">agent/worker.py</text>
+<rect x="810" y="330" width="190" height="62" rx="10" fill="#ffffff" stroke="#ea580c" stroke-width="1.6"/>
+<text x="822" y="356" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#18181b">FastAPI</text>
+<text x="822" y="376" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="11.5" fill="#ea580c">app/main.py</text>
+<text x="905" y="410" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11.5" fill="#71717a">token · (Phase 9) payments</text>
+<path d="M140,240 L188,170" fill="none" stroke="#4f46e5" stroke-width="2" marker-end="url(#arrow-4f46e5)"/>
+<text x="60" y="186" text-anchor="start" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#4f46e5">clicks &amp; speaks</text>
+<path d="M320,192 L320,228" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-059669)"/>
+<path d="M320,292 L320,328" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-059669)"/>
+<path d="M320,392 L320,428" fill="none" stroke="#059669" stroke-width="2" marker-end="url(#arrow-059669)"/>
+<path d="M450,160 L528,160" fill="none" stroke="#2563eb" stroke-width="2" marker-start="url(#arrow-2563eb)" marker-end="url(#arrow-2563eb)"/>
+<text x="489" y="150" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#2563eb">audio</text>
+<text x="489" y="178" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#2563eb">+ RPC</text>
+<path d="M730,160 L808,160" fill="none" stroke="#c026d3" stroke-width="2" marker-start="url(#arrow-c026d3)" marker-end="url(#arrow-c026d3)"/>
+<text x="769" y="150" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#c026d3">audio</text>
+<text x="769" y="178" text-anchor="middle" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#c026d3">+ RPC</text>
+<path d="M840,192 L732,255" fill="none" stroke="#2563eb" stroke-width="2" marker-start="url(#arrow-2563eb)" marker-end="url(#arrow-2563eb)"/>
+<text x="812" y="240" text-anchor="start" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#2563eb">speech ↔ text</text>
+<path d="M450,180 L485,180 L485,360 L808,360" fill="none" stroke="#ea580c" stroke-width="2" marker-end="url(#arrow-ea580c)"/>
+<text x="560" y="352" text-anchor="start" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#ea580c">POST /api/livekit/token</text>
+<path d="M808,380 L500,380 L500,460 L452,460" fill="none" stroke="#ea580c" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrow-ea580c)"/>
+<text x="560" y="398" text-anchor="start" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="11" font-weight="600" fill="#ea580c">reads prices (Phase 9)</text>
+</svg>
