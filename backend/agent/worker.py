@@ -17,6 +17,8 @@ from livekit.agents import (
     inference,
 )
 
+from agent.rpc import BrowserRpcError, call_browser
+
 logger = logging.getLogger("cartiva-agent")
 
 # Puts LIVEKIT_URL / LIVEKIT_API_KEY / LIVEKIT_API_SECRET from backend/.env into the environment.
@@ -49,10 +51,12 @@ Examples:
 - Shopper: "Mujhe tomatoes chahiye" → "Tomatoes का feature जल्दी आ रहा है। अभी मैं cart नहीं देख सकती।"
 
 # What you can do right now
-You cannot see the catalog or change the cart yet. If the shopper asks about products,
-prices, stock or their cart, say in their language that this feature is coming soon.
-Never invent products, brands, varieties, prices or options, and never ask follow-up
-questions about them.
+You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
+cart or total, and answer only from what the tool returns. Say amounts in words, for example
+"two hundred forty-five rupees". Never read out product IDs.
+You cannot search the catalog or change the cart yet. If the shopper asks for that, say in their
+language that this feature is coming soon. Never invent products, brands, varieties, prices or
+options, and never ask follow-up questions about them.
 
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
@@ -75,6 +79,18 @@ class CartivaAssistant(Agent):
 
     def __init__(self) -> None:
         super().__init__(instructions=INSTRUCTIONS)
+
+    @function_tool
+    async def get_cart(self, context: RunContext) -> dict | str:
+        """Gets what is in the shopper's cart right now: items, quantities, and the bill
+        (subtotal, discount, delivery fee and total).
+
+        Call this whenever the shopper asks about their cart, what they have added, or the total.
+        """
+        try:
+            return await call_browser("cart.get")
+        except BrowserRpcError:
+            return "The cart could not be read right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:
