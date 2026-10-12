@@ -48,15 +48,19 @@ because this helps the voice pronounce both correctly.
 Examples:
 - Shopper: "What can you do?" → "I can help you shop for groceries. What do you need today?"
 - Shopper: "आप क्या कर सकते हो?" → "मैं आपको groceries खरीदने में मदद कर सकती हूँ। आपको क्या चाहिए?"
-- Shopper: "Mujhe tomatoes chahiye" → "Tomatoes का feature जल्दी आ रहा है। अभी मैं cart नहीं देख सकती।"
+- Shopper: "Mujhe tomatoes chahiye" → (search first) "मुझे tomatoes मिल गए, screen पर देखिए। Tomato एक kilo चालीस रुपये का है।"
 
 # What you can do right now
+You can search the catalog with the search_products tool. The results also appear on the
+shopper's screen. After a search, say how many products you found and mention at most three,
+with their prices, then ask which one they want. If nothing is found, say so and suggest
+another word. Remember the productIds from the results for later, but never read IDs aloud.
 You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
-cart or total, and answer only from what the tool returns. Say amounts in words, for example
-"two hundred forty-five rupees". Never read out product IDs.
-You cannot search the catalog or change the cart yet. If the shopper asks for that, say in their
-language that this feature is coming soon. Never invent products, brands, varieties, prices or
-options, and never ask follow-up questions about them.
+cart or total, and answer only from what the tool returns.
+Say amounts in words, for example "two hundred forty-five rupees".
+You cannot add or remove cart items yet. If the shopper asks for that, say in their language
+that adding by voice is coming soon and they can tap the ADD button on screen.
+Never invent products, brands, varieties, prices or options; only use what the tools return.
 
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
@@ -91,6 +95,33 @@ class CartivaAssistant(Agent):
             return await call_browser("cart.get")
         except BrowserRpcError:
             return "The cart could not be read right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def search_products(
+        self,
+        context: RunContext,
+        query: str,
+        max_price: float | None = None,
+        min_price: float | None = None,
+    ) -> dict | str:
+        """Searches the Cartiva catalog and shows the results on the shopper's screen.
+
+        Call this whenever the shopper wants to find, see or browse products, or before adding
+        something to the cart (you need the productId from the results).
+
+        Args:
+            query: What to look for, always in English, e.g. "tomato", "vegetables",
+                "dishwashing liquid", "Surf Excel". Translate Hindi words first,
+                e.g. "टमाटर" → "tomato", "दूध" → "milk", "सब्ज़ियाँ" → "vegetables".
+            max_price: Highest price in rupees, only if the shopper gives one,
+                e.g. 200 for "under 200 rupees".
+            min_price: Lowest price in rupees, only if the shopper gives one.
+        """
+        payload = {"query": query, "maxPrice": max_price, "minPrice": min_price}
+        try:
+            return await call_browser("catalog.search", payload)
+        except BrowserRpcError:
+            return "The search failed right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:

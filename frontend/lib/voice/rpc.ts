@@ -1,18 +1,19 @@
 import type { Room, RpcInvocationData } from "livekit-client";
-import { voiceController } from "@/controllers/voice-controller";
+import { voiceController, type VoiceUi } from "@/controllers/voice-controller";
 
-type RpcMethod = (payload: unknown) => unknown;
-
-/** Every browser method the voice agent may call. Phase 7 adds more (catalog.search, cart.add…). */
-const methods: Record<string, RpcMethod> = {
-  "cart.get": () => voiceController.getCart(),
-};
+type RpcMethod = (payload: Record<string, unknown>) => unknown;
 
 /** Registers all voice RPC methods on the room. Returns a function that removes them again. */
-export function registerVoiceRpc(room: Room): () => void {
+export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
+  /** Every browser method the voice agent may call. Add new voice actions here. */
+  const methods: Record<string, RpcMethod> = {
+    "cart.get": () => voiceController.getCart(),
+    "catalog.search": (payload) => voiceController.searchProducts(payload, ui),
+  };
+
   for (const [name, method] of Object.entries(methods)) {
     room.registerRpcMethod(name, async (data: RpcInvocationData) => {
-      const payload: unknown = data.payload ? JSON.parse(data.payload) : {};
+      const payload = data.payload ? (JSON.parse(data.payload) as Record<string, unknown>) : {};
       return JSON.stringify(await method(payload));
     });
   }

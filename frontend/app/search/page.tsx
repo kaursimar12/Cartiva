@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState } from "@/components/common/empty-state";
+import { formatPrice, rupeesToPaise } from "@/models/entities/money";
 import { ProductBrowser } from "@/components/products/product-browser";
 import { catalogService } from "@/lib/container";
 
 const suggestions = ["tomato", "milk", "Surf Excel", "dishwashing liquid", "chips", "shampoo"];
+
+/** Reads an optional rupee amount from the URL, e.g. ?max=200 → 20000 paise. */
+function rupeesParam(value: string | string[] | undefined): number | undefined {
+  const rupees = typeof value === "string" ? Number(value) : NaN;
+  return Number.isFinite(rupees) && rupees >= 0 ? rupeesToPaise(rupees) : undefined;
+}
 
 export async function generateMetadata(props: PageProps<"/search">): Promise<Metadata> {
   const { q } = await props.searchParams;
@@ -12,9 +19,11 @@ export async function generateMetadata(props: PageProps<"/search">): Promise<Met
 }
 
 export default async function SearchPage(props: PageProps<"/search">) {
-  const { q } = await props.searchParams;
+  const { q, min, max } = await props.searchParams;
   const query = typeof q === "string" ? q.trim() : "";
-  const results = query ? catalogService.search(query) : [];
+  const minPrice = rupeesParam(min);
+  const maxPrice = rupeesParam(max);
+  const results = query ? catalogService.filter({ query, minPrice, maxPrice }) : [];
 
   return (
     <div>
@@ -22,6 +31,9 @@ export default async function SearchPage(props: PageProps<"/search">) {
         {query ? (
           <>
             Results for <span className="text-brand-700">“{query}”</span>
+            {maxPrice !== undefined && <> under {formatPrice(maxPrice)}</>}
+            {minPrice !== undefined && <> from {formatPrice(minPrice)}</>}
+
           </>
         ) : (
           "Search products"
@@ -29,7 +41,7 @@ export default async function SearchPage(props: PageProps<"/search">) {
       </h1>
 
       {results.length > 0 ? (
-        <ProductBrowser key={query} products={results} />
+        <ProductBrowser key={`${query}-${minPrice}-${maxPrice}`} products={results} />
       ) : (
         <EmptyState
           icon="🔍"
