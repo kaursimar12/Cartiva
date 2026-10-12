@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi[standard]>=0.142.2",
+    "livekit-agents~=1.8",
     "livekit-api>=1.2.1",
     "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.4",
 ]
 
 [tool.fastapi]

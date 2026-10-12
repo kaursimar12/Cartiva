@@ -4,6 +4,7 @@ import { StoreHydrator } from "@/components/common/providers";
 import { Toaster } from "@/components/common/toaster";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
+import { VoiceProvider } from "@/components/voice/voice-provider"; // ★ CHANGE 1: new import
 import { catalogService } from "@/lib/container";
 import "./globals.css";
 
@@ -37,13 +38,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to content
         </a>
-        <StoreHydrator />
-        <Header categories={categories} />
-        <main id="main" className="mx-auto w-full max-w-[1920px] flex-1 px-4 py-6 sm:px-6 lg:px-10">
-          {children}
-        </main>
-        <Footer categories={categories} />
-        <Toaster />
+        {/* ★ CHANGE 2: one voice session for the whole site, so it survives page navigation */}
+        <VoiceProvider>
+          <StoreHydrator />
+          <Header categories={categories} />
+          <main id="main" className="mx-auto w-full max-w-[1920px] flex-1 px-4 py-6 sm:px-6 lg:px-10">
+            {children}
+          </main>
+          <Footer categories={categories} />
+          <Toaster />
+        </VoiceProvider>
       </body>
     </html>
   );

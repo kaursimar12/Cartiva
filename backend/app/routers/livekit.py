@@ -9,6 +9,8 @@ from app.config import Settings, get_settings
 
 router = APIRouter(prefix="/api/livekit", tags=["livekit"])
 
+AGENT_NAME = "cartiva-agent"
+
 
 class TokenResponse(BaseModel):
     """What the browser needs to join a voice session."""
@@ -30,6 +32,9 @@ def create_token(settings: Annotated[Settings, Depends(get_settings)]) -> TokenR
         .with_identity(identity)
         .with_name("Shopper")
         .with_grants(api.VideoGrants(room_join=True, room=room_name))
+        .with_room_config(
+            api.RoomConfiguration(agents=[api.RoomAgentDispatch(agent_name=AGENT_NAME)])
+        )
         .to_jwt()
     )
 
