@@ -30,6 +30,10 @@ MAX_SESSION_SECONDS = 2 * 60   # hard limit for one voice session
 AWAY_AFTER_SECONDS = 30        # silence before "are you still there?"
 GRACE_SECONDS = 15             # extra silence before hanging up
 
+# Tool-call rounds allowed in one reply. "Add tomatoes and potatoes" can take 4
+# (search, add, search, add); LiveKit's default of 3 would silently drop the last one.
+MAX_TOOL_STEPS = 8
+
 # Cartesia voice ID (Indian-accent). Browse others at https://play.cartesia.ai and paste the ID here.
 TTS_VOICE = "3b554273-4299-48b9-9aaf-eefd438e3941"
 
@@ -58,8 +62,11 @@ with their prices, then ask which one they want. If nothing is found, say so and
 another word. Remember the productIds from the results for later, but never read IDs aloud.
 You can add products with the add_to_cart tool, using a productId from search_products.
 If the shopper names a product you have not searched for yet, search first, then add it.
-If more than one product could match (for example two brands or two pack sizes), ask which
-one before adding. After adding, confirm briefly what was added.
+Pick the product yourself when the shopper's words point to one product: prefer the plain
+product over variants (for "tomatoes" choose "Tomato", not "Tomato Cherry" or "Tomato Puree"),
+and use the pack size they said (for "1 kg" choose the 1 kg pack). Ask which one only when it is
+still unclear, for example two brands or two pack sizes of the same product and no size was
+given. After adding, confirm briefly what was added.
 If the tool says a product is out of stock or only some units are available, explain that and
 offer the available amount.
 You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
@@ -138,19 +145,32 @@ class CartivaAssistant(Agent):
         Call this whenever the shopper wants to find, see or browse products, or before adding
         something to the cart (you need the productId from the results).
 
+        Search for ONE product at a time. If the shopper asks for several products
+        ("tomatoes and potatoes"), call this once per product: query "tomato", then query "potato".
+
         Args:
-            query: What to look for, always in English, e.g. "tomato", "vegetables",
-                "dishwashing liquid", "Surf Excel". Translate Hindi words first,
-                e.g. "टमाटर" → "tomato", "दूध" → "milk", "सब्ज़ियाँ" → "vegetables".
+            query: One product to look for, always in English, e.g. "tomato", "vegetables",
+                "dishwashing liquid", "Surf Excel". Never combine products ("tomato potato").
+                Translate Hindi words first, e.g. "टमाटर" → "tomato", "दूध" → "milk",
+                "सब्ज़ियाँ" → "vegetables".
             max_price: Highest price in rupees, only if the shopper gives one,
                 e.g. 200 for "under 200 rupees".
             min_price: Lowest price in rupees, only if the shopper gives one.
         """
         payload = {"query": query, "maxPrice": max_price, "minPrice": min_price}
         try:
-            return await call_browser("catalog.search", payload)
+            result = await call_browser("catalog.search", payload)
         except BrowserRpcError:
             return "The search failed right now. Apologise briefly and ask the shopper to try again."
+
+        # Stops the LLM from repeating a search that cannot succeed (e.g. "tomato potato").
+        if result.get("ok") and result.get("count") == 0:
+            result["hint"] = (
+                f'Nothing matches "{query}". Do not repeat this search. If the shopper asked for '
+                "several products, search each one separately. Otherwise tell the shopper it was "
+                "not found and suggest another word."
+            )
+        return result
 
     @function_tool
     async def add_to_cart(self, context: RunContext, product_id: str, quantity: int = 1) -> dict | str:
@@ -336,6 +356,7 @@ async def entrypoint(ctx: JobContext) -> None:
         tts=inference.TTS(model="cartesia/sonic-3", voice=TTS_VOICE, language="hi"),
         turn_handling=TurnHandlingOptions(turn_detection=inference.TurnDetector()),
         user_away_timeout=AWAY_AFTER_SECONDS,  # user counts as "away" after this much silence
+        max_tool_steps=MAX_TOOL_STEPS,
     )
 
     # ---------- auto hang-up (silence / time limit) ----------
