@@ -354,7 +354,11 @@ async def entrypoint(ctx: JobContext) -> None:
         llm=inference.LLM(model="google/gemma-4-31b-it"),
         # Cartesia Sonic 3 speaks Hindi, English and Hinglish. Voice: an Indian-accent female voice.
         tts=inference.TTS(model="cartesia/sonic-3", voice=TTS_VOICE, language="hi"),
-        turn_handling=TurnHandlingOptions(turn_detection=inference.TurnDetector()),
+        turn_handling=TurnHandlingOptions(
+            turn_detection=inference.TurnDetector(),
+            # Tell real interruptions ("wait, show me fruits") from backchannels ("mm-hmm", "haan").
+            interruption={"mode": "adaptive"},
+        ),
         user_away_timeout=AWAY_AFTER_SECONDS,  # user counts as "away" after this much silence
         max_tool_steps=MAX_TOOL_STEPS,
     )
