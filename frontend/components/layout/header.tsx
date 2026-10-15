@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BoltIcon } from "@/components/common/icons";
+import { ThemeToggle } from "@/components/common/theme-toggle";
 import { VoiceButton } from "@/components/voice/voice-button";
 import { pricingService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
@@ -10,10 +11,10 @@ import { SearchForm } from "./search-form";
 
 export function Header({ categories }: { categories: Category[] }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-surface/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur">
       <div className="mx-auto flex max-w-[1920px] items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 lg:px-10">
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Cartiva home">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-lg font-black text-white" aria-hidden>
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-lg font-black text-background" aria-hidden>
             c
           </span>
           <span className="text-[22px] font-extrabold tracking-tight text-zinc-900">cartiva</span>
@@ -29,6 +30,7 @@ export function Header({ categories }: { categories: Category[] }) {
 
         <SearchForm id="site-search" className="hidden flex-1 md:block" />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <ThemeToggle />
           <VoiceButton />
           <CartLink />
         </div>

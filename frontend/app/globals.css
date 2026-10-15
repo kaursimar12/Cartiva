@@ -46,3 +46,43 @@ body {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+/*
+ * Dark theme (the default; set on <html data-theme> before paint by the script in app/layout.tsx).
+ * The zinc scale is inverted so neutral utilities (bg-zinc-100, text-zinc-900, …) flip automatically.
+ */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0e0e10;
+  --foreground: #f4f4f5;
+  --color-surface: #18181b;
+  --color-surface-muted: #1f1f23;
+
+  --color-zinc-50: #1c1c20;
+  --color-zinc-100: #242428;
+  --color-zinc-200: #2e2e33;
+  --color-zinc-300: #3f3f46;
+  --color-zinc-400: #8a8a93;
+  --color-zinc-500: #a1a1aa;
+  --color-zinc-600: #b4b4bc;
+  --color-zinc-700: #d4d4d8;
+  --color-zinc-800: #e4e4e7;
+  --color-zinc-900: #f4f4f5;
+
+  --color-brand-50: #10261a;
+  --color-brand-100: #153a22;
+  --color-brand-200: #1d5730;
+  --color-brand-500: #22b14c;
+  --color-brand-700: #1c9a3a;
+  --color-brand-800: #4ade80;
+  --color-brand-900: #bbf7d0;
+
+  --color-red-50: #2a1414;
+  --color-red-200: #5c2020;
+  --color-red-700: #fca5a5;
+  --color-red-800: #fecaca;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}

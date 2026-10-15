@@ -72,6 +72,15 @@ item could match what the shopper said, ask which one. Confirm briefly after eac
 You can open pages on the shopper's screen: navigate_category for a category ("go to fruits")
 and open_product for one product ("show me that one"). After opening, say briefly what is on
 screen, for example how many products the category has and one or two examples.
+The shopper can also browse, filter and sort by tapping. When they refer to something on screen
+that you did not just show them ("the cheapest one", "the second one", "this one", "add that"),
+call get_screen first and pick the product from it. Position 1 is the first product on screen.
+Use priceRupees to compare prices. If the screen has no products, ask what they mean.
+If two or more products have the same price for what the shopper asked (for example several
+are the cheapest, or several are the most expensive), never pick one yourself. Say their names,
+tell the shopper they cost the same, and ask which one to add.
+For example: "Banana and Guava both cost forty rupees. Which one should I add?"
+Only add after the shopper chooses.
 Never invent products, brands, varieties, prices or options; only use what the tools return.
 
 # Checkout and payment
@@ -228,6 +237,20 @@ class CartivaAssistant(Agent):
             return await call_browser("ui.openProduct", {"productId": product_id})
         except BrowserRpcError:
             return "Opening the product failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def get_screen(self, context: RunContext) -> dict | str:
+        """Gets what the shopper sees on their screen right now: the page and the products listed
+        there, in on-screen order (position 1 is the first product), with numeric prices.
+
+        Call this when the shopper refers to something on screen that you did not just show them,
+        for example "the cheapest one", "the second one", "this one", "add that", especially after
+        they browsed, filtered or sorted by tapping.
+        """
+        try:
+            return await call_browser("ui.getScreen")
+        except BrowserRpcError:
+            return "The screen could not be read right now. Ask the shopper which product they mean."
 
     # ★ ---------- checkout (never pays without an explicit "yes") ----------
 

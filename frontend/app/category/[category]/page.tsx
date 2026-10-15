@@ -38,7 +38,7 @@ export default async function CategoryPage(props: PageProps<"/category/[category
           <p className="mt-0.5 text-sm text-zinc-600">{category.description}</p>
         </div>
       </header>
-      <ProductBrowser products={products} />
+      <ProductBrowser products={products} screenTitle={category.name} />
     </div>
   );
 }

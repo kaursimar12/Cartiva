@@ -28,7 +28,7 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
         type="search"
         placeholder='Search "tomato", "milk", "Surf Excel"…'
         autoComplete="off"
-        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-zinc-400 focus:bg-white focus:ring-2 focus:ring-zinc-100 focus:outline-none"
+        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-zinc-400 focus:bg-surface focus:ring-2 focus:ring-zinc-100 focus:outline-none"
       />
     </form>
   );

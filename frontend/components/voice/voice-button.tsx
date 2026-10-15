@@ -44,7 +44,7 @@ export function VoiceButton({ compact = false }: { compact?: boolean }) {
       aria-pressed={active}
       aria-label={active ? "Stop Cartiva voice assistant" : "Ask Cartiva voice assistant"}
       className={`flex h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold transition-colors sm:px-4 ${
-        active ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50"
+        active ? "border-foreground bg-foreground text-background" : "border-zinc-200 bg-surface text-zinc-800 hover:bg-zinc-50"
       }`}
     >
       <MicIcon className={`h-5 w-5 ${agent.state === "listening" ? "animate-pulse" : ""}`} />

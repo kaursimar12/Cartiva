@@ -41,7 +41,11 @@ export default async function SearchPage(props: PageProps<"/search">) {
       </h1>
 
       {results.length > 0 ? (
-        <ProductBrowser key={`${query}-${minPrice}-${maxPrice}`} products={results} />
+        <ProductBrowser
+          key={`${query}-${minPrice}-${maxPrice}`}
+          products={results}
+          screenTitle={`Search results for "${query}"`}
+        />
       ) : (
         <EmptyState
           icon="🔍"

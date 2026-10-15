@@ -12,7 +12,7 @@ export function Footer({ categories }: { categories: Category[] }) {
   ];
 
   return (
-    <footer className="mt-16 border-t border-zinc-200 bg-white text-zinc-700">
+    <footer className="mt-16 border-t border-zinc-200 bg-surface text-zinc-700">
       <ul className="mx-auto grid max-w-[1920px] gap-4 border-b border-zinc-100 px-4 py-6 sm:grid-cols-3 sm:px-6 lg:px-10">
         {promises.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-center gap-3">

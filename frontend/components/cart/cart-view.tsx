@@ -42,7 +42,7 @@ export function CartView() {
                   cartController.clear();
                   setConfirmingClear(false);
                 }}
-                className="rounded-lg bg-red-600 px-3 py-1 font-semibold text-white hover:bg-red-700"
+                className="rounded-lg bg-red-600 px-3 py-1 font-semibold text-white hover:bg-red-500"
               >
                 Clear
               </button>

@@ -31,7 +31,7 @@ export default function HomePage() {
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
                 href="#categories"
-                className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-zinc-800"
+                className="rounded-xl bg-foreground px-6 py-3 text-sm font-semibold text-background transition hover:opacity-90"
               >
                 Start shopping
               </Link>

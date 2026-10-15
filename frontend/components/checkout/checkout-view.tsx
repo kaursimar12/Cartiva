@@ -135,7 +135,7 @@ export function CheckoutView() {
                 <button
                   type="button"
                   onClick={() => setStep({ name: "confirm" })}
-                  className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-700"
+                  className="flex-1 rounded-lg bg-red-600 py-2.5 text-sm font-semibold text-white hover:bg-red-500"
                 >
                   Retry payment
                 </button>

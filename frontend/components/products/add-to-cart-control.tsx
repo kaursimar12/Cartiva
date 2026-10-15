@@ -22,7 +22,7 @@ export function AddToCartControl({ product }: { product: Product }) {
       <button
         type="button"
         onClick={() => cartController.add(product.id)}
-        className="h-8 min-w-[4.25rem] rounded-lg border border-brand-600 bg-white px-4 text-xs font-bold tracking-wide text-brand-700 uppercase transition hover:bg-brand-600 hover:text-white"
+        className="h-8 min-w-[4.25rem] rounded-lg border border-brand-600 bg-surface px-4 text-xs font-bold tracking-wide text-brand-700 uppercase transition hover:bg-brand-600 hover:text-white"
         aria-label={`Add ${product.name} ${product.unit} to cart`}
       >
         Add

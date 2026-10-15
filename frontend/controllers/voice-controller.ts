@@ -5,6 +5,7 @@ import { rupeesToPaise } from "@/models/entities/money";
 import { cartController } from "@/controllers/cart-controller";
 import type { Product } from "@/models/entities/product";
 import { checkoutController } from "@/controllers/checkout-controller";
+import { screenController } from "@/controllers/screen-controller";
 import { checkoutService } from "@/lib/client-container";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
@@ -14,6 +15,9 @@ export interface VoiceUi {
 
 /** How many products we describe to the agent; the screen still shows all of them. */
 const MAX_RESULTS_FOR_AGENT = 8;
+
+/** How many on-screen products we describe to the agent (a page can show many more). */
+const MAX_SCREEN_PRODUCTS_FOR_AGENT = 20;
 
 /** Accepts a rupee amount only if it is a real, non-negative number. */
 function rupees(value: unknown): number | undefined {
@@ -28,6 +32,7 @@ function toAgentProduct(p: Product) {
     brand: p.brand,
     unit: p.unit,
     price: formatPrice(p.price),
+    priceRupees: p.price / 100, // a plain number, so "cheapest" is a reliable comparison
     inStock: p.stock,
   };
 }
@@ -150,6 +155,25 @@ export const voiceController = {
     ui.navigate(`/product/${product.id}`);
     return { ok: true, shownOnScreen: true, product: { ...toAgentProduct(product), description: product.description } };
   },
+
+  /** What the shopper sees right now: the page and its products in on-screen order. */
+  getScreen() {
+    const screen = screenController.current();
+    const products = screen.productIds
+      .map((id) => catalogService.getProduct(id))
+      .filter((p): p is Product => p !== undefined);
+
+    return {
+      ok: true,
+      page: screen.path,
+      title: screen.title,
+      productCount: products.length,
+      products: products
+        .slice(0, MAX_SCREEN_PRODUCTS_FOR_AGENT)
+        .map((p, index) => ({ position: index + 1, ...toAgentProduct(p) })),
+    };
+  },
+
   /** Voice checkout step 1: checks the cart and opens the checkout page. Never takes payment. */
   startCheckout(ui: VoiceUi) {
     const result = checkoutService.validate();

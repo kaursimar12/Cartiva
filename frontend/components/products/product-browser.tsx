@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EmptyState } from "@/components/common/empty-state";
+import { screenController } from "@/controllers/screen-controller";
 import { catalogService } from "@/lib/container";
 import { rupeesToPaise } from "@/models/entities/money";
 import type { Product } from "@/models/entities/product";
@@ -30,7 +31,7 @@ const selectClass =
   "rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800 hover:border-zinc-300 focus:border-brand-500 focus:outline-none";
 
 /** Filterable, sortable product listing (SRS FR-05). Filtering rules live in CatalogService. */
-export function ProductBrowser({ products }: { products: Product[] }) {
+export function ProductBrowser({ products, screenTitle }: { products: Product[]; screenTitle: string }) {
   const [priceRange, setPriceRange] = useState<PriceRangeId>("all");
   const [brand, setBrand] = useState("");
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -51,6 +52,11 @@ export function ProductBrowser({ products }: { products: Product[] }) {
     );
     return catalogService.sort(filtered, sort);
   }, [products, priceRange, brand, inStockOnly, sort]);
+
+  // Tell the voice agent what is on screen, in on-screen order (after filters and sorting).
+  useEffect(() => {
+    screenController.showProducts(screenTitle, visible.map((p) => p.id));
+  }, [screenTitle, visible]);
 
   const hasFilters = priceRange !== "all" || brand !== "" || inStockOnly;
 

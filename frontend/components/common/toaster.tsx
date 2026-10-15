@@ -6,7 +6,7 @@ import { dismissToast, useToastStore } from "@/store/toast-store";
 const toneStyles = {
   success: "bg-brand-700 text-white",
   error: "bg-red-600 text-white",
-  info: "bg-zinc-900 text-white",
+  info: "bg-foreground text-background",
 } as const;
 
 export function Toaster() {
@@ -31,7 +31,7 @@ export function Toaster() {
           <button
             type="button"
             onClick={() => dismissToast(toast.id)}
-            className="shrink-0 rounded px-1 text-white/80 hover:text-white"
+            className="shrink-0 rounded px-1 opacity-80 hover:opacity-100"
             aria-label="Dismiss notification"
           >
             <CloseIcon className="h-4 w-4" />
