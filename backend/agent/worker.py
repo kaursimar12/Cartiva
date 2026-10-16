@@ -101,6 +101,16 @@ checkout must be started again. After confirm_payment, tell the shopper to compl
 in the window on screen. You will then receive the result; never say a payment succeeded before that.
 If it failed and the shopper wants to try again, call start_checkout again.
 
+# Shopping lists (scanned from a photo)
+When you are told a list was scanned, or the shopper asks about their list, call get_shopping_list.
+Read it briefly: the ready items with their amounts (say them naturally, e.g. "two kilos of tomatoes"),
+the items that need a choice (name the options with their sizes), and the items that are not available
+(out of stock, or not sold here). Then ask whether to add them or change something.
+The shopper can remove items (remove_list_item), add items (add_list_item), change amounts
+(update_list_item) or pick an option (choose_list_item). Use the lineId from get_shopping_list and never
+read lineIds aloud. Nothing is in the cart until confirm_shopping_list; call it only after the shopper
+clearly agrees. Afterwards, say how many items were added and which ones were not available.
+
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
 "thank you, I'm done", "बस", "धन्यवाद, हो गया"), call the end_call tool and pass a short
@@ -324,6 +334,87 @@ class CartivaAssistant(Agent):
 
     # ★ ---------- end checkout ----------
 
+    # ---------- shopping list (scanned from a photo; nothing is in the cart until confirmed) ----------
+
+    @function_tool
+    async def get_shopping_list(self, context: RunContext) -> dict | str:
+        """Gets the shopping list the shopper scanned from a photo, line by line: what was written,
+        the status ("found" = product and packs ready, "choose" = pick one of the options,
+        "unavailable" = out of stock, "not-found" = not sold at Cartiva), and the lineId of each line.
+        Nothing on this list is in the cart until confirm_shopping_list is called.
+        """
+        try:
+            return await call_browser("list.get")
+        except BrowserRpcError:
+            return "The list could not be read right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def remove_list_item(self, context: RunContext, line_id: str) -> dict | str:
+        """Removes one line from the scanned shopping list (not from the cart).
+
+        Args:
+            line_id: The lineId from get_shopping_list.
+        """
+        try:
+            return await call_browser("list.remove", {"lineId": line_id})
+        except BrowserRpcError:
+            return "Changing the list failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def add_list_item(
+        self, context: RunContext, name: str, quantity: float | None = None, unit: str | None = None
+    ) -> dict | str:
+        """Adds an item to the scanned shopping list (not to the cart yet). It is matched to a product
+        the same way as scanned items.
+
+        Args:
+            name: One product in simple English, e.g. "bread", "milk". Translate Hindi first.
+            quantity: The amount, only if the shopper said one, e.g. 2 for "two breads" or "2 kg".
+            unit: The unit, only if said: "kg", "g", "l", "ml", "dozen", "pack".
+        """
+        try:
+            return await call_browser("list.add", {"name": name, "quantity": quantity, "unit": unit})
+        except BrowserRpcError:
+            return "Changing the list failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def update_list_item(self, context: RunContext, line_id: str, packs: int) -> dict | str:
+        """Changes how many packs of a "found" line will be added, e.g. "make the tomatoes three".
+
+        Args:
+            line_id: The lineId from get_shopping_list.
+            packs: The new number of packs (a whole number, at least 1).
+        """
+        try:
+            return await call_browser("list.update", {"lineId": line_id, "packs": packs})
+        except BrowserRpcError:
+            return "Changing the list failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def choose_list_item(self, context: RunContext, line_id: str, product_id: str) -> dict | str:
+        """Picks which product to use for a "choose" line, e.g. "the 2 kg Surf Excel".
+
+        Args:
+            line_id: The lineId from get_shopping_list.
+            product_id: One of that line's options (its productId).
+        """
+        try:
+            return await call_browser("list.choose", {"lineId": line_id, "productId": product_id})
+        except BrowserRpcError:
+            return "Changing the list failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def confirm_shopping_list(self, context: RunContext) -> dict | str:
+        """Adds every "found" line of the shopping list to the cart and empties the list.
+        Call this ONLY after the shopper clearly agreed, e.g. "yes, add them", "हाँ, डाल दो".
+        Lines that still need a choice, or are unavailable, are not added.
+        """
+        self._pending_checkout_total = None  # cart changes → any old checkout total is no longer valid
+        try:
+            return await call_browser("list.confirm")
+        except BrowserRpcError:
+            return "Adding the list to the cart failed right now. Apologise briefly and ask the shopper to try again."
+
     @function_tool
     async def end_call(self, context: RunContext, goodbye: str) -> ToolResult:
         """Says goodbye and ends the voice call.
@@ -427,6 +518,18 @@ async def entrypoint(ctx: JobContext) -> None:
                 "Tell the shopper briefly, in their language, and offer to try again."
             )
         session.generate_reply(instructions=instructions)
+        return "ok"
+
+    # Browser → agent: the shopper just scanned a photo of a shopping list.
+    @ctx.room.local_participant.register_rpc_method("list.scanned")
+    async def on_list_scanned(data: rtc.RpcInvocationData) -> str:
+        session.generate_reply(
+            instructions=(
+                "The shopper just scanned a photo of their shopping list. Call get_shopping_list, read the "
+                "list briefly in the shopper's language, mention what is not available, and ask whether to "
+                "add the items or change something."
+            )
+        )
         return "ok"
 
     run_in_background(enforce_time_limit())  # start the 2-minute clock

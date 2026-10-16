@@ -6,7 +6,10 @@ import { cartController } from "@/controllers/cart-controller";
 import type { Product } from "@/models/entities/product";
 import { checkoutController } from "@/controllers/checkout-controller";
 import { screenController } from "@/controllers/screen-controller";
+import { shoppingListController } from "@/controllers/shopping-list-controller";
 import { checkoutService } from "@/lib/client-container";
+import type { ListLine } from "@/models/entities/shopping-list";
+import { useShoppingListStore } from "@/store/shopping-list-store";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
@@ -213,4 +216,90 @@ export const voiceController = {
     };
   },
 
+  // ---------- shopping list (scanned from a photo) ----------
+
+  getShoppingList(ui: VoiceUi) {
+    const { lines } = useShoppingListStore.getState();
+    if (lines.length === 0) return NO_LIST;
+    ui.navigate("/scan-list");
+    return { ok: true, count: lines.length, lines: lines.map(toAgentListLine) };
+  },
+
+  removeListItem(input: { lineId?: unknown }) {
+    const line = findLine(input.lineId);
+    if (!line) return UNKNOWN_LINE;
+    shoppingListController.remove(line.id);
+    return { ok: true, message: `Removed "${line.original}" from the list.` };
+  },
+
+  addListItem(input: { name?: unknown; quantity?: unknown; unit?: unknown }, ui: VoiceUi) {
+    const name = typeof input.name === "string" ? input.name.trim() : "";
+    if (!name) return { ok: false, error: { code: "INVALID_QUERY", message: "No item name was given." } };
+    const quantity = typeof input.quantity === "number" && input.quantity > 0 ? input.quantity : null;
+    const unit = typeof input.unit === "string" && input.unit.trim() ? input.unit.trim() : null;
+    const line = shoppingListController.add(name, quantity, unit);
+    ui.navigate("/scan-list");
+    return { ok: true, line: toAgentListLine(line) };
+  },
+
+  updateListItem(input: { lineId?: unknown; packs?: unknown }) {
+    const line = findLine(input.lineId);
+    if (!line) return UNKNOWN_LINE;
+    if (!line.productId || line.status !== "found") {
+      return { ok: false, error: { code: "INVALID_QUANTITY", message: "That item has no product chosen yet." } };
+    }
+    if (typeof input.packs !== "number" || !Number.isInteger(input.packs) || input.packs < 1) {
+      return { ok: false, error: { code: "INVALID_QUANTITY", message: "Quantity must be a whole number above zero." } };
+    }
+    shoppingListController.setPacks(line.id, input.packs);
+    return { ok: true, line: toAgentListLine(findLine(line.id)!) };
+  },
+
+  chooseListItem(input: { lineId?: unknown; productId?: unknown }) {
+    const line = findLine(input.lineId);
+    if (!line) return UNKNOWN_LINE;
+    if (typeof input.productId !== "string" || !line.options.includes(input.productId)) {
+      return { ok: false, error: { code: "NOT_FOUND", message: "That product is not one of the options for this item." } };
+    }
+    shoppingListController.choose(line.id, input.productId);
+    return { ok: true, line: toAgentListLine(findLine(line.id)!) };
+  },
+
+  /** Adds every ready line to the cart. The agent only calls it after the shopper agreed. */
+  confirmShoppingList(ui: VoiceUi) {
+    if (useShoppingListStore.getState().lines.length === 0) return NO_LIST;
+    const result = shoppingListController.confirm();
+    ui.navigate("/cart");
+    return { ok: true, ...result };
+  },
 };
+
+const NO_LIST = {
+  ok: false,
+  error: { code: "EMPTY_LIST", message: "No shopping list yet. The shopper can tap Scan list and upload a photo." },
+};
+const UNKNOWN_LINE = { ok: false, error: { code: "NOT_FOUND", message: "That item is not on the list." } };
+
+function findLine(lineId: unknown): ListLine | undefined {
+  return useShoppingListStore.getState().lines.find((line) => line.id === lineId);
+}
+
+/** A list line as the agent sees it (product details, never prices as raw paise). */
+function toAgentListLine(line: ListLine) {
+  const product = line.productId ? catalogService.getProduct(line.productId) : undefined;
+  return {
+    lineId: line.id,
+    written: line.original,
+    status: line.status,
+    packs: line.packs,
+    limited: line.limited,
+    product: product ? toAgentProduct(product) : null,
+    options:
+      line.status === "choose"
+        ? line.options
+            .map((id) => catalogService.getProduct(id))
+            .filter((p): p is Product => p !== undefined)
+            .map(toAgentProduct)
+        : [],
+  };
+}

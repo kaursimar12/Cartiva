@@ -205,3 +205,35 @@ async def test_unclear_request_asks_instead_of_acting(chat, browser: FakeBrowser
     assert browser.cart == {"p001": 1}, "nothing may change on an unclear request"
     assert browser.payments == 0
     assert not browser.called("cart.add") and not browser.called("cart.remove")
+
+
+# ---------------------------------------------------------------- E. scanned shopping list
+
+
+def load_scanned_list(browser: FakeBrowser) -> None:
+    browser.load_list([
+        ("tamatar 2 kg", "found", "p001", 2, []),
+        ("Surf Excel", "choose", None, 0, ["p054", "p055", "p056"]),
+        ("pizza", "not-found", None, 0, []),
+    ])
+
+
+async def test_scanned_list_is_read_but_not_added_without_yes(chat, browser: FakeBrowser) -> None:
+    load_scanned_list(browser)
+    await chat("What's on my shopping list?")
+
+    assert browser.called("list.get"), "agent should read the list"
+    assert browser.cart == {}, "nothing may be added before the shopper agrees"
+    assert not browser.called("list.confirm")
+
+
+async def test_scanned_list_edit_then_add_after_yes(chat, browser: FakeBrowser) -> None:
+    load_scanned_list(browser)
+    await chat("What's on my shopping list?")
+    await chat("For Surf Excel take the 2 kg one")
+    await chat("Yes, add everything to my cart")
+
+    assert browser.called("list.confirm")
+    assert browser.cart.get("p001") == 2, "tomatoes 2 kg = 2 packs"
+    assert browser.cart.get("p055") == 1, "the chosen Surf Excel Matic 2 kg"
+    assert len(browser.cart) == 2, "pizza is not sold, so only two products"

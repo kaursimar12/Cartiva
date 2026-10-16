@@ -6,6 +6,7 @@ import { useEffect, type ReactNode } from "react";
 import { notifyAgent, registerVoiceRpc } from "@/lib/voice/rpc";
 import { voiceTokenSource } from "@/lib/voice/token-source";
 import { VoiceErrorReporter } from "./voice-error-reporter";
+import { VoiceListAnnouncer } from "./voice-list-announcer";
 
 /** One voice session for the whole site, so it survives page navigation. */
 export function VoiceProvider({ children }: { children: ReactNode }) {
@@ -28,6 +29,7 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       {children}
       <RoomAudioRenderer />
       <VoiceErrorReporter />
+      <VoiceListAnnouncer />
     </SessionProvider>
   );
 }

@@ -15,6 +15,12 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     "ui.openCategory": (payload) => voiceController.openCategory(payload, ui),
     "ui.openProduct": (payload) => voiceController.openProduct(payload, ui),
     "ui.getScreen": () => voiceController.getScreen(),
+    "list.get": () => voiceController.getShoppingList(ui),
+    "list.remove": (payload) => voiceController.removeListItem(payload),
+    "list.add": (payload) => voiceController.addListItem(payload, ui),
+    "list.update": (payload) => voiceController.updateListItem(payload),
+    "list.choose": (payload) => voiceController.chooseListItem(payload),
+    "list.confirm": () => voiceController.confirmShoppingList(ui),
     "checkout.start": () => voiceController.startCheckout(ui),
     "checkout.confirm": () => voiceController.confirmPayment(ui),
 

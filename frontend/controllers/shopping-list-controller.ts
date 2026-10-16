@@ -11,13 +11,14 @@ const setLines = (next: ListLine[]) => useShoppingListStore.setState({ lines: ne
 const updateLine = (id: string, change: (line: ListLine) => ListLine) =>
   setLines(lines().map((line) => (line.id === id ? change(line) : line)));
 
-/** Entry points for the shopping-list feature (the review page now, the voice agent in 14.4). */
+/** Entry points for the shopping-list feature: the review page and the voice agent both use these. */
 export const shoppingListController = {
   async scan(image: File) {
     useShoppingListStore.setState({ status: { name: "scanning" }, lines: [] });
     try {
       const items = await listScanner.scan(image);
       setLines(items.map((item) => shoppingListService.toLine(item, newId())));
+      useShoppingListStore.setState((state) => ({ scanId: state.scanId + 1 }));
       return { ok: true as const, lines: lines() };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Couldn't read the photo.";

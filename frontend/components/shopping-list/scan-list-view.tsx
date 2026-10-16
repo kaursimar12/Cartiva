@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { CameraIcon, TrashIcon } from "@/components/common/icons";
 import { QuantityStepper } from "@/components/products/quantity-stepper";
+import { ReviewWithVoiceButton } from "@/components/voice/review-with-voice-button";
 import { shoppingListController } from "@/controllers/shopping-list-controller";
 import { catalogService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
@@ -68,6 +69,8 @@ export function ScanListView() {
 
       {status.name === "ready" && (
         <>
+          <ReviewWithVoiceButton />
+
           <Section title={`Ready to add (${found.length})`}>
             {found.map((line) => (
               <FoundRow key={line.id} line={line} />

@@ -59,6 +59,28 @@ class FakeBrowser:
         self.screen: tuple[str, list[str]] = ("", [])  # (title, productIds in on-screen order)
         self.calls: list[tuple[str, dict[str, Any]]] = []
         self.payments = 0
+        self.shopping_list: list[dict[str, Any]] = []  # lines of a scanned list, like the review page
+
+    # ---- shopping list helpers (simulate a scanned photo) ----
+    def load_list(self, lines: list[tuple[str, str, str | None, int, list[str]]]) -> None:
+        """Each line: (written, status, productId, packs, option ids)."""
+        self.shopping_list = [
+            {"lineId": f"line-{i + 1}", "written": written, "status": status, "productId": pid,
+             "packs": packs, "options": options}
+            for i, (written, status, pid, packs, options) in enumerate(lines)
+        ]
+
+    def _list_line(self, line: dict[str, Any]) -> dict[str, Any]:
+        product = BY_ID.get(line["productId"]) if line["productId"] else None
+        return {
+            "lineId": line["lineId"], "written": line["written"], "status": line["status"],
+            "packs": line["packs"], "limited": False,
+            "product": agent_product(product) if product else None,
+            "options": [agent_product(BY_ID[o]) for o in line["options"]] if line["status"] == "choose" else [],
+        }
+
+    def _find_list_line(self, line_id: Any) -> dict[str, Any] | None:
+        return next((line for line in self.shopping_list if line["lineId"] == line_id), None)
 
     # ---- test helpers (simulate the shopper clicking) ----
     def click_category(self, category: str, sort_by_price_desc: bool = False) -> None:
@@ -166,3 +188,54 @@ class FakeBrowser:
         return {"ok": True, "paymentWindowOpen": True,
                 "message": "The payment window is open. The shopper completes the payment on screen; "
                            "you will be told the result."}
+
+    # ---- shopping list RPC methods (same shapes as frontend voiceController) ----
+    def _list_get(self, _: dict[str, Any]) -> dict[str, Any]:
+        if not self.shopping_list:
+            return {"ok": False, "error": {"code": "EMPTY_LIST", "message": "No shopping list yet."}}
+        return {"ok": True, "count": len(self.shopping_list), "lines": [self._list_line(l) for l in self.shopping_list]}
+
+    def _list_remove(self, p: dict[str, Any]) -> dict[str, Any]:
+        line = self._find_list_line(p.get("lineId"))
+        if line is None:
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That item is not on the list."}}
+        self.shopping_list.remove(line)
+        return {"ok": True, "message": f'Removed "{line["written"]}" from the list.'}
+
+    def _list_add(self, p: dict[str, Any]) -> dict[str, Any]:
+        name = str(p.get("name") or "").strip()
+        if not name:
+            return {"ok": False, "error": {"code": "INVALID_QUERY", "message": "No item name was given."}}
+        hits = search(name)
+        product = hits[0] if hits else None
+        status = "not-found" if product is None else ("found" if product["stock"] else "unavailable")
+        packs = max(1, int(p.get("quantity") or 1)) if status == "found" else 0
+        line = {"lineId": f"line-{len(self.shopping_list) + 100}", "written": name, "status": status,
+                "productId": product["id"] if product else None, "packs": packs, "options": []}
+        self.shopping_list.append(line)
+        return {"ok": True, "line": self._list_line(line)}
+
+    def _list_update(self, p: dict[str, Any]) -> dict[str, Any]:
+        line = self._find_list_line(p.get("lineId"))
+        if line is None or line["status"] != "found":
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That item cannot be changed."}}
+        line["packs"] = int(p.get("packs") or 1)
+        return {"ok": True, "line": self._list_line(line)}
+
+    def _list_choose(self, p: dict[str, Any]) -> dict[str, Any]:
+        line = self._find_list_line(p.get("lineId"))
+        if line is None or p.get("productId") not in line["options"]:
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": "Not one of the options."}}
+        line.update(status="found", productId=p["productId"], packs=1)
+        return {"ok": True, "line": self._list_line(line)}
+
+    def _list_confirm(self, _: dict[str, Any]) -> dict[str, Any]:
+        added, failed, skipped = [], [], []
+        for line in self.shopping_list:
+            if line["status"] != "found":
+                skipped.append(line["written"])
+                continue
+            result = self._cart_add({"productId": line["productId"], "quantity": line["packs"]})
+            (added if result["ok"] else failed).append(line["written"])
+        self.shopping_list = []
+        return {"ok": True, "added": added, "failed": failed, "skipped": skipped}
