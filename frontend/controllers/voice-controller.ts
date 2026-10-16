@@ -11,6 +11,8 @@ import { checkoutService } from "@/lib/client-container";
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
   navigate(url: string): void;
+  /** Sends a message to the voice agent (browser → agent RPC). */
+  notifyAgent(method: string, payload: unknown): void;
 }
 
 /** How many products we describe to the agent; the screen still shows all of them. */
@@ -188,17 +190,26 @@ export const voiceController = {
     };
   },
 
-  /** Voice checkout step 2: pays, exactly like the Pay button. The agent only calls it after an explicit "yes". */
-  async confirmPayment(ui: VoiceUi) {
-    const result = await checkoutController.confirmAndPay({ simulateFailure: false });
-    if (!result.ok) return { ok: false, error: result.error };
+  /**
+   * Voice checkout step 2 (the agent only calls it after an explicit "yes").
+   * Opens the payment exactly like the Pay button, but doesn't wait: entering card details takes
+   * longer than an RPC may. The result is sent to the agent afterwards as "payment.result".
+   */
+  confirmPayment(ui: VoiceUi) {
+    ui.navigate("/checkout"); // the shopper sees the payment status there
+    void checkoutController.confirmAndPay({ simulateFailure: false }).then((result) =>
+      ui.notifyAgent(
+        "payment.result",
+        result.ok
+          ? { ok: true, orderId: result.data.id, total: formatPrice(result.data.pricing.total) }
+          : { ok: false, reason: result.error.message },
+      ),
+    );
 
-    ui.navigate("/order-success");
     return {
       ok: true,
-      message: result.message,
-      orderId: result.data.id,
-      total: formatPrice(result.data.pricing.total),
+      paymentWindowOpen: true,
+      message: "The payment window is open. The shopper completes the payment on screen; you will be told the result.",
     };
   },
 

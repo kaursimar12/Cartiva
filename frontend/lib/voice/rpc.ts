@@ -31,3 +31,13 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     for (const name of Object.keys(methods)) room.unregisterRpcMethod(name);
   };
 }
+
+/** Browser → agent: tells the voice agent something happened (e.g. the payment finished). */
+export function notifyAgent(room: Room, method: string, payload: unknown): void {
+  const agent = [...room.remoteParticipants.values()].find((participant) => participant.isAgent);
+  if (!agent) return; // no voice session right now: nothing to tell
+
+  room.localParticipant
+    .performRpc({ destinationIdentity: agent.identity, method, payload: JSON.stringify(payload) })
+    .catch(() => {}); // the agent may have hung up meanwhile; the screen already shows the result
+}

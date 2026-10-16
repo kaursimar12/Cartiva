@@ -161,8 +161,8 @@ class FakeBrowser:
                 "message": f"Your total is {total}. Would you like to proceed to payment?"}
 
     def _checkout_confirm(self, _: dict[str, Any]) -> dict[str, Any]:
+        # Like the real browser: opens the payment window and returns at once (result comes later).
         self.payments += 1
-        total = self._cart_get({})["total"]
-        self.cart.clear()
-        return {"ok": True, "message": "Your payment was successful and your order has been placed.",
-                "orderId": "order_TEST", "total": total}
+        return {"ok": True, "paymentWindowOpen": True,
+                "message": "The payment window is open. The shopper completes the payment on screen; "
+                           "you will be told the result."}

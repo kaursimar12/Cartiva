@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from typing import Literal
 
@@ -17,6 +18,8 @@ from livekit.agents import (
     get_job_context,
     inference,
 )
+
+from livekit import rtc
 
 from agent.rpc import BrowserRpcError, call_browser
 
@@ -94,7 +97,9 @@ Never invent products, brands, varieties, prices or options; only use what the t
 When the shopper wants to check out or pay, call start_checkout. Then read out the total and
 ask clearly whether to pay now. Only call confirm_payment if their answer is a clear yes.
 If they say no, wait, or change their mind, call cancel_pending_action. If the cart changes,
-checkout must be started again. Never say a payment succeeded unless confirm_payment says so.
+checkout must be started again. After confirm_payment, tell the shopper to complete the payment
+in the window on screen. You will then receive the result; never say a payment succeeded before that.
+If it failed and the shopper wants to try again, call start_checkout again.
 
 # Ending the call
 When the shopper says goodbye or that they are done (for example "bye", "that's all",
@@ -291,9 +296,9 @@ class CartivaAssistant(Agent):
 
     @function_tool
     async def confirm_payment(self, context: RunContext) -> dict | str:
-        """Pays for the order. Call this ONLY right after start_checkout, and only when the shopper
-        has clearly said yes to the total you read out (for example "yes", "pay now", "confirm",
-        "हाँ", "कर दो").
+        """Opens the payment window for the order. Call this ONLY right after start_checkout, and only
+        when the shopper has clearly said yes to the total you read out (for example "yes", "pay now",
+        "confirm", "हाँ", "कर दो"). The shopper then pays on screen; you are told the result later.
         """
         if self._pending_checkout_total is None:
             return (
@@ -404,6 +409,23 @@ async def entrypoint(ctx: JobContext) -> None:
 
     await session.start(agent=CartivaAssistant(), room=ctx.room)
     await ctx.connect()
+
+    # Browser → agent: the payment finished (it can take a minute, so we're told instead of waiting).
+    @ctx.room.local_participant.register_rpc_method("payment.result")
+    async def on_payment_result(data: rtc.RpcInvocationData) -> str:
+        result = json.loads(data.payload)
+        if result.get("ok"):
+            instructions = (
+                "The payment succeeded and the order is placed. Tell the shopper briefly, "
+                "in their language, and thank them."
+            )
+        else:
+            instructions = (
+                f"The payment did not go through ({result.get('reason')}). Nothing was charged. "
+                "Tell the shopper briefly, in their language, and offer to try again."
+            )
+        session.generate_reply(instructions=instructions)
+        return "ok"
 
     run_in_background(enforce_time_limit())  # start the 2-minute clock
 
