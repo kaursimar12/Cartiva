@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     razorpay_key_id: str
     razorpay_key_secret: SecretStr
 
+    # OpenAI (reads photos of grocery lists)
+    openai_api_key: SecretStr
+    openai_vision_model: str = "gpt-4.1-mini"
+
     # Optional, with defaults
     cors_origins: list[str] = ["http://localhost:3000"]
     data_dir: Path = BACKEND_DIR.parent / "frontend" / "data"

@@ -8,6 +8,7 @@ dependencies = [
     "fastapi[standard]>=0.142.2",
     "livekit-agents~=1.8",
     "livekit-api>=1.2.1",
+    "openai>=2.54.0",
     "pydantic-settings>=2.15.0",
     "python-dotenv>=1.2.4",
     "razorpay>=2.0.1",
