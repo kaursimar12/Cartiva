@@ -25,7 +25,6 @@ export function CheckoutView() {
   const router = useRouter();
   const { hydrated, items, lines, pricing } = useCart();
   const [step, setStep] = useState<Step>({ name: "review" });
-  const [simulateFailure, setSimulateFailure] = useState(false);
 
   if (step.name === "success") {
     return <p className="py-20 text-center text-zinc-600">Payment successful. Taking you to your order…</p>;
@@ -39,7 +38,7 @@ export function CheckoutView() {
 
   async function handlePay() {
     setStep({ name: "processing" });
-    const result = await checkoutController.confirmAndPay({ simulateFailure });
+    const result = await checkoutController.confirmAndPay({ simulateFailure: false });
     if (result.ok) {
       setStep({ name: "success" });
       router.push("/order-success");
@@ -148,18 +147,16 @@ export function CheckoutView() {
         </section>
 
         <section className="rounded-2xl border border-dashed border-zinc-200 bg-surface shadow-sm-muted p-4 text-sm text-zinc-700">
-          <p className="font-semibold">Test mode</p>
-          <p className="mt-1">Mock payment — no real money is charged. Razorpay is connected in a later phase.</p>
-          <label className="mt-3 flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={simulateFailure}
-              onChange={(e) => setSimulateFailure(e.target.checked)}
-              disabled={step.name === "processing"}
-              className="h-4 w-4 accent-zinc-900"
-            />
-            Simulate payment failure
-          </label>
+          <p className="font-semibold">Razorpay test mode</p>
+          <p className="mt-1">No real money is charged. To try it:</p>
+          <ul className="mt-2 list-disc space-y-1 pl-5">
+            <li>
+              Card <span className="font-mono">4100 2800 0000 1007</span>, any future expiry, any CVV
+            </li>
+            <li>
+              Or Netbanking → any bank → <strong>Success</strong> (or <strong>Failure</strong> to test a failed payment)
+            </li>
+          </ul>
         </section>
       </aside>
     </div>

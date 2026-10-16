@@ -54,7 +54,7 @@ export class CheckoutService {
     if (!validation.ok) return validation;
 
     const pricing = validation.data;
-    const result = await this.payments.pay({ amount: pricing.total, simulateFailure: options.simulateFailure });
+    const result = await this.payments.pay({ items, amount: pricing.total, simulateFailure: options.simulateFailure });
     if (!result.ok) return { ok: false, error: { code: "PAYMENT_FAILED", message: result.reason } };
 
     const order = this.buildOrder(items, pricing, result.orderId, result.paymentId);

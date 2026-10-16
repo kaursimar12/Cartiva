@@ -18,6 +18,10 @@ class Settings(BaseSettings):
     livekit_api_key: str
     livekit_api_secret: SecretStr
 
+    # Razorpay (test keys while developing: rzp_test_...)
+    razorpay_key_id: str
+    razorpay_key_secret: SecretStr
+
     # Optional, with defaults
     cors_origins: list[str] = ["http://localhost:3000"]
     data_dir: Path = BACKEND_DIR.parent / "frontend" / "data"

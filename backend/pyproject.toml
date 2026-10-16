@@ -10,6 +10,7 @@ dependencies = [
     "livekit-api>=1.2.1",
     "pydantic-settings>=2.15.0",
     "python-dotenv>=1.2.4",
+    "razorpay>=2.0.1",
 ]
 
 [tool.fastapi]
