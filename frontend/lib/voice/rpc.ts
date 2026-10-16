@@ -1,4 +1,5 @@
 import type { Room, RpcInvocationData } from "livekit-client";
+import { voiceActivityController } from "@/controllers/voice-activity-controller";
 import { voiceController, type VoiceUi } from "@/controllers/voice-controller";
 
 type RpcMethod = (payload: Record<string, unknown>) => unknown;
@@ -29,7 +30,15 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
   for (const [name, method] of Object.entries(methods)) {
     room.registerRpcMethod(name, async (data: RpcInvocationData) => {
       const payload = data.payload ? (JSON.parse(data.payload) as Record<string, unknown>) : {};
-      return JSON.stringify(await method(payload));
+      voiceActivityController.started(name);
+      try {
+        const result = await method(payload);
+        voiceActivityController.finished(name, result);
+        return JSON.stringify(result);
+      } catch (error) {
+        voiceActivityController.finished(name, { ok: false, error: { message: "Something went wrong." } });
+        throw error;
+      }
     });
   }
 
