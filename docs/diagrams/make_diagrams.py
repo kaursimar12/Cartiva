@@ -16,6 +16,7 @@ LANES = {
     "backend": ("#fff7ed", "#ea580c", "Backend (FastAPI)"),
     "agent": ("#fdf4ff", "#c026d3", "Voice agent (Python)"),
     "livekit": ("#eff6ff", "#2563eb", "LiveKit Cloud"),
+    "rpc": ("#ecfeff", "#0891b2", "RPC bridge (through the room)"),
     "ok": ("#f0fdf4", "#16a34a", "Success"),
     "error": ("#fef2f2", "#dc2626", "Error / alternative"),
 }
@@ -63,7 +64,7 @@ def arrow(x1, y1, x2, y2, label=None, color="#52525b", lx=None, ly=None):
 
 
 def markers():
-    colors = {"#52525b", "#dc2626", "#16a34a", "#2563eb", "#ea580c", "#059669", "#c026d3"}
+    colors = {"#52525b", "#dc2626", "#16a34a", "#2563eb", "#ea580c", "#059669", "#c026d3", "#0891b2"}
     defs = ["<defs>"]
     for c in colors:
         defs.append(
@@ -139,72 +140,151 @@ def flow(filename, title, example, nodes):
 
 # ---------------------------------------------------------------- diagrams
 
-flow("01-manual-add-to-cart.svg", "1 · Manual shopping: “Add to cart” button", "the shopper clicks Add on Tomato (1 kg · ₹40)", [
-    {"lane": "user", "title": "Click “Add” on Tomato", "file": "components/products/add-to-cart-control.tsx"},
-    {"lane": "frontend", "title": "cartController.add(\"p001\", 1)", "sub": ["Controller: entry point for the action"], "file": "controllers/cart-controller.ts"},
+flow("01-manual-add-to-cart.svg", "1 · Clicking “Add to cart” (no voice)", "the shopper clicks ADD on Tomato (1 kg · ₹40)", [
+    {"lane": "user", "title": "Click “ADD” on Tomato", "file": "components/products/add-to-cart-control.tsx"},
+    {"lane": "frontend", "title": "cartController.add(\"p001\", 1)", "sub": ["Controller: the entry point for the action"], "file": "controllers/cart-controller.ts"},
     {"lane": "frontend", "decision": True, "title": "cartService.add — business rules", "sub": ["Product exists? In stock? Quantity valid?"], "file": "services/cart-service.ts",
-     "side": {"lane": "error", "title": "Error toast", "sub": ["OUT_OF_STOCK · PARTIAL_STOCK", "NOT_FOUND · INVALID_QUANTITY"], "edge": "fails"}},
+     "side": {"lane": "error", "title": "Red toast", "sub": ["OUT_OF_STOCK · PARTIAL_STOCK", "NOT_FOUND · INVALID_QUANTITY"], "edge": "fails"}},
     {"lane": "frontend", "edge": "ok", "title": "Save cart items", "sub": ["Kept in localStorage (survives refresh)"], "file": "store/cart-store.ts"},
     {"lane": "frontend", "title": "Recalculate the bill (in paise)", "sub": ["subtotal − discount + delivery = total"], "file": "services/pricing/pricing-service.ts + data/*.json"},
-    {"lane": "frontend", "title": "Screen updates", "sub": ["Cart icon count · bill · offer hints"], "file": "hooks/use-cart.ts"},
-    {"lane": "ok", "title": "Toast: “Added 1 × Tomato (1 kg) to your cart”"},
+    {"lane": "ok", "title": "Cart icon updates + green toast", "sub": ["“Added 1 × Tomato (1 kg) to your cart”"], "file": "hooks/use-cart.ts"},
 ])
 
-flow("02-console-voice-test.svg", "2 · Voice test in the terminal (step 6.5)", "uv run python -m agent.worker console → “Hi, what can you do?”", [
-    {"lane": "user", "title": "Run the agent in console mode", "sub": ["uv run python -m agent.worker console"]},
-    {"lane": "agent", "title": "Load LiveKit settings", "sub": ["LIVEKIT_URL · LIVEKIT_API_KEY · LIVEKIT_API_SECRET"], "file": "agent/worker.py → load_dotenv() → backend/.env"},
-    {"lane": "agent", "title": "Console mode", "sub": ["Uses this PC's mic and speakers — no website, no room"], "file": "agent/worker.py → cli.run_app(server)"},
-    {"lane": "agent", "title": "Build the voice pipeline", "sub": ["AgentSession + CartivaAssistant (INSTRUCTIONS = “You are Cartiva…”)"], "file": "agent/worker.py → entrypoint()"},
-    {"lane": "ok", "title": "Agent greets you", "sub": ["🔊 “Hi! Welcome to Cartiva. What do you need today?”"]},
-    {"lane": "user", "title": "You speak", "sub": ["🎤 “Hi, what can you do?”"]},
-    {"lane": "livekit", "title": "STT — AssemblyAI (the ears)", "sub": ["speech → text: “hi what can you do”"], "file": "LiveKit Inference (cloud)"},
-    {"lane": "livekit", "title": "Turn detector", "sub": ["Decides: “the user finished speaking — reply now”"]},
-    {"lane": "livekit", "title": "LLM — Gemma (the brain)", "sub": ["INSTRUCTIONS + conversation → reply text"]},
-    {"lane": "livekit", "title": "TTS — Fish Audio (the voice)", "sub": ["text → speech"]},
-    {"lane": "ok", "title": "You hear the reply", "sub": ["🔊 “I'm Cartiva, I can help you shop for groceries…”", "Dashed arrow: talk again · Ctrl + C to stop"], "loop_to": 5},
+flow("02-start-voice-session.svg", "2 · Starting a voice session", "the shopper clicks 🎤 “Ask Cartiva” on localhost:3000", [
+    {"lane": "user", "title": "Click 🎤 “Ask Cartiva”", "file": "components/voice/voice-button.tsx → session.start()"},
+    {"lane": "frontend", "title": "Ask FastAPI for a token", "sub": ["POST {NEXT_PUBLIC_BACKEND_URL}/api/livekit/token"], "file": "lib/voice/token-source.ts"},
+    {"lane": "backend", "decision": True, "title": "CORS check", "sub": ["Is the page's origin (localhost:3000) allowed?"], "file": "backend/app/main.py",
+     "side": {"lane": "error", "title": "Browser blocks the reply", "sub": ["Any other website"], "edge": "no"}},
+    {"lane": "backend", "edge": "yes", "title": "Sign a token for a NEW private room", "sub": ["+ “dispatch agent cartiva-agent” written inside", "signed with the secret from backend/.env"], "file": "backend/app/routers/livekit.py"},
+    {"lane": "livekit", "title": "Browser joins room “cartiva-ab12cd34”", "sub": ["Mic turns on (browser asks permission once)"], "file": "components/voice/voice-provider.tsx"},
+    {"lane": "livekit", "title": "LiveKit reads the token → sends a job to cartiva-agent"},
+    {"lane": "agent", "title": "Agent worker joins the same room", "sub": ["Builds STT + LLM + TTS, starts the 2-minute clock"], "file": "backend/agent/worker.py → entrypoint()"},
+    {"lane": "frontend", "title": "Browser has registered its RPC methods", "sub": ["cart.*, catalog.search, ui.*, checkout.* — the only things the agent may ask"], "file": "lib/voice/rpc.ts"},
+    {"lane": "ok", "title": "🔊 “Hi! I'm Cartiva. What do you need today?”", "sub": ["Button: Connecting… → Agent joining… → Listening…"]},
 ])
 
-flow("03-website-voice-session.svg", "3 · Voice from the website (step 6.6)", "the shopper clicks 🎤 on http://localhost:3000", [
-    {"lane": "user", "title": "Click 🎤 on the website", "file": "components/voice/voice-button.tsx"},
-    {"lane": "frontend", "title": "Ask the backend for a token", "sub": ["POST {NEXT_PUBLIC_BACKEND_URL}/api/livekit/token"], "file": "frontend/.env"},
-    {"lane": "backend", "decision": True, "title": "CORS check", "sub": ["Is http://localhost:3000 on the allowed list?"], "file": "app/main.py (CORSMiddleware)",
-     "side": {"lane": "error", "title": "Browser blocks the response", "sub": ["Any other site / origin"], "edge": "not allowed"}},
-    {"lane": "backend", "edge": "allowed", "title": "Create a signed token for a new room", "sub": ["Signed with LIVEKIT_API_SECRET (never leaves the server)"], "file": "app/routers/livekit.py + app/config.py"},
-    {"lane": "frontend", "title": "Receive { token, url, room_name, identity }", "sub": ["room_name: “cartiva-6de253d7”"]},
-    {"lane": "livekit", "future": True, "title": "Browser joins the room with the token", "file": "lib/voice/ (step 6.6)"},
-    {"lane": "livekit", "future": True, "title": "LiveKit dispatches “cartiva-agent” to the room"},
-    {"lane": "agent", "title": "Agent worker joins the same room", "sub": ["Running with: uv run python -m agent.worker dev"], "file": "agent/worker.py → entrypoint()"},
-    {"lane": "ok", "future": True, "title": "Live conversation in the browser", "sub": ["🎤 → STT → LLM → TTS → 🔊", "Voice UI: LISTENING · THINKING · AGENT_SPEAKING"], "file": "types/voice.ts + components/voice/"},
+flow("03-one-voice-turn.svg", "3 · What happens in ONE voice turn", "the shopper says something, the agent answers (with or without tools)", [
+    {"lane": "user", "title": "🎤 The shopper speaks", "sub": ["audio travels through the LiveKit room"]},
+    {"lane": "livekit", "title": "STT — Deepgram Nova-3 (language “multi”)", "sub": ["speech → text, English / Hindi / Hinglish"], "file": "LiveKit Inference (cloud)"},
+    {"lane": "livekit", "title": "Turn detector: “has the shopper finished?”", "sub": ["avoids cutting people off mid-pause"]},
+    {"lane": "agent", "decision": True, "title": "LLM reads INSTRUCTIONS + chat history + tools", "sub": ["Decides: just answer, or call a tool first?"], "file": "backend/agent/worker.py → INSTRUCTIONS",
+     "side": {"lane": "ok", "title": "Just answer", "sub": ["e.g. “What can you do?”"], "edge": "no tool"}},
+    {"lane": "agent", "edge": "tool", "title": "Run the tool (up to 8 rounds per reply)", "sub": ["e.g. search_products, add_to_cart, get_screen"], "file": "backend/agent/worker.py → @function_tool"},
+    {"lane": "rpc", "title": "call_browser(\"catalog.search\", {…})", "sub": ["perform_rpc to the shopper's browser, 5 s timeout"], "file": "backend/agent/rpc.py → frontend/lib/voice/rpc.ts"},
+    {"lane": "frontend", "title": "voiceController runs the SAME services as the buttons", "sub": ["returns JSON: results, or an error code + message"], "file": "frontend/controllers/voice-controller.ts"},
+    {"lane": "agent", "title": "LLM turns the JSON into a short sentence", "sub": ["in the shopper's language; never invents data"]},
+    {"lane": "livekit", "title": "TTS — Cartesia Sonic 3 (Hindi-capable voice)", "sub": ["text → speech"]},
+    {"lane": "ok", "title": "🔊 The shopper hears the reply", "sub": ["Talk over it → adaptive interruption stops the agent", "(“mm-hmm”, “haan” are ignored as backchannels)"]},
 ])
 
-flow("04-voice-add-to-cart.svg", "4 · Voice adds to the cart (Phase 7)", "the shopper says “Add 2 kg tomatoes”", [
-    {"lane": "user", "title": "🎤 “Add 2 kg tomatoes”"},
-    {"lane": "agent", "title": "STT → text, then the LLM chooses a tool", "sub": ["“I need to find tomatoes first”"]},
-    {"lane": "agent", "future": True, "title": "Tool: search_products(\"tomatoes\")", "sub": ["Tools only forward — no business logic"], "file": "agent/tools.py"},
-    {"lane": "livekit", "future": True, "title": "RPC → browser: catalog.search", "file": "agent/rpc.py → lib/voice/"},
-    {"lane": "frontend", "title": "catalogService.search(\"tomatoes\")", "sub": ["→ Tomato · 1 kg · ₹40 · id p001"], "file": "services/catalog-service.ts + data/products.json"},
-    {"lane": "agent", "future": True, "title": "LLM: 1 kg pack, user wants 2 kg → quantity 2", "sub": ["Tool: add_to_cart(\"p001\", 2)"], "file": "agent/tools.py"},
-    {"lane": "livekit", "future": True, "title": "RPC → browser: cart.add"},
-    {"lane": "frontend", "decision": True, "title": "cartController.add → cartService.add", "sub": ["The SAME code as the “Add” button · stock check"], "file": "controllers/cart-controller.ts + services/cart-service.ts",
-     "side": {"lane": "error", "title": "Result: PARTIAL_STOCK / OUT_OF_STOCK", "sub": ["Agent explains the problem aloud"], "edge": "fails"}},
-    {"lane": "frontend", "edge": "ok", "title": "Cart updates on screen + toast", "file": "store/cart-store.ts"},
-    {"lane": "ok", "title": "🔊 “Done! I've added two kilos of tomatoes.”"},
+flow("04-voice-search.svg", "4 · Searching by voice", "“Show me dishwashing liquids under 200”", [
+    {"lane": "user", "title": "🎤 “Show me dishwashing liquids under 200”"},
+    {"lane": "agent", "title": "search_products(query=\"dishwashing liquid\", max_price=200)", "sub": ["one product per search · Hindi words translated to English"], "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “catalog.search” {query, maxPrice: 200}", "file": "backend/agent/rpc.py → frontend/lib/voice/rpc.ts"},
+    {"lane": "frontend", "title": "catalogService.filter({query, maxPrice: 20000 paise})", "sub": ["the same search as the search box (rupees → paise)"], "file": "controllers/voice-controller.ts → services/catalog-service.ts"},
+    {"lane": "frontend", "title": "Navigate to /search?q=dishwashing+liquid&max=200", "sub": ["the shopper SEES the same 4 products"], "file": "app/search/page.tsx"},
+    {"lane": "frontend", "decision": True, "title": "Any results?",
+     "side": {"lane": "error", "title": "count = 0 → hint added", "sub": ["“Don't repeat this search;", "search products separately”"], "edge": "none"}},
+    {"lane": "agent", "edge": "yes", "title": "LLM gets up to 8 products", "sub": ["id, name, unit, price, priceRupees — remembers ids, never reads them aloud"]},
+    {"lane": "ok", "title": "🔊 “I found four. The cheapest is Vim, fifty-five rupees…”"},
 ])
 
-flow("05-voice-checkout-payment.svg", "5 · Voice checkout and payment (Phases 7–9)", "“Checkout” → agent asks to confirm → “Yes” → Razorpay", [
-    {"lane": "user", "title": "🎤 “Checkout”"},
-    {"lane": "agent", "future": True, "title": "Tool: start_checkout", "file": "agent/tools.py"},
-    {"lane": "frontend", "decision": True, "title": "checkoutController.validate()", "sub": ["Cart not empty? Everything in stock?"], "file": "controllers/checkout-controller.ts",
-     "side": {"lane": "error", "title": "🔊 “Your cart is empty”", "sub": ["or “Tomato is out of stock”"], "edge": "invalid"}},
-    {"lane": "agent", "edge": "valid", "future": True, "title": "🔊 “Your total is ninety-one rupees. Proceed?”", "sub": ["pending_confirmation = true"], "file": "agent/context.py"},
+flow("05-voice-add-to-cart.svg", "5 · Adding to the cart by voice", "“Add 1 kg tomatoes and 2 kg potatoes”", [
+    {"lane": "user", "title": "🎤 “Add 1 kg tomatoes and 2 kg potatoes”"},
+    {"lane": "agent", "title": "search_products(\"tomato\") and search_products(\"potato\")", "sub": ["needs productIds first — never guesses an id"]},
+    {"lane": "agent", "decision": True, "title": "Which product exactly?", "sub": ["plain product over variants (Tomato, not Cherry/Puree)", "pack size said? “1 kg” → the 1 kg pack"],
+     "side": {"lane": "error", "title": "Still unclear → ASK", "sub": ["e.g. “Surf Excel” = 3 products", "“Which one would you like?”"], "edge": "unclear"}},
+    {"lane": "agent", "edge": "clear", "title": "Quantity = number of PACKS", "sub": ["Tomato 1 kg pack: “1 kg” = 1 · Potato 1 kg pack: “2 kg” = 2"]},
+    {"lane": "agent", "title": "add_to_cart(\"p001\", 1) · add_to_cart(\"p004\", 2)", "sub": ["also clears any pending checkout (the total changed)"], "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “cart.add” {productId, quantity}", "file": "frontend/lib/voice/rpc.ts"},
+    {"lane": "frontend", "decision": True, "title": "cartController.add → cartService.add", "sub": ["the SAME code as the ADD button: stock checks + toast"], "file": "controllers/cart-controller.ts → services/cart-service.ts",
+     "side": {"lane": "error", "title": "PARTIAL_STOCK / OUT_OF_STOCK", "sub": ["agent explains and offers", "the available amount"], "edge": "fails"}},
+    {"lane": "ok", "edge": "ok", "title": "🔊 “Added one kilo of tomatoes and two kilos of potatoes.”", "sub": ["cart icon + toast update on screen"]},
+])
+
+flow("06-voice-remove-update.svg", "6 · Removing items and changing quantities", "“One more tomato” · “Remove the milk” · “Make it 3”", [
+    {"lane": "user", "title": "🎤 “One more tomato”"},
+    {"lane": "agent", "title": "get_cart() first", "sub": ["finds the productId and the CURRENT quantity (Tomato = 2)"]},
+    {"lane": "rpc", "title": "RPC “cart.get” → items, quantities, bill", "file": "controllers/voice-controller.ts → cartService.getCart()"},
+    {"lane": "agent", "decision": True, "title": "Which cart item? What is the new total?", "sub": ["“one more” → 2 + 1 = 3 · “make it 3” → 3 · 0 → remove"],
+     "side": {"lane": "error", "title": "Not in the cart / unclear", "sub": ["“Bananas aren't in your cart”", "or “Which milk?”"], "edge": "unclear"}},
+    {"lane": "agent", "edge": "clear", "title": "update_cart(\"p001\", 3)  or  remove_from_cart(\"p019\")", "sub": ["also clears any pending checkout"], "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “cart.update” / “cart.remove”", "file": "frontend/lib/voice/rpc.ts"},
+    {"lane": "frontend", "title": "cartController.updateQuantity / remove", "sub": ["the SAME code as the − / + / 🗑 buttons"], "file": "controllers/cart-controller.ts"},
+    {"lane": "ok", "title": "🔊 “You now have three kilos of tomatoes.”"},
+])
+
+flow("07-voice-navigation.svg", "7 · Moving around the website by voice", "“Go to fruits” · “Open the Pril one”", [
+    {"lane": "user", "title": "🎤 “Go to fruits”  /  “डेयरी दिखाओ”"},
+    {"lane": "agent", "title": "navigate_category(category=\"fruits\")", "sub": ["category must be one of 9 fixed values (Python Literal)"], "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “ui.openCategory” {category}", "file": "frontend/lib/voice/rpc.ts"},
+    {"lane": "frontend", "decision": True, "title": "Category exists?", "file": "controllers/voice-controller.ts → openCategory",
+     "side": {"lane": "error", "title": "NOT_FOUND", "sub": ["“There's no electronics section”", "page does not change"], "edge": "no"}},
+    {"lane": "frontend", "edge": "yes", "title": "router.push(\"/category/fruits\")", "sub": ["the voice call keeps going (VoiceProvider lives in the layout)"], "file": "components/voice/voice-provider.tsx"},
+    {"lane": "agent", "title": "Gets the products on that page (with ids)", "sub": ["so “add apples” next needs no new search"]},
+    {"lane": "ok", "title": "🔊 “Here are our fruits, like bananas and apples.”", "sub": ["“Open the Pril one” → open_product(id) → /product/p047"]},
+])
+
+flow("08-screen-references.svg", "8 · “The cheapest one” after browsing by clicking", "the shopper clicks Snacks, then says “Add the cheapest one”", [
+    {"lane": "user", "title": "🖱️ Clicks “Snacks” (and maybe sorts / filters)"},
+    {"lane": "frontend", "title": "ProductBrowser reports what is visible", "sub": ["products AFTER filters + sorting, in on-screen order"], "file": "components/products/product-browser.tsx"},
+    {"lane": "frontend", "title": "screenController.showProducts(\"Snacks\", [ids…])", "file": "controllers/screen-controller.ts → store/screen-store.ts"},
+    {"lane": "user", "title": "🎤 “Add the cheapest one”"},
+    {"lane": "agent", "title": "get_screen()", "sub": ["the agent didn't show this list itself, so it looks at the screen"], "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “ui.getScreen” → page + products", "sub": ["position 1, 2, 3… and numeric priceRupees for comparing"], "file": "controllers/voice-controller.ts → getScreen"},
+    {"lane": "agent", "decision": True, "title": "Exactly one cheapest?", "sub": ["compares priceRupees (numbers, not text)"],
+     "side": {"lane": "error", "title": "Tie → ASK by name", "sub": ["“Lay's Classic, Lay's Masala and", "Kurkure all cost twenty rupees.", "Which one should I add?”"], "edge": "tie"}},
+    {"lane": "agent", "edge": "one", "title": "add_to_cart(cheapest id, 1)"},
+    {"lane": "ok", "title": "🔊 “Added it to your cart.”", "sub": ["same for “the second one”, or “this one” on a product page"]},
+])
+
+flow("09-voice-checkout.svg", "9 · Checkout by voice — never pays without “yes”", "“Checkout” → total read out → “Yes” (or “No”)", [
+    {"lane": "user", "title": "🎤 “Checkout”  (or “Pay now”)"},
+    {"lane": "agent", "title": "start_checkout()  — never pays", "file": "backend/agent/worker.py"},
+    {"lane": "rpc", "title": "RPC “checkout.start” → checkoutService.validate()", "file": "controllers/voice-controller.ts → startCheckout"},
+    {"lane": "frontend", "decision": True, "title": "Cart valid?", "sub": ["not empty · in stock · quantities available"],
+     "side": {"lane": "error", "title": "🔊 “Your cart is empty”", "sub": ["or “Tomato is out of stock”"], "edge": "no"}},
+    {"lane": "agent", "edge": "yes", "title": "🔒 _pending_checkout_total = \"₹245\"", "sub": ["browser opens /checkout"]},
+    {"lane": "ok", "title": "🔊 “Your total is two hundred forty-five rupees. Shall I pay now?”"},
     {"lane": "user", "decision": True, "title": "Shopper answers",
-     "side": {"lane": "error", "title": "“No” / “Cancel”", "sub": ["cancel_pending_action", "Payment never starts"], "edge": "no"}},
-    {"lane": "agent", "edge": "yes", "future": True, "title": "Tool: confirm_payment", "sub": ["Allowed ONLY while pending_confirmation is set"], "file": "agent/tools.py"},
-    {"lane": "backend", "future": True, "title": "POST /api/payment/create-order", "sub": ["Recalculates the total from JSON in paise (never trusts the browser)"], "file": "app/routers/payment.py + app/pricing.py"},
-    {"lane": "frontend", "future": True, "title": "Razorpay Checkout popup", "sub": ["The shopper pays — the agent never touches payment"]},
-    {"lane": "backend", "decision": True, "future": True, "title": "POST /api/payment/verify", "sub": ["HMAC signature check"], "file": "app/routers/payment.py",
-     "side": {"lane": "error", "title": "Payment failed / cancelled", "sub": ["Cart kept · retry offered", "🔊 “The payment didn't go through.”"], "edge": "invalid"}},
-    {"lane": "ok", "edge": "valid", "title": "Order placed", "sub": ["Cart cleared · /order-success page", "🔊 “Your payment was successful!”"]},
+     "side": {"lane": "error", "title": "“No” / “Wait” / “रहने दो”", "sub": ["cancel_pending_action → flag cleared", "nothing paid, cart kept"], "edge": "no"}},
+    {"lane": "agent", "edge": "yes", "decision": True, "title": "confirm_payment(): is the flag set?", "sub": ["cleared by ANY cart change after start_checkout", "one “yes” = one payment attempt"],
+     "side": {"lane": "error", "title": "Refuse — nothing paid", "sub": ["“Start checkout first and", "confirm the (new) total”"], "edge": "not set"}},
+    {"lane": "rpc", "edge": "set", "title": "RPC “checkout.confirm” → checkoutController.confirmAndPay()", "sub": ["the SAME call as the Pay button (mock today, Razorpay in Phase 9)"]},
+    {"lane": "ok", "title": "/order-success · cart cleared · 🔊 “Payment successful!”"},
+])
+
+flow("10-ending-a-call.svg", "10 · How a voice call ends (protects the free credit)", "“Bye” · silence · the 2-minute limit · clicking the button", [
+    {"lane": "agent", "title": "Session running · 2-minute timer started", "file": "worker.py → enforce_time_limit()"},
+    {"lane": "user", "decision": True, "title": "Shopper says “bye”, “that's all”, “बस, धन्यवाद”?",
+     "side": {"lane": "ok", "title": "end_call(goodbye) tool", "sub": ["goodbye spoken in their language,", "THEN the room is deleted"], "edge": "yes"}},
+    {"lane": "livekit", "edge": "no", "decision": True, "title": "30 s of silence? (user state “away”)", "file": "AgentSession(user_away_timeout=30)",
+     "side": {"lane": "error", "title": "“Are you still there?”", "sub": ["still silent 15 s later →", "goodbye + hang up"], "edge": "yes"}},
+    {"lane": "agent", "edge": "no", "decision": True, "title": "2 minutes reached?",
+     "side": {"lane": "error", "title": "Limit message", "sub": ["“We've reached the two minute", "limit…” → hang up"], "edge": "yes"}},
+    {"lane": "user", "edge": "no", "title": "Shopper clicks the button again → session.end()", "sub": ["or closes the tab — LiveKit ends it"], "file": "components/voice/voice-button.tsx"},
+    {"lane": "ok", "title": "Room deleted → browser disconnects → button: “Ask Cartiva”", "sub": ["timers cancelled (shutdown callback) — no credit used after"]},
+])
+
+flow("11-hindi-hinglish.svg", "11 · Hindi and Hinglish", "“टमाटर दिखाओ” → a Hindi answer about tomatoes", [
+    {"lane": "user", "title": "🎤 “टमाटर दिखाओ” (Hindi)"},
+    {"lane": "livekit", "title": "STT Deepgram Nova-3, language “multi”", "sub": ["detects Hindi automatically; mixed sentences work too"]},
+    {"lane": "agent", "title": "Language rule: reply in the language of the LAST message", "sub": ["decided again every turn, so switching works"], "file": "worker.py → INSTRUCTIONS (most important rule)"},
+    {"lane": "agent", "title": "search_products(query=\"tomato\")", "sub": ["the catalog is English, so the LLM translates the product word"]},
+    {"lane": "rpc", "title": "Same search, same screen, same results as in English"},
+    {"lane": "agent", "title": "Reply in Devanagari + English product names", "sub": ["“मुझे tomatoes मिल गए, screen पर देखिए।”"]},
+    {"lane": "livekit", "title": "TTS Cartesia Sonic 3, language “hi”", "sub": ["Indian-accent voice pronounces both scripts"]},
+    {"lane": "ok", "title": "🔊 Hindi answer · prices as “चालीस रुपये”", "sub": ["the very first greeting is always English: “Hi / Hello”"]},
+])
+
+flow("12-testing-the-agent.svg", "12 · How we test the agent without speaking", "uv run pytest -v  (17 conversation tests)", [
+    {"lane": "user", "title": "uv run pytest -v", "file": "backend/tests/test_conversation.py"},
+    {"lane": "agent", "title": "Real agent: same INSTRUCTIONS, tools, LLM, MAX_TOOL_STEPS", "sub": ["text mode — no microphone, no speech (cheap)"]},
+    {"lane": "rpc", "title": "call_browser is swapped for a FakeBrowser", "sub": ["answers the same RPC methods using the real products.json"], "file": "backend/tests/fake_browser.py"},
+    {"lane": "agent", "title": "Each test plays a short conversation", "sub": ["e.g. “Checkout” → “No, wait”"]},
+    {"lane": "frontend", "decision": True, "title": "Check the OUTCOME, not the exact words", "sub": ["what is in the cart? was anything paid? did it ask?"],
+     "side": {"lane": "error", "title": "FAILED → trace the tool calls", "sub": ["found: unnecessary questions,", "dropped 2nd add, search loop"], "edge": "wrong"}},
+    {"lane": "ok", "edge": "right", "title": "17 passed — run again after every worker.py change"},
 ])
 
 

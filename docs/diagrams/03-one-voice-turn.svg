@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1266" viewBox="0 0 1040 1266">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-0891b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="1266" fill="#ffffff"/>
+<text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">3 · What happens in ONE voice turn</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: the shopper says something, the agent answers (with or without tools)</text>
+<rect x="40" y="96" width="580" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🎤 The shopper speaks</text>
+<text x="56" y="144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">audio travels through the LiveKit room</text>
+<line x1="330.0" y1="156" x2="330.0" y2="194" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="196" width="580" height="80" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="224" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">STT — Deepgram Nova-3 (language “multi”)</text>
+<text x="56" y="244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">speech → text, English / Hindi / Hinglish</text>
+<text x="56" y="264" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#2563eb">📄 LiveKit Inference (cloud)</text>
+<line x1="330.0" y1="276" x2="330.0" y2="314" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="316" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="344" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Turn detector: “has the shopper finished?”</text>
+<text x="56" y="364" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">avoids cutting people off mid-pause</text>
+<line x1="330.0" y1="376" x2="330.0" y2="414" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="416" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="3"/>
+<text x="56" y="444" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ LLM reads INSTRUCTIONS + chat history + tools</text>
+<text x="56" y="464" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Decides: just answer, or call a tool first?</text>
+<text x="56" y="484" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 backend/agent/worker.py → INSTRUCTIONS</text>
+<rect x="690" y="426.0" width="320" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="706" y="454.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Just answer</text>
+<text x="706" y="474.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">e.g. “What can you do?”</text>
+<line x1="620" y1="456.0" x2="688" y2="456.0" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow-16a34a)"/>
+<text x="628" y="448.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#16a34a">no tool</text>
+<line x1="330.0" y1="496" x2="330.0" y2="534" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="520.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">tool</text>
+<rect x="40" y="536" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="564" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Run the tool (up to 8 rounds per reply)</text>
+<text x="56" y="584" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">e.g. search_products, add_to_cart, get_screen</text>
+<text x="56" y="604" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 backend/agent/worker.py → @function_tool</text>
+<line x1="330.0" y1="616" x2="330.0" y2="654" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="656" width="580" height="80" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="56" y="684" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">call_browser(&quot;catalog.search&quot;, {…})</text>
+<text x="56" y="704" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">perform_rpc to the shopper&#x27;s browser, 5 s timeout</text>
+<text x="56" y="724" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#0891b2">📄 backend/agent/rpc.py → frontend/lib/voice/rpc.ts</text>
+<line x1="330.0" y1="736" x2="330.0" y2="774" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="776" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="804" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">voiceController runs the SAME services as the buttons</text>
+<text x="56" y="824" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">returns JSON: results, or an error code + message</text>
+<text x="56" y="844" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 frontend/controllers/voice-controller.ts</text>
+<line x1="330.0" y1="856" x2="330.0" y2="894" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="896" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="924" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">LLM turns the JSON into a short sentence</text>
+<text x="56" y="944" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">in the shopper&#x27;s language; never invents data</text>
+<line x1="330.0" y1="956" x2="330.0" y2="994" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="996" width="580" height="60" rx="12" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="56" y="1024" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">TTS — Cartesia Sonic 3 (Hindi-capable voice)</text>
+<text x="56" y="1044" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">text → speech</text>
+<line x1="330.0" y1="1056" x2="330.0" y2="1094" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1096" width="580" height="80" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="1124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 The shopper hears the reply</text>
+<text x="56" y="1144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Talk over it → adaptive interruption stops the agent</text>
+<text x="56" y="1164" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">(“mm-hmm”, “haan” are ignored as backchannels)</text>
+<rect x="40" y="1206" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="62" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<rect x="119" y="1206" width="16" height="16" rx="4" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+<text x="141" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">LiveKit Cloud</text>
+<rect x="240" y="1206" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="262" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
+<rect x="410" y="1206" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="432" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<rect x="489" y="1206" width="16" height="16" rx="4" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="511" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">RPC bridge (through the room)</text>
+<rect x="722" y="1206" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="744" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
+<text x="40" y="1244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+</svg>
