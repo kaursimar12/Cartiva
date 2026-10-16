@@ -196,3 +196,12 @@ async def test_hindi_product_name_is_translated_for_search(chat, browser: FakeBr
 
     searches = browser.called("catalog.search")
     assert searches and "tomato" in str(searches[-1].get("query", "")).lower()
+
+
+async def test_unclear_request_asks_instead_of_acting(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 1}
+    await chat("Umm, that thing, the usual one, you know")
+
+    assert browser.cart == {"p001": 1}, "nothing may change on an unclear request"
+    assert browser.payments == 0
+    assert not browser.called("cart.add") and not browser.called("cart.remove")

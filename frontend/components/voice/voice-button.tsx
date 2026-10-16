@@ -2,7 +2,8 @@
 
 import { useAgent, useSessionContext } from "@livekit/components-react";
 import { MicIcon } from "@/components/common/icons";
-import { showToast } from "@/store/toast-store";
+import { voiceSessionController } from "@/controllers/voice-session-controller";
+import { startProblem } from "@/lib/voice/voice-errors";
 
 /** What the button says for each agent state (SRS FR-12). */
 const STATUS_LABELS: Record<string, string> = {
@@ -15,6 +16,7 @@ const STATUS_LABELS: Record<string, string> = {
   thinking: "Thinking…",
   speaking: "Speaking…",
   failed: "Try again",
+  reconnecting: "Reconnecting…",
 };
 
 /** Voice assistant entry point (SRS FR-01, FR-11): starts and stops the LiveKit voice session. */
@@ -23,7 +25,8 @@ export function VoiceButton({ compact = false }: { compact?: boolean }) {
   const agent = useAgent();
 
   const active = agent.state !== "disconnected" && agent.state !== "failed";
-  const label = STATUS_LABELS[agent.state] ?? "Ask Cartiva";
+  const reconnecting = session.connectionState === "reconnecting" || session.connectionState === "signalReconnecting";
+  const label = reconnecting ? STATUS_LABELS.reconnecting : (STATUS_LABELS[agent.state] ?? "Ask Cartiva");
 
   async function toggle() {
     try {
@@ -32,8 +35,8 @@ export function VoiceButton({ compact = false }: { compact?: boolean }) {
       } else {
         await session.start({ tracks: { microphone: { enabled: true } } });
       }
-    } catch {
-      showToast("Couldn't start voice. Check your microphone permission and try again.", "error");
+    } catch (error) {
+      voiceSessionController.reportProblem(startProblem(error));
     }
   }
 
