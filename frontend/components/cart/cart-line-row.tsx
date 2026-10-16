@@ -5,12 +5,13 @@ import { TrashIcon } from "@/components/common/icons";
 import { ProductImage } from "@/components/products/product-image";
 import { QuantityStepper } from "@/components/products/quantity-stepper";
 import { cartController } from "@/controllers/cart-controller";
+import { catalogService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
 import type { CartLine } from "@/models/entities/cart";
 
 export function CartLineRow({ line }: { line: CartLine }) {
   const { product, quantity, lineTotal } = line;
-  const overStock = !product.stock || quantity > product.availableQuantity;
+  const problem = catalogService.cartQuantityProblem(product, quantity);
 
   return (
     <li className="flex gap-3 py-4 sm:gap-4">
@@ -25,11 +26,7 @@ export function CartLineRow({ line }: { line: CartLine }) {
           <p className="text-xs text-zinc-500">
             {product.unit} · {formatPrice(product.price)} each
           </p>
-          {overStock && (
-            <p className="mt-1 text-xs font-medium text-red-600">
-              {product.stock ? `Only ${product.availableQuantity} available` : "Out of stock — please remove"}
-            </p>
-          )}
+          {problem && <p className="mt-1 text-xs font-medium text-red-600">{problem}</p>}
         </div>
         <div className="flex items-center justify-between gap-4 sm:justify-end">
           <QuantityStepper
@@ -37,7 +34,7 @@ export function CartLineRow({ line }: { line: CartLine }) {
             quantity={quantity}
             onDecrease={() => cartController.decrease(product.id)}
             onIncrease={() => cartController.increase(product.id)}
-            canIncrease={quantity < product.availableQuantity}
+            canIncrease={catalogService.remainingStock(product, quantity) > 0}
           />
           <p className="w-20 text-right font-semibold">{formatPrice(lineTotal)}</p>
           <button

@@ -109,6 +109,17 @@ export class CatalogService {
     return product.availableQuantity <= LOW_STOCK_THRESHOLD ? "low-stock" : "in-stock";
   }
 
+  /** How many more units can still go in the cart when `inCart` are already there (0 = none). */
+  remainingStock(product: Product, inCart: number): number {
+    return product.stock ? Math.max(0, product.availableQuantity - inCart) : 0;
+  }
+
+  /** Why `quantity` of this product can't be bought right now, or null if it can. */
+  cartQuantityProblem(product: Product, quantity: number): string | null {
+    if (!product.stock) return "Out of stock — please remove";
+    return quantity > product.availableQuantity ? `Only ${product.availableQuantity} available` : null;
+  }
+
   getBrands(products: Product[]): string[] {
     return [...new Set(products.map((p) => p.brand).filter((b): b is string => Boolean(b)))].sort();
   }

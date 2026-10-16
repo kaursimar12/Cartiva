@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { cartController } from "@/controllers/cart-controller";
 import { screenController } from "@/controllers/screen-controller";
 import { useCartQuantity } from "@/hooks/use-cart";
+import { catalogService } from "@/lib/container";
 import type { Product } from "@/models/entities/product";
 import { QuantityStepper } from "./quantity-stepper";
 
@@ -12,7 +13,7 @@ import { QuantityStepper } from "./quantity-stepper";
 export function ProductPurchasePanel({ product }: { product: Product }) {
   const inCart = useCartQuantity(product.id);
   const [quantity, setQuantity] = useState(1);
-  const remaining = product.availableQuantity - inCart;
+  const remaining = catalogService.remainingStock(product, inCart);
 
   // On a product page, "this one" means this product.
   useEffect(() => {

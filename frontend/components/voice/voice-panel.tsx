@@ -46,12 +46,22 @@ export function VoicePanel() {
   }, [transcript.length, lastLine]);
 
   const active = agent.state !== "disconnected" && agent.state !== "failed";
+
+  // Tell the page the panel is open: toasts move to the top, and phones get room below the content.
+  useEffect(() => {
+    if (!active) return;
+    document.body.dataset.voicePanel = "open";
+    return () => {
+      delete document.body.dataset.voicePanel;
+    };
+  }, [active]);
+
   if (!active) return null;
 
   return (
     <aside
       aria-label="Cartiva voice assistant"
-      className="fixed inset-x-3 bottom-3 z-50 flex max-h-[55vh] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface shadow-xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96"
+      className="fixed inset-x-3 bottom-3 z-50 flex max-h-[40vh] flex-col sm:max-h-[55vh] overflow-hidden rounded-2xl border border-zinc-200 bg-surface shadow-xl sm:inset-x-auto sm:right-5 sm:bottom-5 sm:w-96"
     >
       <header className="flex items-center gap-3 border-b border-zinc-100 px-4 py-3">
         <BarVisualizer

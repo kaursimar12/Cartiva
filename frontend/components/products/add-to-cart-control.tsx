@@ -2,6 +2,7 @@
 
 import { cartController } from "@/controllers/cart-controller";
 import { useCartQuantity } from "@/hooks/use-cart";
+import { catalogService } from "@/lib/container";
 import type { Product } from "@/models/entities/product";
 import { QuantityStepper } from "./quantity-stepper";
 
@@ -36,7 +37,7 @@ export function AddToCartControl({ product }: { product: Product }) {
       quantity={quantity}
       onDecrease={() => cartController.decrease(product.id)}
       onIncrease={() => cartController.increase(product.id)}
-      canIncrease={quantity < product.availableQuantity}
+      canIncrease={catalogService.remainingStock(product, quantity) > 0}
     />
   );
 }

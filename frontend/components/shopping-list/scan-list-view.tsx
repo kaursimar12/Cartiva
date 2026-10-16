@@ -193,7 +193,7 @@ function FoundRow({ line }: { line: ListLine }) {
           line.packs > 1 ? shoppingListController.setPacks(line.id, line.packs - 1) : shoppingListController.remove(line.id)
         }
         onIncrease={() => shoppingListController.setPacks(line.id, line.packs + 1)}
-        canIncrease={line.packs < product.availableQuantity}
+        canIncrease={catalogService.remainingStock(product, line.packs) > 0}
       />
       <span className="w-16 text-right text-sm font-semibold">{formatPrice(product.price * line.packs)}</span>
     </Row>

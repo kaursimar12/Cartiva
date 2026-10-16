@@ -33,4 +33,18 @@ describe("CatalogService (real catalog)", () => {
     expect(catalogService.getStockStatus({ ...product, stock: true, availableQuantity: 3 })).toBe("low-stock");
     expect(catalogService.getStockStatus({ ...product, stock: true, availableQuantity: 4 })).toBe("in-stock");
   });
+
+  it("knows how many more units fit in the cart", () => {
+    const product = { ...catalogService.getAllProducts()[0], stock: true, availableQuantity: 5 };
+    expect(catalogService.remainingStock(product, 2)).toBe(3);
+    expect(catalogService.remainingStock(product, 7)).toBe(0);
+    expect(catalogService.remainingStock({ ...product, stock: false }, 0)).toBe(0);
+  });
+
+  it("explains why a cart quantity can't be bought", () => {
+    const product = { ...catalogService.getAllProducts()[0], stock: true, availableQuantity: 5 };
+    expect(catalogService.cartQuantityProblem(product, 5)).toBeNull();
+    expect(catalogService.cartQuantityProblem(product, 6)).toBe("Only 5 available");
+    expect(catalogService.cartQuantityProblem({ ...product, stock: false }, 1)).toBe("Out of stock — please remove");
+  });
 });

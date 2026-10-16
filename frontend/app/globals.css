@@ -40,6 +40,25 @@ body {
   outline-offset: 2px;
 }
 
+/* Respect "reduce motion": no hover lifts, spinners slow to a stop, no smooth transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* While the voice panel is open on a phone, leave room so it never hides the page's last buttons. */
+@media (max-width: 639px) {
+  body[data-voice-panel="open"] {
+    padding-bottom: calc(40vh + 1.5rem);
+  }
+}
+
 .scrollbar-none {
   scrollbar-width: none;
 }
