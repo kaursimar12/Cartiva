@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BoltIcon } from "@/components/common/icons";
+import { BoltIcon, CameraIcon } from "@/components/common/icons";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { VoiceButton } from "@/components/voice/voice-button";
 import { pricingService } from "@/lib/container";
@@ -31,6 +31,14 @@ export function Header({ categories }: { categories: Category[] }) {
         <SearchForm id="site-search" className="hidden flex-1 md:block" />
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <ThemeToggle />
+          <Link
+            href="/scan-list"
+            className="flex h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-surface px-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 sm:px-4"
+            aria-label="Scan a shopping list"
+          >
+            <CameraIcon className="h-5 w-5" />
+            <span className="hidden lg:inline">Scan list</span>
+          </Link>
           <VoiceButton />
           <CartLink />
         </div>
