@@ -82,7 +82,7 @@ def legend(y, lanes_used):
         fill, stroke, label = LANES[key]
         out.append(f'<rect x="{x}" y="{y}" width="16" height="16" rx="4" fill="{fill}" stroke="{stroke}" stroke-width="1.6"/>')
         out.append(f'<text x="{x + 22}" y="{y + 13}" font-family="{FONT}" font-size="12" fill="#3f3f46">{label}</text>')
-        x += 30 + len(label) * 7
+        x += 26 + len(label) * 6.2
     out.append(
         f'<text x="{MAIN_X}" y="{y + 38}" font-family="{FONT}" font-size="12" fill="#71717a">'
         "◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>"
@@ -238,20 +238,22 @@ flow("08-screen-references.svg", "8 · “The cheapest one” after browsing by 
     {"lane": "ok", "title": "🔊 “Added it to your cart.”", "sub": ["same for “the second one”, or “this one” on a product page"]},
 ])
 
-flow("09-voice-checkout.svg", "9 · Checkout by voice — never pays without “yes”", "“Checkout” → total read out → “Yes” (or “No”)", [
+flow("09-voice-checkout.svg", "9 · Checkout by voice — never pays without “yes”", "“Checkout” → total read out → “Yes” → Razorpay → result spoken", [
     {"lane": "user", "title": "🎤 “Checkout”  (or “Pay now”)"},
     {"lane": "agent", "title": "start_checkout()  — never pays", "file": "backend/agent/worker.py"},
-    {"lane": "rpc", "title": "RPC “checkout.start” → checkoutService.validate()", "file": "controllers/voice-controller.ts → startCheckout"},
-    {"lane": "frontend", "decision": True, "title": "Cart valid?", "sub": ["not empty · in stock · quantities available"],
+    {"lane": "frontend", "decision": True, "title": "checkoutService.validate()", "sub": ["not empty · in stock · quantities available"], "file": "controllers/voice-controller.ts → startCheckout",
      "side": {"lane": "error", "title": "🔊 “Your cart is empty”", "sub": ["or “Tomato is out of stock”"], "edge": "no"}},
-    {"lane": "agent", "edge": "yes", "title": "🔒 _pending_checkout_total = \"₹245\"", "sub": ["browser opens /checkout"]},
-    {"lane": "ok", "title": "🔊 “Your total is two hundred forty-five rupees. Shall I pay now?”"},
+    {"lane": "agent", "edge": "yes", "title": "🔒 _pending_checkout_total = \"₹245\" → 🔊 “Shall I pay now?”", "sub": ["any cart change clears the lock"]},
     {"lane": "user", "decision": True, "title": "Shopper answers",
-     "side": {"lane": "error", "title": "“No” / “Wait” / “रहने दो”", "sub": ["cancel_pending_action → flag cleared", "nothing paid, cart kept"], "edge": "no"}},
-    {"lane": "agent", "edge": "yes", "decision": True, "title": "confirm_payment(): is the flag set?", "sub": ["cleared by ANY cart change after start_checkout", "one “yes” = one payment attempt"],
-     "side": {"lane": "error", "title": "Refuse — nothing paid", "sub": ["“Start checkout first and", "confirm the (new) total”"], "edge": "not set"}},
-    {"lane": "rpc", "edge": "set", "title": "RPC “checkout.confirm” → checkoutController.confirmAndPay()", "sub": ["the SAME call as the Pay button (mock today, Razorpay in Phase 9)"]},
-    {"lane": "ok", "title": "/order-success · cart cleared · 🔊 “Payment successful!”"},
+     "side": {"lane": "error", "title": "“No” / “Wait” / “रहने दो”", "sub": ["cancel_pending_action", "nothing paid, cart kept"], "edge": "no"}},
+    {"lane": "agent", "edge": "yes", "decision": True, "title": "confirm_payment(): lock set?", "sub": ["one “yes” = one payment attempt"],
+     "side": {"lane": "error", "title": "Refuse — nothing paid", "sub": ["“confirm the (new) total first”"], "edge": "not set"}},
+    {"lane": "rpc", "edge": "set", "title": "RPC “checkout.confirm” → returns at once", "sub": ["“payment window is open” (no 5 s timeout)"], "file": "controllers/voice-controller.ts → confirmPayment"},
+    {"lane": "backend", "title": "POST /api/payment/create-order", "sub": ["browser sends only {productId, quantity}; FastAPI computes the amount"], "file": "backend/app/routers/payment.py + app/pricing.py"},
+    {"lane": "user", "title": "Razorpay popup: card / netbanking", "sub": ["page shows “Processing payment…” (shared checkout store)"], "file": "services/payment/razorpay-payment-gateway.ts"},
+    {"lane": "backend", "decision": True, "title": "POST /api/payment/verify", "sub": ["HMAC signature valid AND order amount = this cart's total"], "file": "backend/app/routers/payment.py",
+     "side": {"lane": "error", "title": "Failed / cancelled / invalid", "sub": ["red box + Retry, cart kept", "→ RPC “payment.result” {ok:false}"], "edge": "no"}},
+    {"lane": "ok", "edge": "yes", "title": "/order-success · cart cleared", "sub": ["→ RPC “payment.result” {ok:true} to the agent", "🔊 “Your payment was successful!”"]},
 ])
 
 flow("10-ending-a-call.svg", "10 · How a voice call ends (protects the free credit)", "“Bye” · silence · the 2-minute limit · clicking the button", [
@@ -277,14 +279,55 @@ flow("11-hindi-hinglish.svg", "11 · Hindi and Hinglish", "“टमाटर �
     {"lane": "ok", "title": "🔊 Hindi answer · prices as “चालीस रुपये”", "sub": ["the very first greeting is always English: “Hi / Hello”"]},
 ])
 
-flow("12-testing-the-agent.svg", "12 · How we test the agent without speaking", "uv run pytest -v  (17 conversation tests)", [
+flow("12-testing-the-agent.svg", "12 · How we test the agent without speaking", "uv run pytest -v  (20 conversation tests)", [
     {"lane": "user", "title": "uv run pytest -v", "file": "backend/tests/test_conversation.py"},
     {"lane": "agent", "title": "Real agent: same INSTRUCTIONS, tools, LLM, MAX_TOOL_STEPS", "sub": ["text mode — no microphone, no speech (cheap)"]},
     {"lane": "rpc", "title": "call_browser is swapped for a FakeBrowser", "sub": ["answers the same RPC methods using the real products.json"], "file": "backend/tests/fake_browser.py"},
     {"lane": "agent", "title": "Each test plays a short conversation", "sub": ["e.g. “Checkout” → “No, wait”"]},
     {"lane": "frontend", "decision": True, "title": "Check the OUTCOME, not the exact words", "sub": ["what is in the cart? was anything paid? did it ask?"],
      "side": {"lane": "error", "title": "FAILED → trace the tool calls", "sub": ["found: unnecessary questions,", "dropped 2nd add, search loop"], "edge": "wrong"}},
-    {"lane": "ok", "edge": "right", "title": "17 passed — run again after every worker.py change"},
+    {"lane": "ok", "edge": "right", "title": "all pass — run again after every worker.py change"},
+])
+
+
+flow("13-scan-shopping-list.svg", "13 · Scanning a photo of a shopping list", "photo of “tamatar 2 kg, Surf Excel, paneer, pizza”", [
+    {"lane": "user", "title": "📷 Scan list → upload or take a photo", "sub": ["JPEG / PNG / WebP, up to 5 MB, handwritten is fine"], "file": "components/shopping-list/scan-list-view.tsx"},
+    {"lane": "frontend", "title": "shoppingListController.scan(photo)", "sub": ["page shows “Reading your list…”"], "file": "controllers/shopping-list-controller.ts → list-scanner.ts"},
+    {"lane": "backend", "decision": True, "title": "POST /api/list/scan — file checks", "file": "backend/app/routers/shopping_list.py",
+     "side": {"lane": "error", "title": "415 / 413 / 400", "sub": ["not an image · too large · empty"], "edge": "bad"}},
+    {"lane": "backend", "edge": "ok", "title": "OpenAI vision model (structured output)", "sub": ["English names (Hindi translated), quantity, unit, original text", "crossed-out items and prices ignored"], "file": "OPENAI_VISION_MODEL (gpt-4.1-mini)"},
+    {"lane": "frontend", "title": "Match each line to OUR catalog", "sub": ["catalogService.search · keep the main category (milk → dairy)", "plain product, or the pack size written (Surf Excel 2 kg)"], "file": "services/shopping-list/shopping-list-service.ts"},
+    {"lane": "frontend", "title": "Quantity → packs", "sub": ["“2 kg” of a 1 kg pack = 2 · “200 g” of a 200 g pack = 1 · capped to stock"], "file": "services/shopping-list/units.ts"},
+    {"lane": "frontend", "decision": True, "title": "Each line gets a status",
+     "side": {"lane": "error", "title": "⚠️ choose / ❌ not available", "sub": ["Surf Excel → 3 options", "pizza → not sold · out of stock"], "edge": "unclear"}},
+    {"lane": "ok", "edge": "found", "title": "✅ Ready: Tomato 1 kg × 2, Mother Dairy Paneer × 1", "sub": ["edit: − / + · 🗑 · pick an option · “Add an item”"]},
+    {"lane": "user", "title": "“Add N to cart” (or say “yes” — see 14)", "sub": ["nothing is in the cart before this"]},
+    {"lane": "ok", "title": "cartService.add for every ready line → /cart", "sub": ["same stock rules as the ADD button · one summary toast"]},
+])
+
+flow("14-voice-list-review.svg", "14 · Reviewing the scanned list by voice", "“Remove the bread” · “the 2 kg Surf Excel” · “Yes, add them”", [
+    {"lane": "frontend", "title": "Scan finished (scanId +1) and the agent is connected", "sub": ["or the shopper taps 🎤 Review with Cartiva"], "file": "components/voice/voice-list-announcer.tsx"},
+    {"lane": "rpc", "title": "Browser → agent: RPC “list.scanned”", "file": "lib/voice/rpc.ts → notifyAgent"},
+    {"lane": "agent", "title": "get_shopping_list()", "sub": ["ready lines, options to choose, not available — with lineIds"], "file": "backend/agent/worker.py"},
+    {"lane": "ok", "title": "🔊 “Two kilos of tomatoes, paneer… Surf Excel comes in three sizes.", "sub": ["Pizza isn't sold here. Shall I add them, or change something?”"]},
+    {"lane": "user", "decision": True, "title": "Shopper edits or agrees",
+     "side": {"lane": "agent", "title": "Edit tools (page updates live)", "sub": ["remove_list_item · add_list_item", "update_list_item · choose_list_item"], "edge": "edit"}},
+    {"lane": "agent", "edge": "“yes”", "title": "confirm_shopping_list()", "sub": ["only after a clear yes · clears any pending checkout"]},
+    {"lane": "rpc", "title": "RPC “list.confirm” → shoppingListController.confirm()", "sub": ["the SAME confirm as the “Add N to cart” button"], "file": "controllers/voice-controller.ts"},
+    {"lane": "ok", "title": "Cart updated → /cart", "sub": ["🔊 “Added four items. Pizza wasn't available.”"]},
+])
+
+flow("15-voice-errors.svg", "15 · When voice goes wrong (shopping always keeps working)", "mic blocked · server down · agent missing · network drop", [
+    {"lane": "user", "title": "Click 🎤 Ask Cartiva", "file": "components/voice/voice-button.tsx"},
+    {"lane": "frontend", "decision": True, "title": "Token from FastAPI?", "file": "lib/voice/token-source.ts",
+     "side": {"lane": "error", "title": "VoiceServerError", "sub": ["“The voice assistant is offline", "right now…”"], "edge": "no"}},
+    {"lane": "frontend", "edge": "yes", "decision": True, "title": "Microphone allowed and available?", "file": "voice-error-reporter.tsx (mediaDevicesError)",
+     "side": {"lane": "error", "title": "mic-denied / missing / busy", "sub": ["how to allow it in the 🔒 menu", "session ended"], "edge": "no"}},
+    {"lane": "livekit", "edge": "yes", "decision": True, "title": "Agent joined within 20 s?", "sub": ["worker down, or free credit used up"],
+     "side": {"lane": "error", "title": "agent-unavailable", "sub": ["“didn't answer, try again —", "tapping still works”"], "edge": "no"}},
+    {"lane": "livekit", "edge": "yes", "decision": True, "title": "Network stable during the call?", "sub": ["button shows “Reconnecting…” while LiveKit retries"],
+     "side": {"lane": "error", "title": "connection-lost", "sub": ["unexpected disconnect only"], "edge": "dropped"}},
+    {"lane": "ok", "edge": "yes", "title": "Normal endings show NO error", "sub": ["bye / silence / 2-minute limit = ROOM_DELETED · stop button = CLIENT_INITIATED"], "file": "lib/voice/voice-errors.ts"},
 ])
 
 
@@ -338,7 +381,7 @@ arch = [
     *group(790, 90, 230, 440, "backend", "backend/ · Python · :8000"),
     *card(810, 130, 190, 62, "agent", "Voice agent", "agent/worker.py"),
     *card(810, 330, 190, 62, "backend", "FastAPI", "app/main.py"),
-    f'<text x="905" y="410" text-anchor="middle" font-family="{FONT}" font-size="11.5" fill="#71717a">token · (Phase 9) payments</text>',
+    f'<text x="905" y="410" text-anchor="middle" font-family="{FONT}" font-size="11.5" fill="#71717a">token · payments · list scan (OpenAI)</text>',
     # arrows
     *path("M140,240 L188,170", "#4f46e5", "clicks & speaks", 60, 186),
     *path("M320,192 L320,228", "#059669"),

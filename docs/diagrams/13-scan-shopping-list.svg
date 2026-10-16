@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1266" viewBox="0 0 1040 1266">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-0891b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="1266" fill="#ffffff"/>
+<text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">13 · Scanning a photo of a shopping list</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: photo of “tamatar 2 kg, Surf Excel, paneer, pizza”</text>
+<rect x="40" y="96" width="580" height="80" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">📷 Scan list → upload or take a photo</text>
+<text x="56" y="144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">JPEG / PNG / WebP, up to 5 MB, handwritten is fine</text>
+<text x="56" y="164" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#4f46e5">📄 components/shopping-list/scan-list-view.tsx</text>
+<line x1="330.0" y1="176" x2="330.0" y2="214" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="216" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">shoppingListController.scan(photo)</text>
+<text x="56" y="264" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">page shows “Reading your list…”</text>
+<text x="56" y="284" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 controllers/shopping-list-controller.ts → list-scanner.ts</text>
+<line x1="330.0" y1="296" x2="330.0" y2="334" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="336" width="580" height="60" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+<text x="56" y="364" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ POST /api/list/scan — file checks</text>
+<text x="56" y="384" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#ea580c">📄 backend/app/routers/shopping_list.py</text>
+<rect x="690" y="336.0" width="320" height="60" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="364.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">415 / 413 / 400</text>
+<text x="706" y="384.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">not an image · too large · empty</text>
+<line x1="620" y1="366.0" x2="688" y2="366.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="358.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">bad</text>
+<line x1="330.0" y1="396" x2="330.0" y2="434" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="420.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">ok</text>
+<rect x="40" y="436" width="580" height="100" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="56" y="464" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">OpenAI vision model (structured output)</text>
+<text x="56" y="484" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">English names (Hindi translated), quantity, unit, original text</text>
+<text x="56" y="504" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">crossed-out items and prices ignored</text>
+<text x="56" y="524" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#ea580c">📄 OPENAI_VISION_MODEL (gpt-4.1-mini)</text>
+<line x1="330.0" y1="536" x2="330.0" y2="574" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="576" width="580" height="100" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="604" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Match each line to OUR catalog</text>
+<text x="56" y="624" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">catalogService.search · keep the main category (milk → dairy)</text>
+<text x="56" y="644" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">plain product, or the pack size written (Surf Excel 2 kg)</text>
+<text x="56" y="664" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 services/shopping-list/shopping-list-service.ts</text>
+<line x1="330.0" y1="676" x2="330.0" y2="714" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="716" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="744" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Quantity → packs</text>
+<text x="56" y="764" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">“2 kg” of a 1 kg pack = 2 · “200 g” of a 200 g pack = 1 · capped to stock</text>
+<text x="56" y="784" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 services/shopping-list/units.ts</text>
+<line x1="330.0" y1="796" x2="330.0" y2="834" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="836" width="580" height="40" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="3"/>
+<text x="56" y="864" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ Each line gets a status</text>
+<rect x="690" y="816.0" width="320" height="80" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="844.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">⚠️ choose / ❌ not available</text>
+<text x="706" y="864.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Surf Excel → 3 options</text>
+<text x="706" y="884.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">pizza → not sold · out of stock</text>
+<line x1="620" y1="856.0" x2="688" y2="856.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="848.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">unclear</text>
+<line x1="330.0" y1="876" x2="330.0" y2="914" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="900.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">found</text>
+<rect x="40" y="916" width="580" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="944" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">✅ Ready: Tomato 1 kg × 2, Mother Dairy Paneer × 1</text>
+<text x="56" y="964" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">edit: − / + · 🗑 · pick an option · “Add an item”</text>
+<line x1="330.0" y1="976" x2="330.0" y2="1014" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1016" width="580" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="1044" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">“Add N to cart” (or say “yes” — see 14)</text>
+<text x="56" y="1064" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">nothing is in the cart before this</text>
+<line x1="330.0" y1="1076" x2="330.0" y2="1114" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1116" width="580" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="1144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">cartService.add for every ready line → /cart</text>
+<text x="56" y="1164" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">same stock rules as the ADD button · one summary toast</text>
+<rect x="40" y="1206" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="62" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<rect x="109.4" y="1206" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="131.4" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
+<rect x="247.00000000000003" y="1206" width="16" height="16" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="269.0" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Backend (FastAPI)</text>
+<rect x="378.40000000000003" y="1206" width="16" height="16" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="400.40000000000003" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Error / alternative</text>
+<rect x="522.2" y="1206" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="544.2" y="1219" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<text x="40" y="1244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+</svg>

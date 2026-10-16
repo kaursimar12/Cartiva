@@ -1,17 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1086" viewBox="0 0 1040 1086">
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="1326" viewBox="0 0 1040 1326">
 <defs>
 <marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
 <marker id="arrow-0891b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
 <marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
-<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
-<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
 <marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
 <marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
 <marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
 </defs>
-<rect width="1040" height="1086" fill="#ffffff"/>
+<rect width="1040" height="1326" fill="#ffffff"/>
 <text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">9 · Checkout by voice — never pays without “yes”</text>
-<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: “Checkout” → total read out → “Yes” (or “No”)</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: “Checkout” → total read out → “Yes” → Razorpay → result spoken</text>
 <rect x="40" y="96" width="580" height="40" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
 <text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🎤 “Checkout”  (or “Pay now”)</text>
 <line x1="330.0" y1="136" x2="330.0" y2="174" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
@@ -19,66 +19,85 @@
 <text x="56" y="204" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">start_checkout()  — never pays</text>
 <text x="56" y="224" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 backend/agent/worker.py</text>
 <line x1="330.0" y1="236" x2="330.0" y2="274" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<rect x="40" y="276" width="580" height="60" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
-<text x="56" y="304" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC “checkout.start” → checkoutService.validate()</text>
-<text x="56" y="324" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#0891b2">📄 controllers/voice-controller.ts → startCheckout</text>
-<line x1="330.0" y1="336" x2="330.0" y2="374" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<rect x="40" y="376" width="580" height="60" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="3"/>
-<text x="56" y="404" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ Cart valid?</text>
-<text x="56" y="424" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">not empty · in stock · quantities available</text>
-<rect x="690" y="376.0" width="320" height="60" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
-<text x="706" y="404.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 “Your cart is empty”</text>
-<text x="706" y="424.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">or “Tomato is out of stock”</text>
-<line x1="620" y1="406.0" x2="688" y2="406.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
-<text x="628" y="398.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">no</text>
-<line x1="330.0" y1="436" x2="330.0" y2="474" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<text x="340.0" y="460.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">yes</text>
-<rect x="40" y="476" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
-<text x="56" y="504" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔒 _pending_checkout_total = &quot;₹245&quot;</text>
-<text x="56" y="524" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">browser opens /checkout</text>
+<rect x="40" y="276" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="3"/>
+<text x="56" y="304" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ checkoutService.validate()</text>
+<text x="56" y="324" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">not empty · in stock · quantities available</text>
+<text x="56" y="344" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 controllers/voice-controller.ts → startCheckout</text>
+<rect x="690" y="286.0" width="320" height="60" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="314.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 “Your cart is empty”</text>
+<text x="706" y="334.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">or “Tomato is out of stock”</text>
+<line x1="620" y1="316.0" x2="688" y2="316.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="308.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">no</text>
+<line x1="330.0" y1="356" x2="330.0" y2="394" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="380.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">yes</text>
+<rect x="40" y="396" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="424" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔒 _pending_checkout_total = &quot;₹245&quot; → 🔊 “Shall I pay now?”</text>
+<text x="56" y="444" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">any cart change clears the lock</text>
+<line x1="330.0" y1="456" x2="330.0" y2="494" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="496" width="580" height="40" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="3"/>
+<text x="56" y="524" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ Shopper answers</text>
+<rect x="690" y="476.0" width="320" height="80" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="504.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">“No” / “Wait” / “रहने दो”</text>
+<text x="706" y="524.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">cancel_pending_action</text>
+<text x="706" y="544.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">nothing paid, cart kept</text>
+<line x1="620" y1="516.0" x2="688" y2="516.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="508.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">no</text>
 <line x1="330.0" y1="536" x2="330.0" y2="574" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<rect x="40" y="576" width="580" height="40" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
-<text x="56" y="604" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 “Your total is two hundred forty-five rupees. Shall I pay now?”</text>
-<line x1="330.0" y1="616" x2="330.0" y2="654" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<rect x="40" y="656" width="580" height="40" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="3"/>
-<text x="56" y="684" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ Shopper answers</text>
-<rect x="690" y="636.0" width="320" height="80" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
-<text x="706" y="664.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">“No” / “Wait” / “रहने दो”</text>
-<text x="706" y="684.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">cancel_pending_action → flag cleared</text>
-<text x="706" y="704.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">nothing paid, cart kept</text>
-<line x1="620" y1="676.0" x2="688" y2="676.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
-<text x="628" y="668.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">no</text>
-<line x1="330.0" y1="696" x2="330.0" y2="734" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<text x="340.0" y="720.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">yes</text>
-<rect x="40" y="736" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="3"/>
-<text x="56" y="764" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ confirm_payment(): is the flag set?</text>
-<text x="56" y="784" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">cleared by ANY cart change after start_checkout</text>
-<text x="56" y="804" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">one “yes” = one payment attempt</text>
-<rect x="690" y="736.0" width="320" height="80" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
-<text x="706" y="764.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Refuse — nothing paid</text>
-<text x="706" y="784.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">“Start checkout first and</text>
-<text x="706" y="804.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">confirm the (new) total”</text>
-<line x1="620" y1="776.0" x2="688" y2="776.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
-<text x="628" y="768.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">not set</text>
-<line x1="330.0" y1="816" x2="330.0" y2="854" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<text x="340.0" y="840.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">set</text>
-<rect x="40" y="856" width="580" height="60" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
-<text x="56" y="884" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC “checkout.confirm” → checkoutController.confirmAndPay()</text>
-<text x="56" y="904" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">the SAME call as the Pay button (mock today, Razorpay in Phase 9)</text>
-<line x1="330.0" y1="916" x2="330.0" y2="954" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
-<rect x="40" y="956" width="580" height="40" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
-<text x="56" y="984" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">/order-success · cart cleared · 🔊 “Payment successful!”</text>
-<rect x="40" y="1026" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
-<text x="62" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
-<rect x="119" y="1026" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
-<text x="141" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
-<rect x="289" y="1026" width="16" height="16" rx="4" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
-<text x="311" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">RPC bridge (through the room)</text>
-<rect x="522" y="1026" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
-<text x="544" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
-<rect x="678" y="1026" width="16" height="16" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
-<text x="700" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Error / alternative</text>
-<rect x="841" y="1026" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
-<text x="863" y="1039" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
-<text x="40" y="1064" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+<text x="340.0" y="560.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">yes</text>
+<rect x="40" y="576" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="3"/>
+<text x="56" y="604" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ confirm_payment(): lock set?</text>
+<text x="56" y="624" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">one “yes” = one payment attempt</text>
+<rect x="690" y="576.0" width="320" height="60" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="604.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Refuse — nothing paid</text>
+<text x="706" y="624.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">“confirm the (new) total first”</text>
+<line x1="620" y1="606.0" x2="688" y2="606.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="598.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">not set</text>
+<line x1="330.0" y1="636" x2="330.0" y2="674" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="660.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">set</text>
+<rect x="40" y="676" width="580" height="80" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="56" y="704" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC “checkout.confirm” → returns at once</text>
+<text x="56" y="724" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">“payment window is open” (no 5 s timeout)</text>
+<text x="56" y="744" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#0891b2">📄 controllers/voice-controller.ts → confirmPayment</text>
+<line x1="330.0" y1="756" x2="330.0" y2="794" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="796" width="580" height="80" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="56" y="824" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">POST /api/payment/create-order</text>
+<text x="56" y="844" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">browser sends only {productId, quantity}; FastAPI computes the amount</text>
+<text x="56" y="864" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#ea580c">📄 backend/app/routers/payment.py + app/pricing.py</text>
+<line x1="330.0" y1="876" x2="330.0" y2="914" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="916" width="580" height="80" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="56" y="944" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Razorpay popup: card / netbanking</text>
+<text x="56" y="964" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">page shows “Processing payment…” (shared checkout store)</text>
+<text x="56" y="984" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#4f46e5">📄 services/payment/razorpay-payment-gateway.ts</text>
+<line x1="330.0" y1="996" x2="330.0" y2="1034" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="1036" width="580" height="80" rx="12" fill="#fff7ed" stroke="#ea580c" stroke-width="3"/>
+<text x="56" y="1064" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ POST /api/payment/verify</text>
+<text x="56" y="1084" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">HMAC signature valid AND order amount = this cart&#x27;s total</text>
+<text x="56" y="1104" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#ea580c">📄 backend/app/routers/payment.py</text>
+<rect x="690" y="1036.0" width="320" height="80" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="706" y="1064.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Failed / cancelled / invalid</text>
+<text x="706" y="1084.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">red box + Retry, cart kept</text>
+<text x="706" y="1104.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">→ RPC “payment.result” {ok:false}</text>
+<line x1="620" y1="1076.0" x2="688" y2="1076.0" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-dc2626)"/>
+<text x="628" y="1068.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#dc2626">no</text>
+<line x1="330.0" y1="1116" x2="330.0" y2="1154" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="1140.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">yes</text>
+<rect x="40" y="1156" width="580" height="80" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="1184" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">/order-success · cart cleared</text>
+<text x="56" y="1204" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">→ RPC “payment.result” {ok:true} to the agent</text>
+<text x="56" y="1224" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">🔊 “Your payment was successful!”</text>
+<rect x="40" y="1266" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="62" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<rect x="109.4" y="1266" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="131.4" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
+<rect x="259.4" y="1266" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="281.4" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
+<rect x="397.0" y="1266" width="16" height="16" rx="4" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+<text x="419.0" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Error / alternative</text>
+<rect x="540.8" y="1266" width="16" height="16" rx="4" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="562.8" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">RPC bridge (through the room)</text>
+<rect x="746.5999999999999" y="1266" width="16" height="16" rx="4" fill="#fff7ed" stroke="#ea580c" stroke-width="1.6"/>
+<text x="768.5999999999999" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Backend (FastAPI)</text>
+<rect x="877.9999999999999" y="1266" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="899.9999999999999" y="1279" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<text x="40" y="1304" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
 </svg>

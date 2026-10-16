@@ -1,4 +1,4 @@
-# Cartiva — How Every Request Works (up to Phase 8)
+# Cartiva — How Every Request Works
 
 Each section has a flowchart, a real example, and a step-by-step explanation. Every box in a
 flowchart names the file that does that step.
@@ -28,6 +28,15 @@ flowchart names the file that does that step.
 | "Yes" (after the total) | `confirm_payment` | `checkout.confirm` | `checkoutController.confirmAndPay` |
 | "No", "wait", "रहने दो" | `cancel_pending_action` | — (agent only) | clears the pending-checkout flag |
 | "Bye", "बस, धन्यवाद" | `end_call` | — (agent only) | says goodbye, deletes the room |
+| "What's on my list?" (after a scan) | `get_shopping_list` | `list.get` | `useShoppingListStore` lines |
+| "Remove the bread" | `remove_list_item` | `list.remove` | `shoppingListController.remove` |
+| "Add two packets of chips" | `add_list_item` | `list.add` | `shoppingListController.add` → `shoppingListService.toLine` |
+| "Make the tomatoes three" | `update_list_item` | `list.update` | `shoppingListController.setPacks` |
+| "The 2 kg Surf Excel" | `choose_list_item` | `list.choose` | `shoppingListController.choose` |
+| "Yes, add them" | `confirm_shopping_list` | `list.confirm` | `shoppingListController.confirm` → `cartService.add` |
+
+**Browser → agent messages** (the reverse direction): `payment.result` (a payment finished) and
+`list.scanned` (a shopping list was scanned), sent with `notifyAgent` in `frontend/lib/voice/rpc.ts`.
 
 **The one rule behind all of them:** the agent **decides**, the browser **does** — using the same
 controllers and services as the buttons — and FastAPI **guards the secrets**.
@@ -182,9 +191,17 @@ Money needs rules the LLM cannot skip, so **Python enforces them**:
 3. **No / wait / रहने दो** → `cancel_pending_action` clears the lock; nothing is paid.
 4. **Yes** → `confirm_payment` checks the lock **in Python**:
    - not set (no checkout, or the cart changed since) → refuses, nothing paid;
-   - set → clears it first (one "yes" = one payment attempt), then pays.
-5. Payment uses the **same call as the Pay button** (`checkoutController.confirmAndPay`) — the mock
-   today, Razorpay in Phase 9 — then shows `/order-success`.
+   - set → clears it first (one "yes" = one payment attempt), then opens the payment.
+5. The browser's `checkout.confirm` **returns at once** ("the payment window is open"), because typing
+   card details takes longer than an RPC may wait.
+6. Payment uses the **same call as the Pay button** (`checkoutController.confirmAndPay`):
+   - the browser sends **only product ids and quantities** to `POST /api/payment/create-order`;
+     FastAPI recalculates the total (Python pricing, tested against the same `pricing-cases.json`);
+   - the **Razorpay popup** opens; the page shows "Processing payment…" from the shared checkout store;
+   - `POST /api/payment/verify` accepts it only if the **HMAC signature is valid** and the Razorpay
+     order's **amount equals this cart's total** (so a cheap payment can't be reused for a big cart).
+7. The result appears on screen (order success, or the red box with Retry) **and** is sent to the agent
+   as `payment.result`, so it says "payment successful" or offers to try again.
 
 ---
 
@@ -223,7 +240,8 @@ timers are cancelled when the session shuts down.
 
 ![Testing the agent](diagrams/12-testing-the-agent.svg)
 
-1. `uv run pytest -v` (in `backend/`) runs **17 conversation tests**.
+1. `uv run pytest -v` (in `backend/`) runs the **20 conversation tests** (plus the offline pricing,
+   payment and list-scan tests).
 2. They use the **real** agent — same instructions, tools, LLM and limits — in text mode (no mic,
    no speech, so very little credit).
 3. A **FakeBrowser** replaces the website: it answers the same RPC methods using the real catalog.
@@ -233,3 +251,62 @@ timers are cancelled when the session shuts down.
    question ("1 kg tomatoes"), a dropped second item (tool-step limit), and a repeating search.
 
 Run the tests again after **every** change to `backend/agent/worker.py`.
+
+---
+
+## 13 · Scanning a photo of a shopping list
+
+![Scanning a shopping list](diagrams/13-scan-shopping-list.svg)
+
+1. **📷 Scan list** (header) opens `/scan-list`. On a phone the file picker opens the back camera.
+2. `shoppingListController.scan` uploads the photo to `POST /api/list/scan`.
+3. FastAPI checks the file (JPEG / PNG / WebP, at most 5 MB, not empty) and sends it with our
+   instructions to the **OpenAI vision model** (`OPENAI_VISION_MODEL`, default `gpt-4.1-mini`).
+   **Structured output** makes the model answer in exactly the `ScannedList` shape: English name
+   (Hindi translated, e.g. "tamatar" → "tomato"), quantity, unit and the original text.
+   Crossed-out items, prices and headings are ignored.
+4. The **browser** matches each line to the catalog with the same `catalogService.search` as the rest of
+   the site, keeping only the most common category ("milk" → dairy, never the *Dairy Milk* chocolate).
+   It picks the plain product ("Tomato", not its variants) or the pack size that was written
+   ("Surf Excel 2 kg"); otherwise it asks.
+5. Quantities become packs: "2 kg" of a 1 kg pack = 2, "200 g" of a 200 g pack = 1, capped to stock.
+6. Each line is **ready**, **choose** (several options) or **not available** (out of stock, or not sold
+   here). The shopper can change packs, remove, pick an option or add items.
+7. **Nothing is in the cart** until "Add N to cart" (or a spoken "yes"), which uses `cartService.add`
+   with the normal stock rules.
+
+The OpenAI key lives only in `backend/.env`; the browser never sees it.
+
+---
+
+## 14 · Reviewing the scanned list by voice
+
+![Voice list review](diagrams/14-voice-list-review.svg)
+
+1. When a scan finishes and the voice agent is connected, `VoiceListAnnouncer` sends `list.scanned`
+   to the agent — once per scan (`scanId`). Tapping **🎤 Review with Cartiva** starts the call if needed.
+2. The agent calls `get_shopping_list` and reads it: ready items with natural amounts, the options
+   to choose from, and what is not available.
+3. The shopper edits by voice — `remove_list_item`, `add_list_item`, `update_list_item`,
+   `choose_list_item` — and the page updates live, because voice and taps use the **same
+   `shoppingListController`**.
+4. Only after a clear "yes" does the agent call `confirm_shopping_list`, which runs the same confirm as
+   the button, opens the cart, and the agent says what was added and what wasn't available.
+
+---
+
+## 15 · When voice goes wrong
+
+![Voice errors](diagrams/15-voice-errors.svg)
+
+Voice is an extra way to shop, so every failure explains itself and tapping keeps working:
+
+| Problem | How we detect it | Shopper sees |
+|---|---|---|
+| FastAPI unreachable | `VoiceServerError` from the token source | "The voice assistant is offline right now…" |
+| Microphone blocked / missing / busy | the session's `mediaDevicesError` + `MediaDeviceFailure` | How to allow the mic in the 🔒 menu |
+| Agent never joins (worker down, credit used up) | `useAgent()` → `failed` after 20 s | "The voice assistant didn't answer…" |
+| Network drop | `connectionState` → reconnecting; unexpected `Disconnected` reason | "Reconnecting…", then "connection was lost" |
+| Normal endings (bye, silence, 2 min, stop) | `ROOM_DELETED` / `CLIENT_INITIATED` | **No** error |
+
+All messages live in one place: `frontend/lib/voice/voice-errors.ts`.

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="986" viewBox="0 0 1040 986">
+<defs>
+<marker id="arrow-2563eb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/></marker>
+<marker id="arrow-0891b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0891b2"/></marker>
+<marker id="arrow-059669" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+<marker id="arrow-c026d3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c026d3"/></marker>
+<marker id="arrow-16a34a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/></marker>
+<marker id="arrow-52525b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#52525b"/></marker>
+<marker id="arrow-ea580c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#ea580c"/></marker>
+<marker id="arrow-dc2626" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/></marker>
+</defs>
+<rect width="1040" height="986" fill="#ffffff"/>
+<text x="40" y="40" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="22" font-weight="800" fill="#18181b">14 · Reviewing the scanned list by voice</text>
+<text x="40" y="66" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="14" fill="#52525b">Example: “Remove the bread” · “the 2 kg Surf Excel” · “Yes, add them”</text>
+<rect x="40" y="96" width="580" height="80" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="56" y="124" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Scan finished (scanId +1) and the agent is connected</text>
+<text x="56" y="144" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">or the shopper taps 🎤 Review with Cartiva</text>
+<text x="56" y="164" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#059669">📄 components/voice/voice-list-announcer.tsx</text>
+<line x1="330.0" y1="176" x2="330.0" y2="214" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="216" width="580" height="60" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="56" y="244" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Browser → agent: RPC “list.scanned”</text>
+<text x="56" y="264" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#0891b2">📄 lib/voice/rpc.ts → notifyAgent</text>
+<line x1="330.0" y1="276" x2="330.0" y2="314" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="316" width="580" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="344" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">get_shopping_list()</text>
+<text x="56" y="364" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">ready lines, options to choose, not available — with lineIds</text>
+<text x="56" y="384" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#c026d3">📄 backend/agent/worker.py</text>
+<line x1="330.0" y1="396" x2="330.0" y2="434" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="436" width="580" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="464" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">🔊 “Two kilos of tomatoes, paneer… Surf Excel comes in three sizes.</text>
+<text x="56" y="484" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">Pizza isn&#x27;t sold here. Shall I add them, or change something?”</text>
+<line x1="330.0" y1="496" x2="330.0" y2="534" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="536" width="580" height="40" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="3"/>
+<text x="56" y="564" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">◆ Shopper edits or agrees</text>
+<rect x="690" y="516.0" width="320" height="80" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="706" y="544.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Edit tools (page updates live)</text>
+<text x="706" y="564.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">remove_list_item · add_list_item</text>
+<text x="706" y="584.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">update_list_item · choose_list_item</text>
+<line x1="620" y1="556.0" x2="688" y2="556.0" stroke="#c026d3" stroke-width="2" marker-end="url(#arrow-c026d3)"/>
+<text x="628" y="548.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#c026d3">edit</text>
+<line x1="330.0" y1="576" x2="330.0" y2="614" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<text x="340.0" y="600.0" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" font-weight="600" fill="#52525b">“yes”</text>
+<rect x="40" y="616" width="580" height="60" rx="12" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="56" y="644" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">confirm_shopping_list()</text>
+<text x="56" y="664" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">only after a clear yes · clears any pending checkout</text>
+<line x1="330.0" y1="676" x2="330.0" y2="714" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="716" width="580" height="80" rx="12" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="56" y="744" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">RPC “list.confirm” → shoppingListController.confirm()</text>
+<text x="56" y="764" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">the SAME confirm as the “Add N to cart” button</text>
+<text x="56" y="784" font-family="Consolas, ui-monospace, Menlo, monospace" font-size="12" fill="#0891b2">📄 controllers/voice-controller.ts</text>
+<line x1="330.0" y1="796" x2="330.0" y2="834" stroke="#52525b" stroke-width="2" marker-end="url(#arrow-52525b)"/>
+<rect x="40" y="836" width="580" height="60" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="56" y="864" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#18181b">Cart updated → /cart</text>
+<text x="56" y="884" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="13" fill="#3f3f46">🔊 “Added four items. Pizza wasn&#x27;t available.”</text>
+<rect x="40" y="926" width="16" height="16" rx="4" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+<text x="62" y="939" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Frontend (Next.js)</text>
+<rect x="177.60000000000002" y="926" width="16" height="16" rx="4" fill="#ecfeff" stroke="#0891b2" stroke-width="1.6"/>
+<text x="199.60000000000002" y="939" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">RPC bridge (through the room)</text>
+<rect x="383.40000000000003" y="926" width="16" height="16" rx="4" fill="#fdf4ff" stroke="#c026d3" stroke-width="1.6"/>
+<text x="405.40000000000003" y="939" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Voice agent (Python)</text>
+<rect x="533.4000000000001" y="926" width="16" height="16" rx="4" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+<text x="555.4000000000001" y="939" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Success</text>
+<rect x="602.8000000000001" y="926" width="16" height="16" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+<text x="624.8000000000001" y="939" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#3f3f46">Shopper</text>
+<text x="40" y="964" font-family="Segoe UI, system-ui, -apple-system, Helvetica, Arial, sans-serif" font-size="12" fill="#71717a">◆ = decision · solid border = exists today · dashed border 🔜 = later phase</text>
+</svg>
