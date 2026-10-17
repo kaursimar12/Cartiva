@@ -109,6 +109,13 @@ async def test_remove_it(chat, browser: FakeBrowser) -> None:
     assert browser.cart == {"p001": 1}
 
 
+async def test_take_me_to_the_cart_opens_it(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 1}
+    await chat("Take me to my cart")
+
+    assert {"page": "cart"} in browser.called("ui.openPage"), "the cart page must open on screen"
+
+
 # ---------------------------------------------------------------- B. screen context & ambiguity
 
 

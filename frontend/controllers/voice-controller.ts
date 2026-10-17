@@ -161,6 +161,16 @@ export const voiceController = {
     return { ok: true, shownOnScreen: true, product: { ...toAgentProduct(product), description: product.description } };
   },
 
+  /** Opens a fixed page (e.g. "take me to the cart"). Checkout has its own flow (startCheckout). */
+  openPage(input: { page?: unknown }, ui: VoiceUi) {
+    const paths: Record<string, string> = { home: "/", cart: "/cart", "scan-list": "/scan-list" };
+    const path = typeof input.page === "string" ? paths[input.page] : undefined;
+    if (!path) return { ok: false, error: { code: "NOT_FOUND", message: "That page doesn't exist." } };
+
+    ui.navigate(path);
+    return { ok: true, shownOnScreen: true, page: input.page };
+  },
+
   /** What the shopper sees right now: the page and its products in on-screen order. */
   getScreen() {
     const screen = screenController.current();

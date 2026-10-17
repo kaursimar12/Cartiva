@@ -9,6 +9,7 @@ const LABELS: Record<string, { running: string; done: string }> = {
   "cart.update": { running: "Updating your cart…", done: "Cart updated" },
   "ui.openCategory": { running: "Opening category…", done: "Category open" },
   "ui.openProduct": { running: "Opening product…", done: "Product open" },
+  "ui.openPage": { running: "Opening page…", done: "Page open" },
   "ui.getScreen": { running: "Looking at your screen…", done: "Got it" },
   "checkout.start": { running: "Preparing checkout…", done: "Checkout ready" },
   "checkout.confirm": { running: "Opening payment…", done: "Payment window open" },

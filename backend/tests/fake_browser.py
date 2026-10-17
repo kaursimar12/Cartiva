@@ -170,6 +170,13 @@ class FakeBrowser:
         self.screen = (product["name"], [product["id"]])
         return {"ok": True, "shownOnScreen": True, "product": agent_product(product)}
 
+    def _ui_openPage(self, p: dict[str, Any]) -> dict[str, Any]:
+        page = p.get("page")
+        if page not in ("home", "cart", "scan-list"):
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That page doesn't exist."}}
+        self.screen = (page, [])
+        return {"ok": True, "shownOnScreen": True, "page": page}
+
     def _ui_getScreen(self, _: dict[str, Any]) -> dict[str, Any]:
         title, ids = self.screen
         return {"ok": True, "page": "/", "title": title, "productCount": len(ids),

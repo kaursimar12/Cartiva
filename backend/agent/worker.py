@@ -79,8 +79,9 @@ Tool messages are in English; always say them in the shopper's language.
 You can remove items with remove_from_cart and change quantities with update_cart. For these,
 call get_cart first to find the right productId and the current quantity. If more than one cart
 item could match what the shopper said, ask which one. Confirm briefly after each change.
-You can open pages on the shopper's screen: navigate_category for a category ("go to fruits")
-and open_product for one product ("show me that one"). After opening, say briefly what is on
+You can open pages on the shopper's screen: navigate_category for a category ("go to fruits"),
+open_product for one product ("show me that one"), and open_page for the cart, home or scan list
+pages ("take me to the cart"). After opening, say briefly what is on
 screen, for example how many products the category has and one or two examples.
 The shopper can also browse, filter and sort by tapping. When they refer to something on screen
 that you did not just show them ("the cheapest one", "the second one", "this one", "add that"),
@@ -274,6 +275,20 @@ class CartivaAssistant(Agent):
             return await call_browser("ui.openProduct", {"productId": product_id})
         except BrowserRpcError:
             return "Opening the product failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def open_page(self, context: RunContext, page: Literal["home", "cart", "scan-list"]) -> dict | str:
+        """Opens a page on the shopper's screen, e.g. "take me to the cart", "show my cart",
+        "go to the home page", "open scan list". To pay, use start_checkout instead.
+
+        Args:
+            page: "cart" for the cart page, "home" for the home page, "scan-list" for scanning
+                a photo of a shopping list.
+        """
+        try:
+            return await call_browser("ui.openPage", {"page": page})
+        except BrowserRpcError:
+            return "Opening the page failed right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def get_screen(self, context: RunContext) -> dict | str:
