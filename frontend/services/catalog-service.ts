@@ -17,6 +17,34 @@ export type ProductSort = "relevance" | "price-asc" | "price-desc" | "name";
 
 export type StockStatus = "out-of-stock" | "low-stock" | "in-stock";
 
+/** Price for a standard amount (per kg, per litre, per piece), so different pack sizes compare fairly. */
+export interface UnitPrice {
+  amount: Paise;
+  per: "kg" | "L" | "pc";
+}
+
+/** Grams, millilitres or pieces in one pack, read from units like "250 g", "1.5 L", "4 x 250 g", "1 dozen". */
+function packContents(unit: string): { amount: number; base: UnitPrice["per"] } | null {
+  const match = unit.trim().toLowerCase().match(/^(?:(\d+)\s*x\s*)?(\d+(?:\.\d+)?)\s*(kg|g|l|ml|pcs?|dozen)$/);
+  if (!match) return null;
+  const count = match[1] ? Number(match[1]) : 1;
+  const value = Number(match[2]) * count;
+  switch (match[3]) {
+    case "kg":
+      return { amount: value * 1000, base: "kg" };
+    case "g":
+      return { amount: value, base: "kg" };
+    case "l":
+      return { amount: value * 1000, base: "L" };
+    case "ml":
+      return { amount: value, base: "L" };
+    case "dozen":
+      return { amount: value * 12, base: "pc" };
+    default:
+      return { amount: value, base: "pc" };
+  }
+}
+
 const LOW_STOCK_THRESHOLD = 3;
 
 function normalize(text: string): string {
@@ -55,6 +83,21 @@ export class CatalogService {
     return this.products.findAll().filter((p) => p.featured);
   }
 
+  /**
+   * Products to suggest next to a cart: in stock, not already in it, from the same aisles first,
+   * then featured picks to fill up. Same input always gives the same order.
+   */
+  getSuggestions(cartProductIds: string[], limit = 8): Product[] {
+    const inCart = new Set(cartProductIds);
+    const aisles = new Set(
+      cartProductIds.map((id) => this.products.findById(id)?.category).filter((c) => c !== undefined),
+    );
+    const candidates = this.products.findAll().filter((p) => p.stock && !inCart.has(p.id));
+    const sameAisle = candidates.filter((p) => aisles.has(p.category));
+    const featured = candidates.filter((p) => p.featured && !aisles.has(p.category));
+    return [...sameAisle, ...featured].slice(0, limit);
+  }
+
   getCategories(): Category[] {
     return this.categories.findAll();
   }
@@ -65,6 +108,11 @@ export class CatalogService {
 
   getActiveOffers(): Offer[] {
     return this.offers.findActive();
+  }
+
+  /** Active offers a product counts toward: its own aisle's offers plus whole-cart offers. */
+  getOffersFor(product: Product): Offer[] {
+    return this.offers.findActive().filter((offer) => offer.category === null || offer.category === product.category);
   }
 
   /** Partial-match search over name, brand, category and tags. Every query term must match. */
@@ -118,6 +166,18 @@ export class CatalogService {
   cartQuantityProblem(product: Product, quantity: number): string | null {
     if (!product.stock) return "Out of stock — please remove";
     return quantity > product.availableQuantity ? `Only ${product.availableQuantity} available` : null;
+  }
+
+  /**
+   * Price per kg / litre / piece, e.g. ₹240/kg for 250 g at ₹60.
+   * Null when it would just repeat the price (a 1 kg, 1 L or single-piece pack) or the unit is unknown.
+   */
+  unitPrice(product: Product): UnitPrice | null {
+    const pack = packContents(product.unit);
+    if (!pack || pack.amount <= 0) return null;
+    const perBase = pack.base === "pc" ? 1 : 1000; // pieces, or grams/millilitres in 1 kg/L
+    if (pack.amount === perBase) return null;
+    return { amount: Math.round((product.price * perBase) / pack.amount), per: pack.base };
   }
 
   getBrands(products: Product[]): string[] {

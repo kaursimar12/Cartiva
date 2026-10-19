@@ -19,7 +19,7 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
       <label htmlFor={id} className="sr-only">
         Search products
       </label>
-      <span className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center text-zinc-500" aria-hidden>
+      <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-zinc-500" aria-hidden>
         <SearchIcon className="h-[18px] w-[18px]" />
       </span>
       <input
@@ -28,7 +28,7 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
         type="search"
         placeholder='Search "tomato", "milk", "Surf Excel"…'
         autoComplete="off"
-        className="w-full rounded-xl border border-zinc-200 bg-zinc-50 py-2.5 pr-4 pl-10 text-sm text-zinc-900 placeholder:text-zinc-500 focus:border-zinc-400 focus:bg-surface focus:ring-2 focus:ring-zinc-100 focus:outline-none"
+        className="h-11 w-full rounded-full border border-hairline bg-surface-muted pr-4 pl-11 text-sm text-zinc-900 transition placeholder:text-zinc-500 focus:border-brand-500/50 focus:bg-surface focus:ring-4 focus:ring-brand-500/10 focus:outline-none"
       />
     </form>
   );

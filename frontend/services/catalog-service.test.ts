@@ -23,6 +23,29 @@ describe("CatalogService (real catalog)", () => {
     expect(results.every((p) => p.price <= 20000)).toBe(true);
   });
 
+  it("works out a fair price per kg, litre or piece", () => {
+    const product = (id: string) => catalogService.getProduct(id)!;
+    expect(catalogService.unitPrice(product("p002"))).toEqual({ amount: 24000, per: "kg" }); // 250 g at ₹60
+    expect(catalogService.unitPrice(product("p045"))?.per).toBe("L"); // Vim 250 ml
+    expect(catalogService.unitPrice(product("p012"))?.per).toBe("pc"); // bananas, 1 dozen
+    expect(catalogService.unitPrice(product("p001"))).toBeNull(); // 1 kg: same as the price
+  });
+
+  it("suggests in-stock products from the cart's aisles, never what's already in it", () => {
+    const suggestions = catalogService.getSuggestions(["p001", "p004"], 6);
+    expect(suggestions.length).toBe(6);
+    expect(suggestions.some((p) => p.id === "p001" || p.id === "p004")).toBe(false);
+    expect(suggestions.every((p) => p.stock)).toBe(true);
+    expect(suggestions[0].category).toBe("vegetables");
+  });
+
+  it("lists the offers a product counts toward, never inactive ones", () => {
+    const offers = catalogService.getOffersFor(catalogService.getProduct("p001")!); // tomato
+    expect(offers.map((o) => o.id).sort()).toEqual(["offer001", "offer003"]);
+    const fruit = catalogService.getOffersFor(catalogService.getProduct("p013")!);
+    expect(fruit.some((o) => o.id === "offer004")).toBe(false); // fruits offer is inactive
+  });
+
   it("filters by availability", () => {
     expect(catalogService.filter({ available: true }).every((p) => p.stock)).toBe(true);
   });

@@ -12,7 +12,7 @@ export function Footer({ categories }: { categories: Category[] }) {
   ];
 
   return (
-    <footer className="mt-16 border-t border-zinc-200 bg-surface text-zinc-700">
+    <footer className="mt-24 border-t border-hairline bg-surface/60 text-zinc-700">
       <ul className="mx-auto grid max-w-[1920px] gap-4 border-b border-zinc-100 px-4 py-6 sm:grid-cols-3 sm:px-6 lg:px-10">
         {promises.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-center gap-3">
@@ -28,7 +28,7 @@ export function Footer({ categories }: { categories: Category[] }) {
       </ul>
       <div className="mx-auto grid max-w-[1920px] gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:px-10 lg:grid-cols-3">
         <div>
-          <p className="text-xl font-extrabold tracking-tight text-zinc-900">cartiva</p>
+          <p className="text-xl font-semibold tracking-[-0.04em] text-zinc-900">cartiva</p>
           <p className="mt-2 max-w-xs text-sm text-zinc-500">
             Intelligent grocery shopping. Browse with taps or just ask with your voice.
           </p>

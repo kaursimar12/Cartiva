@@ -1,5 +1,6 @@
 import asyncio
 import json
+import os
 import logging
 from typing import Literal
 
@@ -8,20 +9,27 @@ from livekit.agents import (
     Agent,
     AgentServer,
     AgentSession,
+    ConversationItemAddedEvent,
+    FunctionToolsExecutedEvent,
     JobContext,
     RunContext,
     ToolResult,
     TurnHandlingOptions,
+    UserInputTranscribedEvent,
     UserStateChangedEvent,
+    UserTranscriptionTimeoutEvent,
     cli,
     function_tool,
     get_job_context,
     inference,
+    llm,
 )
 
 from livekit import rtc
 
+from agent.language import REPLY_RULES, detect_language
 from agent.rpc import BrowserRpcError, call_browser
+from app.catalog import get_catalog
 
 logger = logging.getLogger("cartiva-agent")
 
@@ -29,16 +37,49 @@ logger = logging.getLogger("cartiva-agent")
 load_dotenv()
 
 # Session limits (protect the free monthly credit)
-MAX_SESSION_SECONDS = 2 * 60   # hard limit for one voice session
+# Hard limit for one voice session (protects the free monthly credit). Override with CARTIVA_MAX_SESSION_SECONDS.
+MAX_SESSION_SECONDS = int(os.getenv("CARTIVA_MAX_SESSION_SECONDS", str(5 * 60)))
+TIME_WARNING_SECONDS = 30      # heads-up this long before the limit
 AWAY_AFTER_SECONDS = 30        # silence before "are you still there?"
 GRACE_SECONDS = 15             # extra silence before hanging up
+LIST_SIGNAL_WAIT_SECONDS = 1.5 # how long to wait for "a list is coming" before the normal greeting
 
 # Tool-call rounds allowed in one reply. "Add tomatoes and potatoes" can take 4
 # (search, add, search, add); LiveKit's default of 3 would silently drop the last one.
 MAX_TOOL_STEPS = 8
 
+# LLM, called through LiveKit Inference (billed to the LiveKit credit). The evals in
+# tests/test_conversation.py import this, so the tests always check the model the app uses.
+LLM_MODEL = "openai/gpt-4.1-mini"
+
 # Cartesia voice ID (Indian-accent). Browse others at https://play.cartesia.ai and paste the ID here.
 TTS_VOICE = "3b554273-4299-48b9-9aaf-eefd438e3941"
+
+# Words Deepgram should expect, so accented speech maps to them ("cart", not "partner").
+# Deepgram refuses the whole connection (error 2006, the agent hears nothing) when the list is too
+# long: ~1,240 characters already failed. So the most useful words go first and we stop at a budget.
+STT_KEYTERM_BUDGET = 1000  # total characters of all keyterms
+STT_PRIORITY_KEYTERMS = [
+    "cart", "checkout", "kg", "kilo", "litre", "dozen", "Cartiva", "okay", "bye",
+    "tomatoes", "potatoes", "onions", "bananas", "apples", "eggs",  # plurals shoppers say
+    "aloo", "tamatar", "pyaaz", "doodh",                           # Hindi names in Latin letters
+]
+
+
+def build_stt_keyterms(budget: int = STT_KEYTERM_BUDGET) -> list[str]:
+    """Priority words first, then catalog product names (shortest first, so more products fit)."""
+    names = sorted({product.name for product in get_catalog().products.values()}, key=len)
+    terms: list[str] = []
+    used = 0
+    for term in [*STT_PRIORITY_KEYTERMS, *names]:
+        if used + len(term) > budget:
+            break
+        terms.append(term)
+        used += len(term)
+    return terms
+
+
+STT_KEYTERMS = build_stt_keyterms()
 
 INSTRUCTIONS = """
 You are Cartiva, a friendly voice assistant for an Indian online grocery store.
@@ -92,6 +133,9 @@ are the cheapest, or several are the most expensive), never pick one yourself. S
 tell the shopper they cost the same, and ask which one to add.
 For example: "Banana and Guava both cost forty rupees. Which one should I add?"
 Only add after the shopper chooses.
+Point at products on screen with highlight_products whenever you name one specific product
+("the cheapest is Vim") or ask the shopper to choose between several (reason "options"),
+so they can see what you mean. Call it before you speak about them. It changes nothing in the cart.
 Never invent products, brands, varieties, prices or options; only use what the tools return.
 
 # Checkout and payment
@@ -104,9 +148,13 @@ If it failed and the shopper wants to try again, call start_checkout again.
 
 # Shopping lists (scanned from a photo)
 When you are told a list was scanned, or the shopper asks about their list, call get_shopping_list.
-Read it briefly: the ready items with their amounts (say them naturally, e.g. "two kilos of tomatoes"),
-the items that need a choice (name the options with their sizes), and the items that are not available
-(out of stock, or not sold here). Then ask whether to add them or change something.
+Go through it in this order:
+1. The ready items, briefly, with their amounts said naturally ("two kilos of tomatoes, a pack of Amul butter").
+   If one has fewer packs than asked because of stock, say how many you could add.
+2. The items that need a choice, ONE AT A TIME: name the options with their sizes, ask which one, and wait
+   for the answer. Call choose_list_item with the choice before asking about the next item.
+3. When no choices are left: the items that are not available (which are out of stock, which are not sold here).
+4. Then ask whether to add everything to the cart.
 The shopper can remove items (remove_list_item), add items (add_list_item), change amounts
 (update_list_item) or pick an option (choose_list_item). Use the lineId from get_shopping_list and never
 read lineIds aloud. Nothing is in the cart until confirm_shopping_list; call it only after the shopper
@@ -123,10 +171,18 @@ Do not end the call if they only pause or say "wait" or "रुको".
 - Keep replies short: one or two sentences. Ask one question at a time.
 - If you did not understand the shopper or the request is unclear, ask one short question to
   clarify. Never guess an action, and never add, remove or pay for anything you are unsure about.
+- The shopper's words come from speech recognition and can be misheard, especially with an
+  Indian accent: a product can turn into a similar-sounding word ("tools" for "tomatoes",
+  "partner" for "cart"). If a word makes no sense for grocery shopping, it is probably a
+  mishearing of a product or a cart word. Never answer the literal word; ask one short
+  question with your best guess, for example "Did you mean tomatoes?", and act only after
+  the shopper confirms.
 - Say prices in rupees, in words, in the shopper's language, for example "forty rupees"
   or "चालीस रुपये".
 - The very first greeting is in English with "Hi" or "Hello", never "Namaste". After that,
   follow the shopper's language.
+- Reading a just-scanned shopping list (and the "reading your list" sentence before it) is always in
+  English. From the shopper's next reply on, follow their language as usual.
 """
 
 
@@ -137,6 +193,13 @@ class CartivaAssistant(Agent):
         super().__init__(instructions=INSTRUCTIONS)
         # ★ Set by start_checkout; required by confirm_payment; cleared by cancel or any cart change.
         self._pending_checkout_total: str | None = None
+
+    async def on_user_turn_completed(self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage) -> None:
+        """Before every reply: pin the reply language to what the shopper actually said this turn,
+        instead of leaving it to the model (which sometimes answered English in Hindi)."""
+        language = detect_language(new_message.text_content or "")
+        logger.info("reply language: %s", language)
+        turn_ctx.add_message(role="system", content=REPLY_RULES[language])
 
     @function_tool
     async def get_cart(self, context: RunContext) -> dict | str:
@@ -304,6 +367,29 @@ class CartivaAssistant(Agent):
         except BrowserRpcError:
             return "The screen could not be read right now. Ask the shopper which product they mean."
 
+    @function_tool
+    async def highlight_products(
+        self,
+        context: RunContext,
+        product_ids: list[str],
+        reason: Literal["spotlight", "options"] = "spotlight",
+    ) -> dict | str:
+        """Highlights products on the shopper's screen so they can see what you are talking about.
+        Use "spotlight" for the one product you are naming ("the cheapest one is Vim 250 ml"),
+        and "options" when you ask the shopper to choose between several products
+        ("Surf Excel Matic 1 kg, Matic 2 kg or Easy Wash 1 kg?"). It never changes the cart.
+        If the result lists products in notOnScreen, they are not visible right now; that is fine,
+        just describe them in words.
+
+        Args:
+            product_ids: The productIds to highlight, e.g. ["p045"].
+            reason: "spotlight" for one product you are naming, "options" for a choice.
+        """
+        try:
+            return await call_browser("ui.highlight", {"productIds": product_ids, "reason": reason})
+        except BrowserRpcError:
+            return "Highlighting failed; just describe the products in words."
+
     # ★ ---------- checkout (never pays without an explicit "yes") ----------
 
     @function_tool
@@ -408,10 +494,13 @@ class CartivaAssistant(Agent):
     @function_tool
     async def choose_list_item(self, context: RunContext, line_id: str, product_id: str) -> dict | str:
         """Picks which product to use for a "choose" line, e.g. "the 2 kg Surf Excel".
+        Use the lineId and the option's productId from the shopping list. If you are not sure of the ids,
+        call get_shopping_list first. If the result says it is not an option, call get_shopping_list and
+        try again with the exact ids; never tell the shopper it is unavailable without checking.
 
         Args:
             line_id: The lineId from get_shopping_list.
-            product_id: One of that line's options (its productId).
+            product_id: One of that line's options: its productId (preferred), or its exact product name.
         """
         try:
             return await call_browser("list.choose", {"lineId": line_id, "productId": product_id})
@@ -464,17 +553,45 @@ async def entrypoint(ctx: JobContext) -> None:
     session = AgentSession(
         # "multi" = automatic language detection, including Hindi and English mixed in one sentence
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
-        llm=inference.LLM(model="google/gemma-4-31b-it"),
+        llm=inference.LLM(model=LLM_MODEL),
         # Cartesia Sonic 3 speaks Hindi, English and Hinglish. Voice: an Indian-accent female voice.
         tts=inference.TTS(model="cartesia/sonic-3", voice=TTS_VOICE, language="hi"),
         turn_handling=TurnHandlingOptions(
             turn_detection=inference.TurnDetector(),
+            # Learn each shopper's pause length, so "Show me Amul … butter" isn't cut after "Amul".
+            endpointing={"mode": "dynamic"},
             # Tell real interruptions ("wait, show me fruits") from backchannels ("mm-hmm", "haan").
             interruption={"mode": "adaptive"},
         ),
         user_away_timeout=AWAY_AFTER_SECONDS,  # user counts as "away" after this much silence
         max_tool_steps=MAX_TOOL_STEPS,
+        stt_context_options={"keyterms": STT_KEYTERMS},  # bias Deepgram toward our words
     )
+
+    # ---------- debug: what the agent hears and does ----------
+    @session.on("user_input_transcribed")
+    def on_transcribed(ev: UserInputTranscribedEvent) -> None:
+        # interim = Deepgram's live guess while the shopper speaks; FINAL = what it settled on
+        kind = "FINAL  " if ev.is_final else "interim"
+        logger.info("HEARD %s [%s] %r", kind, ev.language, ev.transcript)
+
+    @session.on("conversation_item_added")
+    def on_item_added(ev: ConversationItemAddedEvent) -> None:
+        # the exact text the LLM receives as one turn (user) or speaks (assistant)
+        if ev.item.type == "message":  # skip non-message items, e.g. the AgentHandoff added at start
+            logger.info("TURN %s: %r", ev.item.role, ev.item.text_content)
+
+    @session.on("function_tools_executed")
+    def on_tools(ev: FunctionToolsExecutedEvent) -> None:
+        # what the LLM decided to do with that text, e.g. search_products {"query": "potato"}
+        for call in ev.function_calls:
+            logger.info("TOOL %s %s", call.name, call.arguments)
+
+    @session.on("user_transcription_timeout")
+    def on_no_transcript(ev: UserTranscriptionTimeoutEvent) -> None:
+        # the mic heard speech, but Deepgram returned no words at all
+        logger.warning("HEARD NOTHING: %.1fs of speech produced no transcript", ev.speech_duration)
+    # ---------- end debug ----------
 
     # ---------- auto hang-up (silence / time limit) ----------
     background_tasks: set[asyncio.Task] = set()
@@ -486,10 +603,17 @@ async def entrypoint(ctx: JobContext) -> None:
         background_tasks.add(task)
         task.add_done_callback(background_tasks.discard)
 
+    async def finish_current_speech() -> None:
+        """Waits until Cartiva finishes the sentence it is saying (never cut it off mid-word)."""
+        speech = session.current_speech
+        if speech is not None:
+            await speech.wait_for_playout()
+
     async def hang_up(goodbye: str) -> None:
-        """Says goodbye, then deletes the room, which disconnects the browser too."""
+        """Lets Cartiva finish speaking, says goodbye, then deletes the room (disconnects the browser too)."""
         logger.info("hanging up room %s", ctx.room.name)
-        await session.say(goodbye)
+        await finish_current_speech()
+        await session.say(goodbye, allow_interruptions=False)
         await ctx.delete_room()
 
     async def check_if_still_there() -> None:
@@ -499,8 +623,17 @@ async def entrypoint(ctx: JobContext) -> None:
             await hang_up("I'll close the voice assistant now. Tap the mic anytime to talk again.")
 
     async def enforce_time_limit() -> None:
-        await asyncio.sleep(MAX_SESSION_SECONDS)
-        await hang_up("We've reached the two minute limit for this session. Tap the mic anytime to continue.")
+        await asyncio.sleep(max(MAX_SESSION_SECONDS - TIME_WARNING_SECONDS, 0))
+        await finish_current_speech()
+        session.generate_reply(
+            instructions="In one short sentence, mention that this voice session ends in about 30 seconds."
+        )
+        await asyncio.sleep(TIME_WARNING_SECONDS)
+        minutes = round(MAX_SESSION_SECONDS / 60)
+        await hang_up(
+            f"We've reached the {minutes} minute limit for this session. Tap the mic anytime to continue, "
+            "your cart and list are saved."
+        )
 
     @session.on("user_state_changed")
     def on_user_state_changed(ev: UserStateChangedEvent) -> None:
@@ -514,6 +647,9 @@ async def entrypoint(ctx: JobContext) -> None:
 
     ctx.add_shutdown_callback(cancel_background_tasks)
     # ---------- end auto hang-up ----------
+
+    # Set when the browser says a shopping list is being (or was just) scanned.
+    list_coming = asyncio.Event()
 
     await session.start(agent=CartivaAssistant(), room=ctx.room)
     await ctx.connect()
@@ -535,23 +671,112 @@ async def entrypoint(ctx: JobContext) -> None:
         session.generate_reply(instructions=instructions)
         return "ok"
 
-    # Browser → agent: the shopper just scanned a photo of a shopping list.
+    # ---------- shopping list review: Cartiva talks, and doesn't listen until it has finished ----------
+    list_review = {"pending": False}  # True from upload until the readout has been spoken
+
+    def stop_listening() -> None:
+        session.input.set_audio_enabled(False)
+
+    def start_listening() -> None:
+        session.input.set_audio_enabled(True)
+
+    async def speak_uninterrupted(instructions: str) -> None:
+        handle = session.generate_reply(instructions=instructions, allow_interruptions=False)
+        await handle.wait_for_playout()
+
+    async def say_reading_list() -> None:
+        await speak_uninterrupted(
+            "In English, in one short sentence, say hello, that you are Cartiva, and that you are reading "
+            "their shopping list now. Do not call any tools."
+        )
+        if not list_review["pending"]:  # the readout already finished meanwhile
+            start_listening()
+
+    async def remember_list(shopping_list: dict) -> None:
+        """Puts the list (with lineIds and productIds) into the conversation, so that when the shopper
+        answers a question ("the 2 kg one") the model can call choose_list_item with the right ids."""
+        agent = session.current_agent
+        chat_ctx = agent.chat_ctx.copy()
+        chat_ctx.add_message(
+            role="system",
+            content=(
+                "Current shopping list (from get_shopping_list). Use these lineIds and productIds for "
+                f"choose_list_item, update_list_item and remove_list_item: {json.dumps(shopping_list, ensure_ascii=False)}"
+            ),
+        )
+        await agent.update_chat_ctx(chat_ctx)
+
+    async def read_list_aloud() -> None:
+        try:
+            shopping_list = await call_browser("list.get")
+        except BrowserRpcError:
+            shopping_list = None
+        if shopping_list and shopping_list.get("ok"):
+            await remember_list(shopping_list)
+        try:
+            if not shopping_list or not shopping_list.get("ok"):
+                await speak_uninterrupted("Say briefly that you couldn't open their shopping list, and ask them to try again.")
+                return
+            await speak_uninterrupted(
+                "The shopper's shopping list has just been read. Here it is as JSON: "
+                f"{json.dumps(shopping_list, ensure_ascii=False)}. "
+                "Speak in English. Do not call any tools now. First read the ready items with their amounts. Then, if any items "
+                "need a choice, ask about the FIRST one only (name its options with sizes) and stop to wait for "
+                "the answer; the other choices and the unavailable items come after the shopper answers. If "
+                "nothing needs a choice, say which items are not available (out of stock, or not sold here) "
+                "and ask whether to add everything to the cart."
+            )
+        finally:
+            list_review["pending"] = False
+            start_listening()
+
+    # Browser → agent: the shopper is uploading a shopping list photo (reading it takes a few seconds).
+    @ctx.room.local_participant.register_rpc_method("list.scanning")
+    async def on_list_scanning(data: rtc.RpcInvocationData) -> str:
+        list_coming.set()  # skip the generic greeting
+        list_review["pending"] = True
+        stop_listening()  # from now until the list has been read out
+        run_in_background(say_reading_list())
+        return "ok"
+
+    # Browser → agent: the shopping list photo has been read; read it out, uninterrupted.
     @ctx.room.local_participant.register_rpc_method("list.scanned")
     async def on_list_scanned(data: rtc.RpcInvocationData) -> str:
-        session.generate_reply(
-            instructions=(
-                "The shopper just scanned a photo of their shopping list. Call get_shopping_list, read the "
-                "list briefly in the shopper's language, mention what is not available, and ask whether to "
-                "add the items or change something."
-            )
-        )
+        list_coming.set()
+        list_review["pending"] = True
+        stop_listening()
+        run_in_background(read_list_aloud())
         return "ok"
+
+    # Browser → agent: the photo could not be read.
+    @ctx.room.local_participant.register_rpc_method("list.failed")
+    async def on_list_failed(data: rtc.RpcInvocationData) -> str:
+        reason = json.loads(data.payload or "{}").get("message", "")
+
+        async def explain() -> None:
+            try:
+                await speak_uninterrupted(
+                    f"The shopping list photo could not be read ({reason}). Say so briefly and suggest a clearer "
+                    "photo, or that they can tell you the items instead."
+                )
+            finally:
+                list_review["pending"] = False
+                start_listening()
+
+        run_in_background(explain())
+        return "ok"
+    # ---------- end shopping list review ----------
 
     run_in_background(enforce_time_limit())  # start the 2-minute clock
 
-    await session.generate_reply(
-        instructions='Greet the shopper in English with "Hi" or "Hello", say you are Cartiva, and ask what they need today.'
-    )
+    # If the shopper started the call by uploading a list, the list handlers greet instead.
+    # The browser tells us within a moment of connecting, so wait briefly before the generic greeting.
+    try:
+        await asyncio.wait_for(list_coming.wait(), timeout=LIST_SIGNAL_WAIT_SECONDS)
+    except asyncio.TimeoutError:
+        await session.generate_reply(
+            instructions='Greet the shopper in English with "Hi" or "Hello", say you are Cartiva, and ask what they need today.'
+        )
 
 
 if __name__ == "__main__":

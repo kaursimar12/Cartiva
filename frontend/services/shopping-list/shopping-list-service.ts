@@ -39,6 +39,30 @@ export class ShoppingListService {
     return product ? this.withProduct(line, product) : line;
   }
 
+  /**
+   * Works out which line and option a voice answer refers to. Prefers exact ids, but forgives the
+   * agent: a wrong lineId falls back to any line that has the option, and the option may be given by
+   * its product name ("Surf Excel Matic 2 kg"). Returns null unless exactly one option matches.
+   */
+  resolveChoice(lines: ListLine[], lineId: unknown, choice: string): { line: ListLine; productId: string } | null {
+    const target = lines.find((l) => l.id === lineId);
+    const pool = target ? [target] : lines.filter((l) => l.status === "choose");
+    const options = pool.flatMap((line) => line.options.map((productId) => ({ line, productId })));
+
+    const byId = options.filter((o) => o.productId === choice);
+    if (byId.length > 0) return byId.length === 1 ? byId[0] : null;
+
+    const wanted = normalize(choice);
+    if (!wanted) return null;
+    const byName = options.filter(({ productId }) => {
+      const product = this.catalog.getProduct(productId);
+      if (!product) return false;
+      const full = normalize(`${product.name} ${product.unit}`);
+      return full === wanted || full.includes(wanted) || normalize(product.name) === wanted;
+    });
+    return byName.length === 1 ? byName[0] : null;
+  }
+
   /** The shopper changed the number of packs. */
   withPacks(line: ListLine, packs: number): ListLine {
     const product = line.productId ? this.catalog.getProduct(line.productId) : undefined;

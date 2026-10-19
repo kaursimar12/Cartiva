@@ -7,7 +7,11 @@ import { notifyAgent, registerVoiceRpc } from "@/lib/voice/rpc";
 import { voiceTokenSource } from "@/lib/voice/token-source";
 import { VoiceErrorReporter } from "./voice-error-reporter";
 import { VoiceListAnnouncer } from "./voice-list-announcer";
-import { VoicePanel } from "./voice-panel";
+import { AgentAura } from "@/components/agent/agent-aura";
+import { AgentNavigationToast } from "@/components/agent/agent-navigation-toast";
+import { AgentOrb } from "@/components/agent/agent-orb";
+import { AgentPointer } from "@/components/agent/agent-pointer";
+import { FlyToCartLayer } from "@/components/agent/fly-to-cart-layer";
 
 /** One voice session for the whole site, so it survives page navigation. */
 export function VoiceProvider({ children }: { children: ReactNode }) {
@@ -31,7 +35,12 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
       <RoomAudioRenderer />
       <VoiceErrorReporter />
       <VoiceListAnnouncer />
-      <VoicePanel />
+      {/* The agent's presence: no chat window, the page itself shows what it does. */}
+      <AgentAura />
+      <AgentNavigationToast />
+      <AgentPointer />
+      <FlyToCartLayer />
+      <AgentOrb />
     </SessionProvider>
   );
 }

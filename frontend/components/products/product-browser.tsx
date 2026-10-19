@@ -28,7 +28,7 @@ const sortOptions: { id: ProductSort; label: string }[] = [
 ];
 
 const selectClass =
-  "rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800 hover:border-zinc-300 focus:border-brand-500 focus:outline-none";
+  "h-10 rounded-full border border-hairline bg-zinc-50/70 px-4 text-sm font-medium text-zinc-800 transition-colors hover:border-zinc-300 focus:border-brand-500 focus:outline-none";
 
 /** Filterable, sortable product listing (SRS FR-05). Filtering rules live in CatalogService. */
 export function ProductBrowser({ products, screenTitle }: { products: Product[]; screenTitle: string }) {
@@ -68,7 +68,7 @@ export function ProductBrowser({ products, screenTitle }: { products: Product[];
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap items-center gap-2 rounded-2xl border border-zinc-200 bg-surface p-3 shadow-sm">
+      <div className="glass mb-6 flex flex-wrap items-center gap-2 rounded-3xl p-2 lg:rounded-full">
         <label className="sr-only" htmlFor="filter-price">
           Price range
         </label>
@@ -96,7 +96,7 @@ export function ProductBrowser({ products, screenTitle }: { products: Product[];
           </>
         )}
 
-        <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-800">
+        <label className="flex h-10 cursor-pointer items-center gap-2 rounded-full border border-hairline bg-zinc-50/70 px-4 text-sm font-medium text-zinc-800">
           <input
             type="checkbox"
             checked={inStockOnly}
@@ -137,7 +137,7 @@ export function ProductBrowser({ products, screenTitle }: { products: Product[];
           <button
             type="button"
             onClick={resetFilters}
-            className="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+            className="mt-6 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
           >
             Clear filters
           </button>

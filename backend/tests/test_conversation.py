@@ -18,7 +18,7 @@ from livekit.agents import AgentSession, inference
 import agent.worker as worker
 from tests.fake_browser import BY_ID, FakeBrowser
 
-LLM_MODEL = "google/gemma-4-31b-it"  # same model as agent/worker.py
+LLM_MODEL = worker.LLM_MODEL  # always the same model as the real agent
 
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 
@@ -244,3 +244,49 @@ async def test_scanned_list_edit_then_add_after_yes(chat, browser: FakeBrowser) 
     assert browser.cart.get("p001") == 2, "tomatoes 2 kg = 2 packs"
     assert browser.cart.get("p055") == 1, "the chosen Surf Excel Matic 2 kg"
     assert len(browser.cart) == 2, "pizza is not sold, so only two products"
+
+
+# ---------------------------------------------------------------- F. speech recognition mistakes & Hinglish
+# Real transcripts from voice sessions: the STT sometimes mishears an Indian-accented word.
+
+
+async def test_misheard_word_asks_instead_of_acting(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 1}  # tomatoes in the cart
+    result = await chat("Remove the tools.")  # the STT heard "tools" for "tomatoes"
+
+    assert browser.cart == {"p001": 1}, "a word that makes no sense must not change the cart"
+    assert "?" in assistant_text(result), "it should ask what the shopper meant"
+
+
+async def test_misheard_word_acts_after_confirmation(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 1}
+    await chat("Remove the tools.")
+    await chat("Yes, the tomatoes")
+
+    assert browser.cart == {}, "after the shopper confirms, the tomatoes are removed"
+
+
+async def test_misheard_extra_word_does_not_block_a_clear_request(chat, browser: FakeBrowser) -> None:
+    await chat("Help me add two KG potatoes to my partner.")  # "partner" was "cart"
+
+    assert browser.cart == {"p004": 2}, "product and amount are clear, so it should just add them"
+
+
+async def test_hinglish_in_latin_letters(chat, browser: FakeBrowser) -> None:
+    await chat("do kilo pyaaz add kar do")
+
+    assert browser.cart == {"p005": 2}, "pyaaz = onion, do kilo = 2 packs of 1 kg"
+
+
+async def test_hinglish_in_devanagari(chat, browser: FakeBrowser) -> None:
+    await chat("दो kilo आलू add कर दो.")
+
+    assert browser.cart == {"p004": 2}, "आलू = potato"
+
+
+async def test_ruko_stops_a_pending_checkout(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 2}
+    await chat("Checkout")
+    await chat("रुको")
+
+    assert browser.payments == 0, "'wait' in Hindi must never confirm a payment"

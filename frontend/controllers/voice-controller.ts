@@ -7,7 +7,7 @@ import type { Product } from "@/models/entities/product";
 import { checkoutController } from "@/controllers/checkout-controller";
 import { screenController } from "@/controllers/screen-controller";
 import { shoppingListController } from "@/controllers/shopping-list-controller";
-import { checkoutService } from "@/lib/client-container";
+import { checkoutService, shoppingListService } from "@/lib/client-container";
 import type { ListLine } from "@/models/entities/shopping-list";
 import { useShoppingListStore } from "@/store/shopping-list-store";
 
@@ -189,6 +189,26 @@ export const voiceController = {
     };
   },
 
+  /**
+   * Points at products on screen: one the agent is talking about ("the cheapest is Vim"),
+   * or several the shopper must choose between. Changes nothing; it only highlights.
+   */
+  highlightProducts(input: { productIds?: unknown; reason?: unknown }) {
+    const wanted = Array.isArray(input.productIds) ? input.productIds.filter((id): id is string => typeof id === "string") : [];
+    const productIds = wanted.filter((id) => catalogService.getProduct(id) !== undefined);
+    if (productIds.length === 0) {
+      return { ok: false, error: { code: "NOT_FOUND", message: "None of those products exist." } };
+    }
+
+    const onScreen = new Set(screenController.current().productIds);
+    return {
+      ok: true,
+      productIds,
+      reason: input.reason === "options" ? "options" : "spotlight",
+      notOnScreen: productIds.filter((id) => !onScreen.has(id)), // the agent can open them first if needed
+    };
+  },
+
   /** Voice checkout step 1: checks the cart and opens the checkout page. Never takes payment. */
   startCheckout(ui: VoiceUi) {
     const result = checkoutService.validate();
@@ -266,13 +286,20 @@ export const voiceController = {
   },
 
   chooseListItem(input: { lineId?: unknown; productId?: unknown }) {
-    const line = findLine(input.lineId);
-    if (!line) return UNKNOWN_LINE;
-    if (typeof input.productId !== "string" || !line.options.includes(input.productId)) {
-      return { ok: false, error: { code: "NOT_FOUND", message: "That product is not one of the options for this item." } };
+    const { lines } = useShoppingListStore.getState();
+    const choice = typeof input.productId === "string" ? input.productId : "";
+    const match = shoppingListService.resolveChoice(lines, input.lineId, choice);
+    if (!match) {
+      return {
+        ok: false,
+        error: {
+          code: "NOT_FOUND",
+          message: "Couldn't match that to one option. Call get_shopping_list and use the exact lineId and productId.",
+        },
+      };
     }
-    shoppingListController.choose(line.id, input.productId);
-    return { ok: true, line: toAgentListLine(findLine(line.id)!) };
+    shoppingListController.choose(match.line.id, match.productId);
+    return { ok: true, line: toAgentListLine(findLine(match.line.id)!) };
   },
 
   /** Adds every ready line to the cart. The agent only calls it after the shopper agreed. */

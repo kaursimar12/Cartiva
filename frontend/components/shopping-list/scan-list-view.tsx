@@ -7,6 +7,7 @@ import { CameraIcon, TrashIcon } from "@/components/common/icons";
 import { QuantityStepper } from "@/components/products/quantity-stepper";
 import { ReviewWithVoiceButton } from "@/components/voice/review-with-voice-button";
 import { shoppingListController } from "@/controllers/shopping-list-controller";
+import { useVoiceSession } from "@/hooks/use-voice-session";
 import { catalogService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
 import type { ListLine } from "@/models/entities/shopping-list";
@@ -17,6 +18,7 @@ export function ScanListView() {
   const router = useRouter();
   const { status, lines } = useShoppingListStore();
   const [newItem, setNewItem] = useState("");
+  const voice = useVoiceSession();
 
   const found = lines.filter((l) => l.status === "found");
   const choose = lines.filter((l) => l.status === "choose");
@@ -48,7 +50,11 @@ export function ScanListView() {
           className="sr-only"
           onChange={(e) => {
             const file = e.target.files?.[0];
-            if (file) void shoppingListController.scan(file);
+            if (!file) return;
+            // Start Cartiva in the same tap (browsers only allow mic + audio from a tap), so it can
+            // greet while the photo is read, then go through the list out loud.
+            void voice.start();
+            void shoppingListController.scan(file);
             e.target.value = "";
           }}
         />
@@ -105,14 +111,14 @@ export function ScanListView() {
               value={newItem}
               onChange={(e) => setNewItem(e.target.value)}
               placeholder='Add an item, e.g. "bread"'
-              className="flex-1 rounded-xl border border-zinc-200 bg-surface px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
+              className="flex-1 rounded-xl border border-hairline bg-surface px-4 py-2.5 text-sm focus:border-brand-500 focus:outline-none"
             />
-            <button type="submit" className="rounded-xl border border-zinc-200 bg-surface px-4 text-sm font-semibold hover:bg-surface-muted">
+            <button type="submit" className="rounded-xl border border-hairline bg-surface px-4 text-sm font-semibold hover:bg-surface-muted">
               Add
             </button>
           </form>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-surface p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-hairline bg-surface p-4">
             <p className="text-sm">
               {found.length} item{found.length === 1 ? "" : "s"} · <strong>{formatPrice(total)}</strong>
               {choose.length > 0 && <span className="text-zinc-500"> · {choose.length} still to choose</span>}
@@ -129,7 +135,7 @@ export function ScanListView() {
                 type="button"
                 onClick={handleConfirm}
                 disabled={found.length === 0}
-                className="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+                className="rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
               >
                 Add {found.length} to cart
               </button>
@@ -152,9 +158,9 @@ export function ScanListView() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-2xl border border-zinc-200 bg-surface px-4 sm:px-5">
+    <section className="rounded-2xl border border-hairline bg-surface px-4 sm:px-5">
       <h2 className="border-b border-zinc-100 py-3 text-sm font-semibold">{title}</h2>
-      <ul className="divide-y divide-zinc-100">{children}</ul>
+      <ul className="divide-y divide-hairline">{children}</ul>
     </section>
   );
 }
@@ -210,7 +216,7 @@ function ChooseRow({ line }: { line: ListLine }) {
         id={`choose-${line.id}`}
         defaultValue=""
         onChange={(e) => shoppingListController.choose(line.id, e.target.value)}
-        className="rounded-lg border border-zinc-200 bg-surface px-3 py-2 text-sm"
+        className="rounded-lg border border-hairline bg-surface px-3 py-2 text-sm"
       >
         <option value="" disabled>
           Which one?

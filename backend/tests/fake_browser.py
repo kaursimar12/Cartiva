@@ -182,6 +182,15 @@ class FakeBrowser:
         return {"ok": True, "page": "/", "title": title, "productCount": len(ids),
                 "products": [{"position": i + 1, **agent_product(BY_ID[pid])} for i, pid in enumerate(ids[:20])]}
 
+    def _ui_highlight(self, p: dict[str, Any]) -> dict[str, Any]:
+        # Same shape as voiceController.highlightProducts: only makes cards glow, never changes the cart.
+        ids = [pid for pid in p.get("productIds") or [] if pid in BY_ID]
+        if not ids:
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": "None of those products exist."}}
+        on_screen = set(self.screen[1])
+        return {"ok": True, "productIds": ids, "reason": "options" if p.get("reason") == "options" else "spotlight",
+                "notOnScreen": [pid for pid in ids if pid not in on_screen]}
+
     def _checkout_start(self, _: dict[str, Any]) -> dict[str, Any]:
         if not self.cart:
             return {"ok": False, "error": {"code": "EMPTY_CART", "message": "Your cart is empty."}}

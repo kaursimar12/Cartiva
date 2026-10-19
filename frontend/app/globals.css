@@ -1,43 +1,88 @@
 @import "tailwindcss";
 
+/* `dark:` follows the app's theme toggle (<html data-theme>), not the OS setting. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+ * Bright, food-first theme (the default): warm off-white canvas, white cards, colour from the food.
+ * A dark theme is still available from the header toggle (see :root[data-theme="dark"] below).
+ */
 :root {
-  --background: #f7f7f8;
-  --foreground: #18181b;
+  --background: #f6f4ef;
+  --foreground: #16150f;
+  --hairline: rgba(22, 21, 15, 0.09);
+  --glass: rgba(255, 255, 255, 0.82);
+  --card-shadow: 0 1px 2px rgba(22, 21, 15, 0.04), 0 6px 20px -12px rgba(22, 21, 15, 0.14);
+  /* Product photo tiles: packshots are shot on white, so the tile is a gentle off-white. */
+  --tile: #f3f2ed;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-hairline: var(--hairline);
+  --color-tile: var(--tile);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-instrument-serif);
 }
 
-/* Cards are white on a soft neutral page canvas. */
 @theme {
   --color-surface: #ffffff;
-  --color-surface-muted: #f4f4f5;
+  --color-surface-muted: #f1efe9;
 }
 
-/* Restrained green, used only for primary actions and savings. */
+/* Deep grocery green for primary actions, savings and the agent. */
 @theme {
-  --color-brand-50: #ecf8ef;
-  --color-brand-100: #d3f0da;
-  --color-brand-200: #a8e0b6;
-  --color-brand-500: #1a9c3a;
-  --color-brand-600: #0c831f;
-  --color-brand-700: #0a6e1a;
-  --color-brand-800: #085a15;
-  --color-brand-900: #064210;
+  --color-brand-50: #eef7f0;
+  --color-brand-100: #d6eedc;
+  --color-brand-200: #acdcb9;
+  --color-brand-400: #34a853;
+  --color-brand-500: #138a36;
+  --color-brand-600: #0b7a2e;
+  --color-brand-700: #086425;
+  --color-brand-800: #064f1d;
+  --color-brand-900: #043714;
+}
+
+/* Motion: one easing curve for the whole app, so every movement feels related. */
+@theme {
+  --ease-luxe: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-brand-600);
+  outline: 2px solid var(--color-brand-500);
   outline-offset: 2px;
+}
+
+/* Frosted surface: sticky header, voice dock, toasts. */
+@utility glass {
+  background-color: var(--glass);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid var(--hairline);
+}
+
+/* Soft card elevation that reads on both themes. */
+@utility shadow-card {
+  box-shadow: var(--card-shadow);
+}
+
+/* Green halo for what the voice agent is working on (kept off ordinary buttons). */
+@utility glow-brand {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--color-brand-500) 45%, transparent),
+    0 10px 30px -12px color-mix(in oklab, var(--color-brand-500) 60%, transparent);
+}
+
+/* Prices line up digit by digit. */
+@utility tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 /* Respect "reduce motion": no hover lifts, spinners slow to a stop, no smooth transitions. */
@@ -52,11 +97,9 @@ body {
   }
 }
 
-/* While the voice panel is open on a phone, leave room so it never hides the page's last buttons. */
-@media (max-width: 639px) {
-  body[data-voice-panel="open"] {
-    padding-bottom: calc(40vh + 1.5rem);
-  }
+/* During a voice session, leave room so the voice dock never hides the page's last buttons. */
+body[data-voice="on"] {
+  padding-bottom: 10rem;
 }
 
 .scrollbar-none {
@@ -66,33 +109,44 @@ body {
   display: none;
 }
 
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
 /*
- * Dark theme (the default; set on <html data-theme> before paint by the script in app/layout.tsx).
- * The zinc scale is inverted so neutral utilities (bg-zinc-100, text-zinc-900, …) flip automatically.
+ * Dark theme (optional). The zinc scale is inverted so neutral utilities (bg-zinc-100,
+ * text-zinc-900, …) flip automatically.
  */
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --background: #0e0e10;
-  --foreground: #f4f4f5;
-  --color-surface: #18181b;
-  --color-surface-muted: #1f1f23;
+  --background: #0f0f0d;
+  --foreground: #f4f3ee;
+  --hairline: rgba(255, 255, 255, 0.09);
+  --glass: rgba(24, 24, 21, 0.78);
+  --card-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 10px 28px -16px rgba(0, 0, 0, 0.8);
+  --tile: #ecebe6; /* packshots keep a light tile, as on real stores in dark mode */
 
-  --color-zinc-50: #1c1c20;
-  --color-zinc-100: #242428;
-  --color-zinc-200: #2e2e33;
-  --color-zinc-300: #3f3f46;
-  --color-zinc-400: #8a8a93;
-  --color-zinc-500: #a1a1aa;
-  --color-zinc-600: #b4b4bc;
-  --color-zinc-700: #d4d4d8;
-  --color-zinc-800: #e4e4e7;
-  --color-zinc-900: #f4f4f5;
+  --color-surface: #191916;
+  --color-surface-muted: #22221e;
 
-  --color-brand-50: #10261a;
-  --color-brand-100: #153a22;
-  --color-brand-200: #1d5730;
-  --color-brand-500: #22b14c;
-  --color-brand-700: #1c9a3a;
+  --color-zinc-50: #1e1e1b;
+  --color-zinc-100: #262622;
+  --color-zinc-200: #30302b;
+  --color-zinc-300: #42423c;
+  --color-zinc-400: #8b8a82;
+  --color-zinc-500: #a5a49b;
+  --color-zinc-600: #bab9b0;
+  --color-zinc-700: #d6d5ce;
+  --color-zinc-800: #e7e6e0;
+  --color-zinc-900: #f4f3ee;
+
+  --color-brand-50: #11261a;
+  --color-brand-100: #163521;
+  --color-brand-200: #1e5130;
+  --color-brand-400: #4ade80;
+  --color-brand-500: #22c55e;
+  --color-brand-600: #15803d;
+  --color-brand-700: #22c55e;
   --color-brand-800: #4ade80;
   --color-brand-900: #bbf7d0;
 
@@ -102,6 +156,75 @@ body {
   --color-red-800: #fecaca;
 }
 
-:root[data-theme="light"] {
-  color-scheme: light;
+/* ---------- page transitions (app/template.tsx) ---------- */
+::view-transition {
+  pointer-events: none; /* keep the page clickable while a transition runs */
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+::view-transition-old(.page-exit) {
+  animation: 160ms ease-in both page-out;
+}
+::view-transition-new(.page-enter) {
+  animation: 420ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both page-in;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+    filter: blur(2px);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* ---------- loading shimmer (skeletons) ---------- */
+@utility shimmer {
+  background: linear-gradient(100deg, var(--color-zinc-100) 40%, var(--color-zinc-50) 50%, var(--color-zinc-100) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* ---------- hover sheen (offer banners, hero) ---------- */
+@utility sheen {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+    transform: translateX(-120%);
+    transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+  &:hover::after {
+    transform: translateX(120%);
+  }
 }

@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Checkout" };
 export default function CheckoutPage() {
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold tracking-tight sm:text-3xl">Checkout</h1>
+      <h1 className="mb-6 font-display text-4xl leading-none tracking-tight sm:text-5xl">Checkout</h1>
       <CheckoutView />
     </div>
   );

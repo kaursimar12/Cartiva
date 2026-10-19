@@ -1,4 +1,5 @@
 import type { Room, RpcInvocationData } from "livekit-client";
+import { agentEventController } from "@/controllers/agent-event-controller";
 import { voiceActivityController } from "@/controllers/voice-activity-controller";
 import { voiceController, type VoiceUi } from "@/controllers/voice-controller";
 
@@ -17,6 +18,7 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     "ui.openProduct": (payload) => voiceController.openProduct(payload, ui),
     "ui.openPage": (payload) => voiceController.openPage(payload, ui),
     "ui.getScreen": () => voiceController.getScreen(),
+    "ui.highlight": (payload) => voiceController.highlightProducts(payload),
     "list.get": () => voiceController.getShoppingList(ui),
     "list.remove": (payload) => voiceController.removeListItem(payload),
     "list.add": (payload) => voiceController.addListItem(payload, ui),
@@ -25,19 +27,23 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     "list.confirm": () => voiceController.confirmShoppingList(ui),
     "checkout.start": () => voiceController.startCheckout(ui),
     "checkout.confirm": () => voiceController.confirmPayment(ui),
-
   };
 
   for (const [name, method] of Object.entries(methods)) {
     room.registerRpcMethod(name, async (data: RpcInvocationData) => {
       const payload = data.payload ? (JSON.parse(data.payload) as Record<string, unknown>) : {};
-      voiceActivityController.started(name);
+      // Show what the agent is doing: the caption, and the effect on the page (glows, pointer, …).
+      voiceActivityController.started(name, payload);
+      agentEventController.started(name, payload);
       try {
         const result = await method(payload);
-        voiceActivityController.finished(name, result);
+        voiceActivityController.finished(name, result, payload);
+        agentEventController.finished(name, payload, result);
         return JSON.stringify(result);
       } catch (error) {
-        voiceActivityController.finished(name, { ok: false, error: { message: "Something went wrong." } });
+        const failure = { ok: false, error: { message: "Something went wrong." } };
+        voiceActivityController.finished(name, failure, payload);
+        agentEventController.finished(name, payload, failure);
         throw error;
       }
     });

@@ -1,57 +1,27 @@
 "use client";
 
-import { useAgent, useSessionContext } from "@livekit/components-react";
 import { MicIcon } from "@/components/common/icons";
-import { voiceSessionController } from "@/controllers/voice-session-controller";
-import { startProblem } from "@/lib/voice/voice-errors";
+import { useVoiceSession } from "@/hooks/use-voice-session";
 
-/** What the button says for each agent state (SRS FR-12). */
-const STATUS_LABELS: Record<string, string> = {
-  disconnected: "Ask Cartiva",
-  connecting: "Connecting…",
-  "pre-connect-buffering": "Connecting…",
-  initializing: "Agent joining…",
-  idle: "Agent joining…",
-  listening: "Listening…",
-  thinking: "Thinking…",
-  speaking: "Speaking…",
-  failed: "Try again",
-  reconnecting: "Reconnecting…",
-};
-
-/** Voice assistant entry point (SRS FR-01, FR-11): starts and stops the LiveKit voice session. */
+/** Header voice entry point (SRS FR-01, FR-11): starts and stops the LiveKit voice session. */
 export function VoiceButton({ compact = false }: { compact?: boolean }) {
-  const session = useSessionContext();
-  const agent = useAgent();
-
-  const active = agent.state !== "disconnected" && agent.state !== "failed";
-  const reconnecting = session.connectionState === "reconnecting" || session.connectionState === "signalReconnecting";
-  const label = reconnecting ? STATUS_LABELS.reconnecting : (STATUS_LABELS[agent.state] ?? "Ask Cartiva");
-
-  async function toggle() {
-    try {
-      if (active) {
-        await session.end();
-      } else {
-        await session.start({ tracks: { microphone: { enabled: true } } });
-      }
-    } catch (error) {
-      voiceSessionController.reportProblem(startProblem(error));
-    }
-  }
+  const { active, label, state, toggle } = useVoiceSession();
 
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={() => void toggle()}
       aria-pressed={active}
       aria-label={active ? "Stop Cartiva voice assistant" : "Ask Cartiva voice assistant"}
-      className={`flex h-11 items-center gap-2 rounded-xl border px-3 text-sm font-semibold transition-colors sm:px-4 ${
-        active ? "border-foreground bg-foreground text-background" : "border-zinc-200 bg-surface text-zinc-800 hover:bg-zinc-50"
+      className={`flex h-11 shrink-0 items-center gap-2 rounded-full px-3 text-sm font-medium transition-colors sm:px-4 ${
+        active ? "bg-zinc-900 text-background" : "border border-hairline bg-surface text-zinc-800 hover:bg-zinc-50"
       }`}
     >
-      <MicIcon className={`h-5 w-5 ${agent.state === "listening" ? "animate-pulse" : ""}`} />
-      {!compact && <span className="hidden sm:inline">{label}</span>}
+      <span className="relative flex h-5 w-5 items-center justify-center">
+        {active && <span aria-hidden className="absolute inset-0 animate-ping rounded-full bg-teal-400/50" />}
+        <MicIcon className="relative h-5 w-5" />
+      </span>
+      {!compact && <span className="hidden sm:inline">{state === "disconnected" ? "Ask Cartiva" : label}</span>}
     </button>
   );
 }

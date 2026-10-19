@@ -30,11 +30,11 @@ export default async function CategoryPage(props: PageProps<"/category/[category
         / <span className="text-zinc-800">{category.name}</span>
       </nav>
       <header className="mb-6 flex items-center gap-4">
-        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-zinc-200 sm:h-20 sm:w-20">
+        <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl bg-zinc-100 ring-1 ring-hairline sm:h-20 sm:w-20">
           <Image src={category.image} alt="" fill sizes="80px" className="object-cover" priority />
         </span>
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-zinc-900 sm:text-3xl">{category.name}</h1>
+          <h1 className="font-display text-4xl leading-none tracking-tight text-zinc-900 sm:text-5xl">{category.name}</h1>
           <p className="mt-0.5 text-sm text-zinc-600">{category.description}</p>
         </div>
       </header>

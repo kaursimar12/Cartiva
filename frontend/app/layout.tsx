@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { StoreHydrator, ThemeSync } from "@/components/common/providers";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
+import { MotionProvider, StoreHydrator, ThemeSync } from "@/components/common/providers";
 import { Toaster } from "@/components/common/toaster";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
@@ -12,6 +12,13 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+});
+
+/** Display serif for headlines only; body text stays in Geist. */
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const geistMono = Geist_Mono({
@@ -27,7 +34,7 @@ export const metadata: Metadata = {
   description: "Shop groceries by browsing or by voice. Fresh vegetables, fruits, dairy, essentials and more.",
 };
 
-/** Applies the saved theme before first paint (dark is the default), so there is no flash. */
+/** Applies the saved theme before first paint (light is the default), so there is no flash. */
 const themeScript = `try{var t=JSON.parse(localStorage.getItem("${THEME_STORAGE_KEY}")||"null");t=t&&t.state&&t.state.theme;if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -36,9 +43,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      data-theme="dark"
+      data-theme="light"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
@@ -51,6 +58,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {/* ★ CHANGE 2: one voice session for the whole site, so it survives page navigation */}
+        <MotionProvider>
         <VoiceProvider>
           <StoreHydrator />
           <ThemeSync />
@@ -61,6 +69,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Footer categories={categories} />
           <Toaster />
         </VoiceProvider>
+        </MotionProvider>
       </body>
     </html>
   );

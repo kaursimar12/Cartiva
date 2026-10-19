@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { MotionConfig } from "motion/react";
+import { useEffect, type ReactNode } from "react";
 import { useCartStore } from "@/store/cart-store";
 import { useOrderStore } from "@/store/order-store";
 import { useThemeStore } from "@/store/theme-store";
@@ -25,4 +26,13 @@ export function ThemeSync() {
     if (hydrated) document.documentElement.dataset.theme = theme;
   }, [theme, hydrated]);
   return null;
+}
+
+/** App-wide animation settings: honour the OS "reduce motion" setting, one easing curve everywhere. */
+export function MotionProvider({ children }: { children: ReactNode }) {
+  return (
+    <MotionConfig reducedMotion="user" transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
+      {children}
+    </MotionConfig>
+  );
 }

@@ -11,8 +11,8 @@ interface EmptyStateProps {
 
 export function EmptyState({ icon, title, description, action, children }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-zinc-200 bg-surface px-6 py-14 shadow-sm text-center">
-      <span className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-100 text-5xl" aria-hidden>
+    <div className="flex flex-col items-center rounded-3xl border border-hairline bg-surface px-6 py-16 text-center shadow-card">
+      <span className="flex h-24 w-24 items-center justify-center rounded-full bg-zinc-100 text-5xl ring-1 ring-hairline" aria-hidden>
         {icon}
       </span>
       <h2 className="mt-4 text-lg font-semibold">{title}</h2>
@@ -20,7 +20,7 @@ export function EmptyState({ icon, title, description, action, children }: Empty
       {action && (
         <Link
           href={action.href}
-          className="mt-6 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
+          className="mt-6 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700"
         >
           {action.label}
         </Link>

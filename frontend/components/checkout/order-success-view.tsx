@@ -26,11 +26,11 @@ export function OrderSuccessView() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="rounded-2xl border border-zinc-200 bg-surface shadow-sm p-6 text-center sm:p-8">
-        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-3xl text-brand-700" aria-hidden>
+      <div className="rounded-3xl border border-hairline bg-surface shadow-card p-6 text-center sm:p-8">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-3xl text-white" aria-hidden>
           ✓
         </span>
-        <h1 className="mt-4 text-2xl font-bold">Order placed!</h1>
+        <h1 className="mt-5 font-display text-5xl leading-none tracking-tight">Order placed!</h1>
         <p className="mt-1 text-zinc-600">Your payment was successful and your order has been placed.</p>
         <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-3 rounded-xl bg-surface-muted p-4 text-left text-sm">
           <dt className="text-zinc-600">Order reference</dt>
@@ -42,11 +42,11 @@ export function OrderSuccessView() {
         </dl>
       </div>
 
-      <section aria-labelledby="order-items" className="mt-4 rounded-2xl border border-zinc-200 bg-surface shadow-sm p-6">
+      <section aria-labelledby="order-items" className="mt-4 rounded-3xl border border-hairline bg-surface shadow-card p-6">
         <h2 id="order-items" className="font-semibold">
           Items
         </h2>
-        <ul className="mt-3 divide-y divide-zinc-100 text-sm">
+        <ul className="mt-3 divide-y divide-hairline text-sm">
           {order.lines.map((line) => (
             <li key={line.productId} className="flex justify-between gap-4 py-2.5">
               <span>
@@ -56,7 +56,7 @@ export function OrderSuccessView() {
             </li>
           ))}
         </ul>
-        <dl className="mt-3 space-y-1.5 border-t border-zinc-200 pt-3 text-sm">
+        <dl className="mt-3 space-y-1.5 border-t border-hairline pt-3 text-sm">
           <div className="flex justify-between">
             <dt className="text-zinc-600">Subtotal</dt>
             <dd>{formatPrice(pricing.subtotal)}</dd>
@@ -80,7 +80,7 @@ export function OrderSuccessView() {
 
       <Link
         href="/"
-        className="mt-6 flex w-full items-center justify-center rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700"
+        className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-600 py-3.5 text-sm transition active:scale-[0.99] font-semibold text-white hover:bg-brand-700"
       >
         Continue shopping
       </Link>

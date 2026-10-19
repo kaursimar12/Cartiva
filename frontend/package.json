@@ -13,6 +13,7 @@
   "dependencies": {
     "@livekit/components-react": "^2.9.24",
     "livekit-client": "^2.22.4",
+    "motion": "^14.3.0",
     "next": "16.3.8",
     "react": "19.2.8",
     "react-dom": "19.2.8",

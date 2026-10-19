@@ -69,3 +69,33 @@ describe("ShoppingListService (real catalog)", () => {
     expect(chosen).toMatchObject({ status: "found", productId: "p054", packs: 1 });
   });
 });
+
+describe("resolveChoice (voice answers to 'which one?')", () => {
+  const lines = [{ ...line("surf excel"), id: "a" }, { ...line("milk"), id: "b" }];
+  const surf = lines[0];
+
+  it("needs a choice for Surf Excel in the first place", () => {
+    expect(surf.status).toBe("choose");
+  });
+
+  it("accepts the exact line and product id", () => {
+    expect(service.resolveChoice(lines, "a", surf.options[1])).toEqual({ line: surf, productId: surf.options[1] });
+  });
+
+  it("forgives a wrong lineId when the product is an option on exactly one line", () => {
+    expect(service.resolveChoice(lines, "made-up", surf.options[0])?.line.id).toBe("a");
+  });
+
+  it("accepts the option's product name with its size", () => {
+    const result = service.resolveChoice(lines, "a", "Surf Excel Matic 2 kg");
+    expect(catalogService.getProduct(result!.productId)?.unit).toBe("2 kg");
+  });
+
+  it("refuses when the name fits several options", () => {
+    expect(service.resolveChoice(lines, "a", "Surf Excel Matic")).toBeNull();
+  });
+
+  it("refuses a product that isn't an option", () => {
+    expect(service.resolveChoice(lines, "a", "p001")).toBeNull();
+  });
+});

@@ -7,33 +7,32 @@ import { formatPrice } from "@/lib/format";
 import type { Category } from "@/models/entities/product";
 import { CartLink } from "./cart-link";
 import { CategoryNav } from "./category-nav";
+import { HeaderShell } from "./header-shell";
 import { SearchForm } from "./search-form";
 
 export function Header({ categories }: { categories: Category[] }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-surface/95 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur">
-      <div className="mx-auto flex max-w-[1920px] items-center gap-3 px-4 py-3 sm:gap-6 sm:px-6 lg:px-10">
-        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="Cartiva home">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-foreground text-lg font-black text-background" aria-hidden>
-            c
-          </span>
-          <span className="text-[22px] font-extrabold tracking-tight text-zinc-900">cartiva</span>
+    <HeaderShell>
+      <div className="mx-auto flex max-w-[1920px] items-center gap-3 px-4 py-3 transition-[padding] duration-300 ease-luxe group-data-[scrolled=true]:py-2 sm:gap-6 sm:px-6 lg:px-10">
+        <Link href="/" className="flex shrink-0 items-baseline gap-1" aria-label="Cartiva home">
+          <span className="font-display text-[30px] leading-none tracking-tight text-zinc-900">cartiva</span>
+          <span className="h-2 w-2 rounded-full bg-brand-500" aria-hidden />
         </Link>
 
-        <div className="hidden shrink-0 border-l border-zinc-200 pl-6 lg:block">
+        <div className="hidden shrink-0 border-l border-hairline pl-6 xl:block">
           <p className="flex items-center gap-1 text-sm font-semibold text-zinc-900">
-            <BoltIcon className="h-4 w-4 text-zinc-500" />
-            Groceries in minutes
+            <BoltIcon className="h-4 w-4 text-brand-600" />
+            Delivery in 10 minutes
           </p>
-          <p className="text-xs text-zinc-500">Free delivery above {formatPrice(pricingService.delivery.freeAbove)}</p>
+          <p className="text-xs text-zinc-500">Free above {formatPrice(pricingService.delivery.freeAbove)}</p>
         </div>
 
         <SearchForm id="site-search" className="hidden flex-1 md:block" />
-        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+        <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
           <Link
             href="/scan-list"
-            className="flex h-11 items-center gap-2 rounded-xl border border-zinc-200 bg-surface px-3 text-sm font-semibold text-zinc-800 hover:bg-zinc-50 sm:px-4"
+            className="flex h-11 items-center gap-2 rounded-full border border-hairline bg-surface px-3 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-50 sm:px-4"
             aria-label="Scan a shopping list"
           >
             <CameraIcon className="h-5 w-5" />
@@ -47,6 +46,6 @@ export function Header({ categories }: { categories: Category[] }) {
         <SearchForm id="site-search-mobile" />
       </div>
       <CategoryNav categories={categories} />
-    </header>
+    </HeaderShell>
   );
 }

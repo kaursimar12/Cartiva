@@ -1,3 +1,4 @@
+import { catalogService } from "@/lib/container";
 import { useVoiceActivityStore, type VoiceActivity } from "@/store/voice-activity-store";
 
 /** What the shopper sees while each browser method runs, and after it succeeds. */
@@ -21,6 +22,14 @@ const LABELS: Record<string, { running: string; done: string }> = {
   "list.confirm": { running: "Adding your list to the cart…", done: "List added to cart" },
 };
 
+/** Sharper wording when we know which product the agent is handling ("Adding Potato…"). */
+const NAMED_LABELS: Record<string, { running: (name: string) => string; done: (name: string) => string }> = {
+  "cart.add": { running: (n) => `Adding ${n}…`, done: (n) => `Added ${n}` },
+  "cart.remove": { running: (n) => `Removing ${n}…`, done: (n) => `Removed ${n}` },
+  "cart.update": { running: (n) => `Updating ${n}…`, done: (n) => `Updated ${n}` },
+  "ui.openProduct": { running: (n) => `Opening ${n}…`, done: (n) => n },
+};
+
 const CLEAR_AFTER_MS = 2500;
 let clearTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -36,15 +45,23 @@ function failureMessage(result: unknown): string | null {
   return typeof error?.message === "string" ? error.message : "That didn't work.";
 }
 
-/** Shows what a voice action is doing ("Adding to cart…"), then its outcome for a moment. */
+/** The labels for a method, naming the product when the payload says which one. */
+function labelsFor(method: string, payload?: Record<string, unknown>): { running: string; done: string } | undefined {
+  const named = NAMED_LABELS[method];
+  const productId = payload?.productId;
+  const product = named && typeof productId === "string" ? catalogService.getProduct(productId) : undefined;
+  return product ? { running: named.running(product.name), done: named.done(product.name) } : LABELS[method];
+}
+
+/** Shows what a voice action is doing ("Adding Potato…"), then its outcome for a moment. */
 export const voiceActivityController = {
-  started(method: string) {
-    const labels = LABELS[method];
+  started(method: string, payload?: Record<string, unknown>) {
+    const labels = labelsFor(method, payload);
     if (labels) show({ label: labels.running, state: "running" });
   },
 
-  finished(method: string, result: unknown) {
-    const labels = LABELS[method];
+  finished(method: string, result: unknown, payload?: Record<string, unknown>) {
+    const labels = labelsFor(method, payload);
     if (!labels) return;
     const failure = failureMessage(result);
     show(failure ? { label: failure, state: "error" } : { label: labels.done, state: "done" });
