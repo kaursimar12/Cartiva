@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { CheckIcon, CloseIcon } from "@/components/common/icons";
 import { agentEventController } from "@/controllers/agent-event-controller";
 import { useVoiceActivityStore } from "@/store/voice-activity-store";
+import { useVoiceAgentStore } from "@/store/voice-agent-store";
 import { VoiceSphere, type SphereMode } from "./voice-sphere";
 
 /** What the caption says when the agent isn't running an action. */
@@ -53,8 +54,13 @@ export function AgentOrb() {
             : "idle";
   const level = mode === "speaking" ? agentLevel : mode === "user" ? userLevel : 0;
 
-  const caption = activity?.label ?? (userSpeaking ? "Go on, I'm listening…" : (STATE_TEXT[agent.state] ?? "Cartiva"));
-  const captionKey = activity ? `${activity.state}:${activity.label}` : userSpeaking ? "user" : agent.state;
+  // Before Cartiva's first words it isn't listening yet (it introduces itself first).
+  const greeted = useVoiceAgentStore((s) => s.greeted);
+  const joining = !greeted && agent.state !== "speaking";
+  const caption =
+    activity?.label ??
+    (joining ? "Cartiva is joining…" : userSpeaking ? "Go on, I'm listening…" : (STATE_TEXT[agent.state] ?? "Cartiva"));
+  const captionKey = activity ? `${activity.state}:${activity.label}` : joining ? "joining" : userSpeaking ? "user" : agent.state;
 
   // Leave room at the bottom of the page so the dock never covers the last buttons.
   useEffect(() => {
@@ -77,12 +83,11 @@ export function AgentOrb() {
             exit={{ opacity: 0, y: 30, scale: 0.8 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Opens big in the middle of the screen, then glides down into the dock. */}
+            {/* Light fade-and-rise: this plays during "Hi, I'm Cartiva", so it must stay cheap for the browser. */}
             <motion.div
-              // Start from the middle of the screen (this only renders in the browser, once a call starts).
-              initial={reduce ? false : { y: -(window.innerHeight / 2 - 140), scale: 2.4, opacity: 0 }}
-              animate={{ y: 0, scale: 1, opacity: 1 }}
-              transition={{ opacity: { duration: 0.4 }, default: { delay: 1.1, type: "spring", stiffness: 90, damping: 18 } }}
+              initial={reduce ? false : { y: 24, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             >
               <VoiceSphere mode={mode} level={level} size={84} />
             </motion.div>
@@ -91,7 +96,7 @@ export function AgentOrb() {
               className="glass pointer-events-auto flex max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4 shadow-2xl"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: reduce ? 0 : 1.5 }}
+              transition={{ delay: reduce ? 0 : 0.15 }}
             >
               <div className="relative min-w-0 overflow-hidden" aria-live="polite" role="status">
                 <AnimatePresence mode="popLayout" initial={false}>

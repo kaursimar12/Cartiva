@@ -195,7 +195,7 @@ class FakeBrowser:
         if not self.cart:
             return {"ok": False, "error": {"code": "EMPTY_CART", "message": "Your cart is empty."}}
         total = self._cart_get({})["total"]
-        return {"ok": True, "itemCount": sum(self.cart.values()), "total": total,
+        return {"ok": True, "itemCount": len(self.cart), "total": total,
                 "message": f"Your total is {total}. Would you like to proceed to payment?"}
 
     def _checkout_confirm(self, _: dict[str, Any]) -> dict[str, Any]:

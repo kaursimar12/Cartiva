@@ -5,6 +5,9 @@ import { packsNeeded, parsePack } from "./units";
 
 const MAX_OPTIONS = 5;
 
+/** Words that say nothing about which option ("the 2 kg one", "wala"). */
+const CHOICE_FILLER = new Set(["the", "a", "an", "one", "pack", "of", "please", "wala", "wali", "vala"]);
+
 function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 }
@@ -40,25 +43,30 @@ export class ShoppingListService {
   }
 
   /**
-   * Works out which line and option a voice answer refers to. Prefers exact ids, but forgives the
-   * agent: a wrong lineId falls back to any line that has the option, and the option may be given by
-   * its product name ("Surf Excel Matic 2 kg"). Returns null unless exactly one option matches.
+   * Works out which line and option a voice answer refers to. Only lines still waiting for a choice
+   * ("Which one?") can change: never an out-of-stock or already-decided line, even if the agent names
+   * it. A wrong lineId falls back to the waiting line that has the option, and the option may be given
+   * by name ("Vim 250 ml", "Surf Excel Matic 2 kg"). Returns null unless exactly one option matches.
    */
   resolveChoice(lines: ListLine[], lineId: unknown, choice: string): { line: ListLine; productId: string } | null {
-    const target = lines.find((l) => l.id === lineId);
-    const pool = target ? [target] : lines.filter((l) => l.status === "choose");
+    const waiting = lines.filter((l) => l.status === "choose");
+    const target = waiting.find((l) => l.id === lineId);
+    const pool = target ? [target] : waiting;
     const options = pool.flatMap((line) => line.options.map((productId) => ({ line, productId })));
 
     const byId = options.filter((o) => o.productId === choice);
     if (byId.length > 0) return byId.length === 1 ? byId[0] : null;
 
-    const wanted = normalize(choice);
-    if (!wanted) return null;
+    // Every word the agent used must appear in the option's name and size ("vim 250 ml").
+    const words = normalize(choice)
+      .split(" ")
+      .filter((w) => w && !CHOICE_FILLER.has(w));
+    if (words.length === 0) return null;
     const byName = options.filter(({ productId }) => {
       const product = this.catalog.getProduct(productId);
       if (!product) return false;
-      const full = normalize(`${product.name} ${product.unit}`);
-      return full === wanted || full.includes(wanted) || normalize(product.name) === wanted;
+      const full = ` ${normalize(`${product.name} ${product.unit}`)} `;
+      return words.every((w) => full.includes(` ${w} `));
     });
     return byName.length === 1 ? byName[0] : null;
   }

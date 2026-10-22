@@ -88,7 +88,8 @@ export function AgentPointer() {
           initial={{ opacity: 0, scale: 0.4, x: point.x, y: point.y + 40 }}
           animate={{ opacity: 1, scale: 1, x: point.x, y: point.y }}
           exit={{ opacity: 0, scale: 0.4 }}
-          transition={{ type: "spring", stiffness: 170, damping: 22, mass: 0.9 }}
+          // Snappy: arrives in ~0.3 s, in step with the cart action (see POINTER_TRAVEL_MS in lib/voice/rpc.ts).
+          transition={{ type: "spring", stiffness: 520, damping: 38, mass: 0.6 }}
         >
           {/* Cursor arrow with a glowing tip. */}
           <svg width="26" height="26" viewBox="0 0 24 24" className="-translate-x-1 -translate-y-1 drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
@@ -99,6 +100,18 @@ export function AgentPointer() {
             animate={{ scale: [1, 1.6, 1], opacity: [0.9, 0.3, 0.9] }}
             transition={{ duration: 1.4, repeat: Infinity }}
           />
+          {/* "Click" ripple at the moment the agent's action lands on the card. */}
+          {focus && (focus.kind === "added" || focus.kind === "removed" || focus.kind === "error") && (
+            <motion.span
+              key={focus.seq}
+              className={`absolute -top-5 -left-5 h-10 w-10 rounded-full border-2 ${
+                focus.kind === "error" ? "border-red-500" : "border-brand-500"
+              }`}
+              initial={{ scale: 0.3, opacity: 0.9 }}
+              animate={{ scale: 1.6, opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            />
+          )}
           <span className="absolute top-6 left-4 rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap text-background shadow-lg">
             Cartiva
           </span>

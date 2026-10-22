@@ -5,6 +5,19 @@ import { voiceController, type VoiceUi } from "@/controllers/voice-controller";
 
 type RpcMethod = (payload: Record<string, unknown>) => unknown;
 
+/** Cart actions the on-screen pointer "performs": it travels to the card first, then the action lands. */
+const POINTER_ACTIONS = new Set(["cart.add", "cart.remove", "cart.update"]);
+/** Time for the agent pointer to reach a card (its spring settles in about this long). */
+const POINTER_TRAVEL_MS = 350;
+
+/** Lets the pointer reach the product's card before the cart changes, when that card is on screen. */
+async function letPointerArrive(method: string, payload: Record<string, unknown>): Promise<void> {
+  if (!POINTER_ACTIONS.has(method) || typeof payload.productId !== "string") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; // no pointer is shown
+  if (!document.querySelector(`[data-agent-target="product:${payload.productId}"]`)) return;
+  await new Promise((resolve) => setTimeout(resolve, POINTER_TRAVEL_MS));
+}
+
 /** Registers all voice RPC methods on the room. Returns a function that removes them again. */
 export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
   /** Every browser method the voice agent may call. Add new voice actions here. */
@@ -36,6 +49,7 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
       voiceActivityController.started(name, payload);
       agentEventController.started(name, payload);
       try {
+        await letPointerArrive(name, payload);
         const result = await method(payload);
         voiceActivityController.finished(name, result, payload);
         agentEventController.finished(name, payload, result);

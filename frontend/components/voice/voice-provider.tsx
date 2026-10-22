@@ -4,9 +4,12 @@ import { RoomAudioRenderer, SessionProvider, useSession } from "@livekit/compone
 import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { notifyAgent, registerVoiceRpc } from "@/lib/voice/rpc";
+import { waitForPage } from "@/lib/voice/wait-for-page";
 import { voiceTokenSource } from "@/lib/voice/token-source";
+import { VoiceAgentBridge } from "./voice-agent-bridge";
 import { VoiceErrorReporter } from "./voice-error-reporter";
 import { VoiceListAnnouncer } from "./voice-list-announcer";
+import { VoicePaymentAnnouncer } from "./voice-payment-announcer";
 import { AgentAura } from "@/components/agent/agent-aura";
 import { AgentNavigationToast } from "@/components/agent/agent-navigation-toast";
 import { AgentOrb } from "@/components/agent/agent-orb";
@@ -15,7 +18,8 @@ import { FlyToCartLayer } from "@/components/agent/fly-to-cart-layer";
 
 /** One voice session for the whole site, so it survives page navigation. */
 export function VoiceProvider({ children }: { children: ReactNode }) {
-  const session = useSession(voiceTokenSource);
+  // Starting a job process on a Windows laptop can take ~15 s; LiveKit's default gives up at 20 s.
+  const session = useSession(voiceTokenSource, { agentConnectTimeoutMilliseconds: 45_000 });
   const router = useRouter();
 
   // Let the voice agent call browser methods (cart.get, catalog.search, …) through the LiveKit room,
@@ -23,7 +27,10 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
   useEffect(
     () =>
       registerVoiceRpc(session.room, {
-        navigate: (url) => router.push(url),
+        navigate: (url) => {
+          router.push(url);
+          return waitForPage(url); // the agent speaks only once the page is on screen
+        },
         notifyAgent: (method, payload) => notifyAgent(session.room, method, payload),
       }),
     [session.room, router],
@@ -33,8 +40,10 @@ export function VoiceProvider({ children }: { children: ReactNode }) {
     <SessionProvider session={session}>
       {children}
       <RoomAudioRenderer />
+      <VoiceAgentBridge />
       <VoiceErrorReporter />
       <VoiceListAnnouncer />
+      <VoicePaymentAnnouncer />
       {/* The agent's presence: no chat window, the page itself shows what it does. */}
       <AgentAura />
       <AgentNavigationToast />

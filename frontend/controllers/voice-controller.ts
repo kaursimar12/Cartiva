@@ -13,7 +13,8 @@ import { useShoppingListStore } from "@/store/shopping-list-store";
 
 /** What the voice controller may ask the screen to do (implemented with the Next.js router). */
 export interface VoiceUi {
-  navigate(url: string): void;
+  /** Opens a page and resolves once it is on screen, so the agent speaks after the shopper sees it. */
+  navigate(url: string): Promise<void>;
   /** Sends a message to the voice agent (browser → agent RPC). */
   notifyAgent(method: string, payload: unknown): void;
 }
@@ -70,7 +71,7 @@ export const voiceController = {
   },
 
   /** Searches the catalog, shows the results on screen, and returns the same results. */
-  searchProducts(input: { query?: unknown; minPrice?: unknown; maxPrice?: unknown }, ui: VoiceUi) {
+  async searchProducts(input: { query?: unknown; minPrice?: unknown; maxPrice?: unknown; showOnScreen?: unknown }, ui: VoiceUi) {
     const query = typeof input.query === "string" ? input.query.trim() : "";
     if (!query) {
       return { ok: false, error: { code: "INVALID_QUERY", message: "No search words were given." } };
@@ -84,17 +85,21 @@ export const voiceController = {
       maxPrice: maxRupees === undefined ? undefined : rupeesToPaise(maxRupees),
     });
 
-    // Show the same results on screen (the search page runs the same filter).
-    const params = new URLSearchParams({ q: query });
-    if (minRupees !== undefined) params.set("min", String(minRupees));
-    if (maxRupees !== undefined) params.set("max", String(maxRupees));
-    ui.navigate(`/search?${params}`);
+    // Show the same results on screen (the search page runs the same filter) — unless the agent
+    // only needs a productId for the cart, so the shopper stays on the page they are looking at.
+    const showOnScreen = input.showOnScreen !== false;
+    if (showOnScreen) {
+      const params = new URLSearchParams({ q: query });
+      if (minRupees !== undefined) params.set("min", String(minRupees));
+      if (maxRupees !== undefined) params.set("max", String(maxRupees));
+      await ui.navigate(`/search?${params}`);
+    }
 
     return {
       ok: true,
       count: results.length,
-      shownOnScreen: true,
-            products: results.slice(0, MAX_RESULTS_FOR_AGENT).map(toAgentProduct),
+      shownOnScreen: showOnScreen,
+      products: results.slice(0, MAX_RESULTS_FOR_AGENT).map(toAgentProduct),
     };
   },
     /** Adds a product to the cart, exactly like pressing its ADD button (same rules, same toast). */
@@ -130,7 +135,7 @@ export const voiceController = {
       : { ok: false, error: result.error };
   },
     /** Opens a category page (e.g. "go to fruits") and returns the products shown there. */
-  openCategory(input: { category?: unknown }, ui: VoiceUi) {
+  async openCategory(input: { category?: unknown }, ui: VoiceUi) {
     const wanted = typeof input.category === "string" ? input.category.trim().toLowerCase() : "";
     const category = catalogService
       .getCategories()
@@ -139,7 +144,7 @@ export const voiceController = {
       return { ok: false, error: { code: "NOT_FOUND", message: "That category doesn't exist." } };
     }
 
-    ui.navigate(`/category/${category.id}`);
+    await ui.navigate(`/category/${category.id}`);
     const products = catalogService.getProductsByCategory(category.id);
     return {
       ok: true,
@@ -151,23 +156,23 @@ export const voiceController = {
   },
 
   /** Opens one product's detail page (e.g. "show me that one"). */
-  openProduct(input: { productId?: unknown }, ui: VoiceUi) {
+  async openProduct(input: { productId?: unknown }, ui: VoiceUi) {
     const product = typeof input.productId === "string" ? catalogService.getProduct(input.productId) : undefined;
     if (!product) {
       return { ok: false, error: { code: "NOT_FOUND", message: "That product couldn't be found." } };
     }
 
-    ui.navigate(`/product/${product.id}`);
+    await ui.navigate(`/product/${product.id}`);
     return { ok: true, shownOnScreen: true, product: { ...toAgentProduct(product), description: product.description } };
   },
 
   /** Opens a fixed page (e.g. "take me to the cart"). Checkout has its own flow (startCheckout). */
-  openPage(input: { page?: unknown }, ui: VoiceUi) {
+  async openPage(input: { page?: unknown }, ui: VoiceUi) {
     const paths: Record<string, string> = { home: "/", cart: "/cart", "scan-list": "/scan-list" };
     const path = typeof input.page === "string" ? paths[input.page] : undefined;
     if (!path) return { ok: false, error: { code: "NOT_FOUND", message: "That page doesn't exist." } };
 
-    ui.navigate(path);
+    await ui.navigate(path);
     return { ok: true, shownOnScreen: true, page: input.page };
   },
 
@@ -210,11 +215,11 @@ export const voiceController = {
   },
 
   /** Voice checkout step 1: checks the cart and opens the checkout page. Never takes payment. */
-  startCheckout(ui: VoiceUi) {
+  async startCheckout(ui: VoiceUi) {
     const result = checkoutService.validate();
     if (!result.ok) return { ok: false, error: result.error };
 
-    ui.navigate("/checkout");
+    await ui.navigate("/checkout");
     return {
       ok: true,
       itemCount: result.data.itemCount,
@@ -228,16 +233,10 @@ export const voiceController = {
    * Opens the payment exactly like the Pay button, but doesn't wait: entering card details takes
    * longer than an RPC may. The result is sent to the agent afterwards as "payment.result".
    */
-  confirmPayment(ui: VoiceUi) {
-    ui.navigate("/checkout"); // the shopper sees the payment status there
-    void checkoutController.confirmAndPay({ simulateFailure: false }).then((result) =>
-      ui.notifyAgent(
-        "payment.result",
-        result.ok
-          ? { ok: true, orderId: result.data.id, total: formatPrice(result.data.pricing.total) }
-          : { ok: false, reason: result.error.message },
-      ),
-    );
+  async confirmPayment(ui: VoiceUi) {
+    await ui.navigate("/checkout"); // the shopper sees the payment status there
+    // The result reaches the agent through VoicePaymentAnnouncer (it reports every payment, voice or tap).
+    void checkoutController.confirmAndPay({ simulateFailure: false });
 
     return {
       ok: true,
@@ -248,10 +247,10 @@ export const voiceController = {
 
   // ---------- shopping list (scanned from a photo) ----------
 
-  getShoppingList(ui: VoiceUi) {
+  async getShoppingList(ui: VoiceUi) {
     const { lines } = useShoppingListStore.getState();
     if (lines.length === 0) return NO_LIST;
-    ui.navigate("/scan-list");
+    await ui.navigate("/scan-list");
     return { ok: true, count: lines.length, lines: lines.map(toAgentListLine) };
   },
 
@@ -262,13 +261,13 @@ export const voiceController = {
     return { ok: true, message: `Removed "${line.original}" from the list.` };
   },
 
-  addListItem(input: { name?: unknown; quantity?: unknown; unit?: unknown }, ui: VoiceUi) {
+  async addListItem(input: { name?: unknown; quantity?: unknown; unit?: unknown }, ui: VoiceUi) {
     const name = typeof input.name === "string" ? input.name.trim() : "";
     if (!name) return { ok: false, error: { code: "INVALID_QUERY", message: "No item name was given." } };
     const quantity = typeof input.quantity === "number" && input.quantity > 0 ? input.quantity : null;
     const unit = typeof input.unit === "string" && input.unit.trim() ? input.unit.trim() : null;
     const line = shoppingListController.add(name, quantity, unit);
-    ui.navigate("/scan-list");
+    await ui.navigate("/scan-list");
     return { ok: true, line: toAgentListLine(line) };
   },
 
@@ -290,23 +289,41 @@ export const voiceController = {
     const choice = typeof input.productId === "string" ? input.productId : "";
     const match = shoppingListService.resolveChoice(lines, input.lineId, choice);
     if (!match) {
+      // Hand back the open questions with their exact options, so the agent can retry correctly.
+      const waiting = lines.filter((l) => l.status === "choose").map(toAgentListLine);
       return {
         ok: false,
         error: {
           code: "NOT_FOUND",
-          message: "Couldn't match that to one option. Call get_shopping_list and use the exact lineId and productId.",
+          message:
+            "Nothing was chosen: that didn't match exactly one option of an item still waiting for a choice. " +
+            "Retry with a lineId and productId from waitingForChoice, or ask the shopper which size they mean.",
         },
+        waitingForChoice: waiting,
       };
     }
     shoppingListController.choose(match.line.id, match.productId);
-    return { ok: true, line: toAgentListLine(findLine(match.line.id)!) };
+    // Tell the agent what is still open, in order, so it asks about the next one instead of moving on.
+    const stillToChoose = useShoppingListStore
+      .getState()
+      .lines.filter((l) => l.status === "choose")
+      .map(toAgentListLine);
+    return {
+      ok: true,
+      line: toAgentListLine(findLine(match.line.id)!),
+      stillToChoose,
+      next:
+        stillToChoose.length > 0
+          ? `Ask about "${stillToChoose[0].written}" next (its options are in stillToChoose).`
+          : "No choices left: say which items are not available, then ask whether to add everything to the cart.",
+    };
   },
 
   /** Adds every ready line to the cart. The agent only calls it after the shopper agreed. */
-  confirmShoppingList(ui: VoiceUi) {
+  async confirmShoppingList(ui: VoiceUi) {
     if (useShoppingListStore.getState().lines.length === 0) return NO_LIST;
     const result = shoppingListController.confirm();
-    ui.navigate("/cart");
+    await ui.navigate("/cart");
     return { ok: true, ...result };
   },
 };

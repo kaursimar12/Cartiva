@@ -70,3 +70,16 @@ describe("PricingService — hints", () => {
     expect(pricing.getFreeDeliveryRemaining([])).toBeNull();
   });
 });
+
+describe("PricingService — item count", () => {
+  it("counts different products, not units (2 × tomato is 1 item)", () => {
+    const [first, second] = fixture.products;
+    expect(pricing.calculate([{ productId: first.id, quantity: 2 }]).itemCount).toBe(1);
+    expect(
+      pricing.calculate([
+        { productId: first.id, quantity: 2 },
+        { productId: second.id, quantity: 3 },
+      ]).itemCount,
+    ).toBe(2);
+  });
+});

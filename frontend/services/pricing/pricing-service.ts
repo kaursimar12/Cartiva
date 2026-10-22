@@ -36,7 +36,7 @@ export class PricingService {
     const deliveryFee = this.deliveryFee(subtotal);
 
     return {
-      itemCount: lines.reduce((sum, l) => sum + l.quantity, 0),
+      itemCount: lines.length, // distinct products: 2 × Tomato 1 kg is 1 item
       subtotal,
       discount,
       appliedOffers,

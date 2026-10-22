@@ -9,7 +9,7 @@ from livekit.agents import get_job_context
 
 logger = logging.getLogger("cartiva-agent.rpc")
 
-RPC_TIMEOUT_SECONDS = 5.0
+RPC_TIMEOUT_SECONDS = 8.0  # browser actions now wait until the page is on screen (up to ~4.5 s)
 
 
 class BrowserRpcError(Exception):

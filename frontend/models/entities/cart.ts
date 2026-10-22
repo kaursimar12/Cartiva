@@ -27,6 +27,7 @@ export interface OfferHint {
 }
 
 export interface PricingSummary {
+  /** Number of different products in the cart (not units): 2 × Tomato counts as 1. */
   itemCount: number;
   subtotal: Paise;
   discount: Paise;

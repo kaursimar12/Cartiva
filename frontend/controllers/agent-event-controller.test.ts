@@ -25,6 +25,12 @@ describe("agent effects", () => {
     expect(finishEffects("catalog.search", {}, result).focus).toEqual({ productIds: ["p045", "p046"], kind: "looking" });
   });
 
+  it("a silent lookup (only needs a productId) leaves the page alone", () => {
+    expect(startEffects("catalog.search", { query: "onion", showOnScreen: false })).toEqual({});
+    const result = { ok: true, products: [{ productId: "p005" }] };
+    expect(finishEffects("catalog.search", { showOnScreen: false }, result).focus).toBeUndefined();
+  });
+
   it("rings every option when the agent asks the shopper to choose", () => {
     const result = { ok: true, productIds: ["p060", "p061", "p062"], reason: "options" };
     expect(finishEffects("ui.highlight", {}, result).focus).toEqual({ productIds: ["p060", "p061", "p062"], kind: "options" });

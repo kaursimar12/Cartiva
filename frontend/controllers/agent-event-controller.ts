@@ -46,6 +46,8 @@ export function startEffects(method: string, payload: Payload): AgentEffects {
     case "ui.openProduct":
       return { focus: one(payload.productId, "looking") };
     case "catalog.search":
+      // A silent lookup (the agent only needs a productId) keeps the page: no beam, no re-reveal.
+      if (payload.showOnScreen === false) return {};
       return { reveal: true, navigation: str(payload.query) ? `Searching for “${str(payload.query)}”` : "Searching…" };
     case "ui.openCategory":
       return { reveal: true, navigation: str(payload.category) ? `Opening ${str(payload.category)}…` : "Opening category…" };
@@ -74,6 +76,7 @@ export function finishEffects(method: string, payload: Payload, result: unknown)
       return { ...base, focus: one(payload.productId, ok ? "removed" : "error") ?? null };
     case "catalog.search":
     case "ui.openCategory": {
+      if (method === "catalog.search" && payload.showOnScreen === false) return base;
       const ids = ok ? productIdsIn(data.products) : [];
       return { ...base, focus: ids.length ? { productIds: ids, kind: "looking" } : null };
     }

@@ -1,9 +1,11 @@
 "use client";
 
+import { motion } from "motion/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { CameraIcon, TrashIcon } from "@/components/common/icons";
+import { ProductImage } from "@/components/products/product-image";
 import { QuantityStepper } from "@/components/products/quantity-stepper";
 import { ReviewWithVoiceButton } from "@/components/voice/review-with-voice-button";
 import { shoppingListController } from "@/controllers/shopping-list-controller";
@@ -86,8 +88,9 @@ export function ScanListView() {
 
           {choose.length > 0 && (
             <Section title={`Choose a product (${choose.length})`}>
-              {choose.map((line) => (
-                <ChooseRow key={line.id} line={line} />
+              {choose.map((line, i) => (
+                // Cartiva asks about these in order, so while it's on the call the first one is "being asked".
+                <ChooseRow key={line.id} line={line} asking={voice.active && i === 0} />
               ))}
             </Section>
           )}
@@ -206,30 +209,78 @@ function FoundRow({ line }: { line: ListLine }) {
   );
 }
 
-function ChooseRow({ line }: { line: ListLine }) {
+/**
+ * An item that needs a choice: its options as tappable cards (answer by tap or by voice).
+ * While Cartiva is asking about it, it lights up and scrolls into view.
+ */
+function ChooseRow({ line, asking }: { line: ListLine; asking: boolean }) {
+  const ref = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    if (asking) ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [asking]);
+
   return (
-    <Row line={line}>
-      <label className="sr-only" htmlFor={`choose-${line.id}`}>
-        Choose a product for {line.original}
-      </label>
-      <select
-        id={`choose-${line.id}`}
-        defaultValue=""
-        onChange={(e) => shoppingListController.choose(line.id, e.target.value)}
-        className="rounded-lg border border-hairline bg-surface px-3 py-2 text-sm"
-      >
-        <option value="" disabled>
-          Which one?
-        </option>
-        {line.options.map((id) => {
+    <li
+      ref={ref}
+      className={`-mx-2 my-1 rounded-2xl px-2 py-3 transition-[background-color,box-shadow] duration-500 ${
+        asking ? "glow-brand bg-brand-500/5" : ""
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <span className="min-w-0 flex-1 text-sm">
+          <span className="text-zinc-500">“{line.original}”</span>
+          {asking ? (
+            <span className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" aria-hidden />
+              Cartiva is asking: which one?
+            </span>
+          ) : (
+            <span className="ml-2 text-xs text-zinc-500">Which one?</span>
+          )}
+        </span>
+        <button
+          type="button"
+          onClick={() => shoppingListController.remove(line.id)}
+          className="rounded-lg p-2 text-zinc-400 hover:bg-red-50 hover:text-red-600"
+          aria-label={`Remove ${line.original}`}
+        >
+          <TrashIcon className="h-4 w-4" />
+        </button>
+      </div>
+      <div role="radiogroup" aria-label={`Choose a product for ${line.original}`} className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {line.options.map((id, i) => {
           const p = catalogService.getProduct(id);
-          return p ? (
-            <option key={id} value={id}>
-              {p.name} ({p.unit}) · {formatPrice(p.price)}
-            </option>
-          ) : null;
+          if (!p) return null;
+          return (
+            <motion.button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={false}
+              onClick={() => shoppingListController.choose(line.id, id)}
+              initial={asking ? { opacity: 0, y: 8 } : false}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: asking ? i * 0.06 : 0 }}
+              whileTap={{ scale: 0.97 }}
+              className={`flex items-center gap-3 rounded-xl border p-2 text-left transition-colors hover:border-brand-500 hover:bg-brand-500/5 ${
+                asking ? "border-brand-500/40 bg-surface" : "border-hairline bg-surface"
+              }`}
+            >
+              <ProductImage product={p} size="sm" />
+              <span className="min-w-0 flex-1 leading-tight">
+                <span className="block truncate text-sm font-medium text-zinc-900">{p.name}</span>
+                <span className="tabular block text-xs text-zinc-500">
+                  {p.unit} · {formatPrice(p.price)}
+                </span>
+              </span>
+              <span className="tabular flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-muted text-[11px] font-semibold text-zinc-600">
+                {i + 1}
+              </span>
+            </motion.button>
+          );
         })}
-      </select>
-    </Row>
+      </div>
+    </li>
   );
 }

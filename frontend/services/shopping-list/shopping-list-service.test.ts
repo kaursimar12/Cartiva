@@ -95,6 +95,23 @@ describe("resolveChoice (voice answers to 'which one?')", () => {
     expect(service.resolveChoice(lines, "a", "Surf Excel Matic")).toBeNull();
   });
 
+  it("never changes an out-of-stock line, even if the agent points at it", () => {
+    const ariel = { ...line("ariel detergent"), id: "c" };
+    expect(ariel.status).toBe("unavailable");
+    const withAriel = [...lines, ariel];
+    // Surf Excel is among Ariel's alternatives, but Ariel is not waiting for a choice: the waiting
+    // Surf Excel line gets it instead.
+    expect(service.resolveChoice(withAriel, "c", surf.options[0])?.line.id).toBe("a");
+  });
+
+  it("matches by the words used, so a size picks exactly one pack", () => {
+    const vim = { ...line("vim"), id: "v" };
+    expect(vim.status).toBe("choose");
+    const result = service.resolveChoice([vim], "v", "Vim 250 ml");
+    expect(catalogService.getProduct(result!.productId)?.unit).toBe("250 ml");
+    expect(service.resolveChoice([vim], "v", "Vim")).toBeNull(); // both sizes fit: refuse
+  });
+
   it("refuses a product that isn't an option", () => {
     expect(service.resolveChoice(lines, "a", "p001")).toBeNull();
   });

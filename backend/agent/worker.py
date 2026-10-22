@@ -12,6 +12,7 @@ from livekit.agents import (
     ConversationItemAddedEvent,
     FunctionToolsExecutedEvent,
     JobContext,
+    MetricsCollectedEvent,
     RunContext,
     ToolResult,
     TurnHandlingOptions,
@@ -23,11 +24,12 @@ from livekit.agents import (
     get_job_context,
     inference,
     llm,
+    metrics,
 )
 
 from livekit import rtc
 
-from agent.language import REPLY_RULES, detect_language
+from agent.language import REPLY_RULES, VOICE_LANGUAGE, Language, detect_language, language_instructions
 from agent.rpc import BrowserRpcError, call_browser
 from app.catalog import get_catalog
 
@@ -42,7 +44,8 @@ MAX_SESSION_SECONDS = int(os.getenv("CARTIVA_MAX_SESSION_SECONDS", str(5 * 60)))
 TIME_WARNING_SECONDS = 30      # heads-up this long before the limit
 AWAY_AFTER_SECONDS = 30        # silence before "are you still there?"
 GRACE_SECONDS = 15             # extra silence before hanging up
-LIST_SIGNAL_WAIT_SECONDS = 1.5 # how long to wait for "a list is coming" before the normal greeting
+LIST_SIGNAL_WAIT_SECONDS = 0.8 # how long to wait for "a list is coming" before the normal greeting
+GREETING = "Hi, I'm Cartiva! What would you like to buy today?"
 
 # Tool-call rounds allowed in one reply. "Add tomatoes and potatoes" can take 4
 # (search, add, search, add); LiveKit's default of 3 would silently drop the last one.
@@ -63,6 +66,7 @@ STT_PRIORITY_KEYTERMS = [
     "cart", "checkout", "kg", "kilo", "litre", "dozen", "Cartiva", "okay", "bye",
     "tomatoes", "potatoes", "onions", "bananas", "apples", "eggs",  # plurals shoppers say
     "aloo", "tamatar", "pyaaz", "doodh",                           # Hindi names in Latin letters
+    "scan", "shopping list",                                       # "I want to scan a list"
 ]
 
 
@@ -85,7 +89,9 @@ INSTRUCTIONS = """
 You are Cartiva, a friendly voice assistant for an Indian online grocery store.
 You help people find groceries, manage their cart and check out.
 
-# MOST IMPORTANT RULE: answer in the shopper's language
+# MOST IMPORTANT RULE: answer in the shopper's language (English by default)
+Speak English unless the shopper speaks Hindi or Hinglish. The exact language for right now is given
+at the end of these instructions under "Reply language right now"; always follow it.
 Look at the language of the shopper's LAST message and reply in exactly that language:
 - English → reply in English.
 - Hindi → reply in Hindi.
@@ -101,16 +107,23 @@ Examples:
 
 # What you can do right now
 You can search the catalog with the search_products tool. The results also appear on the
-shopper's screen. After a search, say how many products you found and mention at most three,
-with their prices, then ask which one they want. If nothing is found, say so and suggest
+shopper's screen. After a search that is shown on screen, say only how many products you found
+and ask which one they want, for example "I found four dishwashing liquids, they're on your
+screen. Which one would you like?" Do not read out product names or prices unless the shopper
+asks (for example "which is cheapest?" or "what are they?"). If nothing is found, say so and suggest
 another word. Remember the productIds from the results for later, but never read IDs aloud.
 You can add products with the add_to_cart tool, using a productId from search_products.
-If the shopper names a product you have not searched for yet, search first, then add it.
+If the shopper names a product you have not searched for yet, search first with show_on_screen false
+(so their current page stays, e.g. they are on Vegetables and say "add 2 kg onions"), then add it.
 Pick the product yourself when the shopper's words point to one product: prefer the plain
 product over variants (for "tomatoes" choose "Tomato", not "Tomato Cherry" or "Tomato Puree"),
 and use the pack size they said (for "1 kg" choose the 1 kg pack). Ask which one only when it is
 still unclear, for example two brands or two pack sizes of the same product and no size was
 given. After adding, confirm briefly what was added.
+Only say a product was added, removed or changed after the tool for it returned ok in this turn.
+If you did not call the tool, or it returned an error, never say it was done: ask or explain instead.
+When several products match what they asked to add (for example "dishwash" matches Vim, Pril and
+Exo in several sizes), ask which one first; do not add any of them yet.
 If the tool says a product is out of stock or only some units are available, explain that and
 offer the available amount.
 You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
@@ -122,8 +135,10 @@ call get_cart first to find the right productId and the current quantity. If mor
 item could match what the shopper said, ask which one. Confirm briefly after each change.
 You can open pages on the shopper's screen: navigate_category for a category ("go to fruits"),
 open_product for one product ("show me that one"), and open_page for the cart, home or scan list
-pages ("take me to the cart"). After opening, say briefly what is on
-screen, for example how many products the category has and one or two examples.
+pages ("take me to the cart"). After opening a category, say only that it is open and how many
+products are on screen, then ask what they would like, for example "Here are the vegetables,
+eleven products on screen. What would you like?" Do not name the products; the screen shows them.
+Name products only if the shopper asks what is there.
 The shopper can also browse, filter and sort by tapping. When they refer to something on screen
 that you did not just show them ("the cheapest one", "the second one", "this one", "add that"),
 call get_screen first and pick the product from it. Position 1 is the first product on screen.
@@ -147,17 +162,26 @@ in the window on screen. You will then receive the result; never say a payment s
 If it failed and the shopper wants to try again, call start_checkout again.
 
 # Shopping lists (scanned from a photo)
+When the shopper wants to scan, upload or photograph a shopping list, or says they have a list
+("I want to scan a list", "I have a list", "scan karna hai"), call open_page with page "scan-list"
+right away, then tell them to tap the upload box and choose a photo of their list. Do not search
+for products called "list" or "scan".
 When you are told a list was scanned, or the shopper asks about their list, call get_shopping_list.
 Go through it in this order:
 1. The ready items, briefly, with their amounts said naturally ("two kilos of tomatoes, a pack of Amul butter").
    If one has fewer packs than asked because of stock, say how many you could add.
 2. The items that need a choice, ONE AT A TIME: name the options with their sizes, ask which one, and wait
    for the answer. Call choose_list_item with the choice before asking about the next item.
+   Its result lists stillToChoose and says what to do next: ask about every item in stillToChoose, in
+   that order, before moving on. The item you are asking about is highlighted on the shopper's screen
+   with its options, so they can also tap one.
 3. When no choices are left: the items that are not available (which are out of stock, which are not sold here).
 4. Then ask whether to add everything to the cart.
 The shopper can remove items (remove_list_item), add items (add_list_item), change amounts
 (update_list_item) or pick an option (choose_list_item). Use the lineId from get_shopping_list and never
-read lineIds aloud. Nothing is in the cart until confirm_shopping_list; call it only after the shopper
+read lineIds aloud. Only say an option was chosen, an item removed or the list added to the cart after
+that tool returned ok. If it returned an error, nothing changed: retry with the exact ids it gives, or
+ask the shopper (for example which size of Vim they want). Nothing is in the cart until confirm_shopping_list; call it only after the shopper
 clearly agrees. Afterwards, say how many items were added and which ones were not available.
 
 # Ending the call
@@ -190,16 +214,22 @@ class CartivaAssistant(Agent):
     """The agent's personality and its shopping tools."""
 
     def __init__(self) -> None:
-        super().__init__(instructions=INSTRUCTIONS)
+        super().__init__(instructions=INSTRUCTIONS + language_instructions("english"))
+        self._language: Language = "english"  # English until the shopper speaks Hindi or Hinglish
         # ★ Set by start_checkout; required by confirm_payment; cleared by cancel or any cart change.
         self._pending_checkout_total: str | None = None
 
     async def on_user_turn_completed(self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage) -> None:
-        """Before every reply: pin the reply language to what the shopper actually said this turn,
-        instead of leaving it to the model (which sometimes answered English in Hindi)."""
+        """Before every reply: set the reply language from what the shopper actually said this turn.
+        It goes into the agent's standing instructions (so the sentence after a tool call keeps it too)
+        and into the voice (so an English reply reads "2 kg" as "two kg", not "do kilo")."""
         language = detect_language(new_message.text_content or "")
         logger.info("reply language: %s", language)
-        turn_ctx.add_message(role="system", content=REPLY_RULES[language])
+        if language != self._language:
+            self._language = language
+            await self.update_instructions(INSTRUCTIONS + language_instructions(language))
+            self.session.tts.update_options(language=VOICE_LANGUAGE[language])
+        turn_ctx.add_message(role="system", content=REPLY_RULES[language])  # this reply, right away
 
     @function_tool
     async def get_cart(self, context: RunContext) -> dict | str:
@@ -220,11 +250,14 @@ class CartivaAssistant(Agent):
         query: str,
         max_price: float | None = None,
         min_price: float | None = None,
+        show_on_screen: bool = True,
     ) -> dict | str:
-        """Searches the Cartiva catalog and shows the results on the shopper's screen.
+        """Searches the Cartiva catalog. Results open on the shopper's screen unless show_on_screen is false.
 
         Call this whenever the shopper wants to find, see or browse products, or before adding
         something to the cart (you need the productId from the results).
+        When you only need a productId to add, remove or change a product ("add 2 kg onions"),
+        set show_on_screen to false: the shopper stays on the page they are looking at.
 
         Search for ONE product at a time. If the shopper asks for several products
         ("tomatoes and potatoes"), call this once per product: query "tomato", then query "potato".
@@ -237,12 +270,26 @@ class CartivaAssistant(Agent):
             max_price: Highest price in rupees, only if the shopper gives one,
                 e.g. 200 for "under 200 rupees".
             min_price: Lowest price in rupees, only if the shopper gives one.
+            show_on_screen: True when the shopper wants to see or browse products ("show me milk").
+                False when you only need the productId for the cart ("add 2 kg onions").
         """
-        payload = {"query": query, "maxPrice": max_price, "minPrice": min_price}
+        payload = {"query": query, "maxPrice": max_price, "minPrice": min_price, "showOnScreen": show_on_screen}
         try:
             result = await call_browser("catalog.search", payload)
         except BrowserRpcError:
             return "The search failed right now. Apologise briefly and ask the shopper to try again."
+
+        if result.get("ok") and result.get("count", 0) > 0:
+            if show_on_screen:
+                result["say"] = (
+                    "The results are on screen. Say only how many you found and ask which one they want. "
+                    "Do not read out names or prices unless the shopper asks."
+                )
+            elif result.get("count", 0) > 1:
+                result["say"] = (
+                    "Several products match. If the shopper's words don't point to exactly one of them, "
+                    "ask which one before calling add_to_cart, and do not say anything was added yet."
+                )
 
         # Stops the LLM from repeating a search that cannot succeed (e.g. "tomato potato").
         if result.get("ok") and result.get("count") == 0:
@@ -316,13 +363,24 @@ class CartivaAssistant(Agent):
         ],
     ) -> dict | str:
         """Opens a category page on the shopper's screen, e.g. "go to fruits", "show me dairy",
-        "डेयरी दिखाओ". Returns the products now visible on that page.
+        "डेयरी दिखाओ". Returns the category name and how many products are on screen.
 
         Args:
             category: The category to open.
         """
         try:
-            return await call_browser("ui.openCategory", {"category": category})
+            result = await call_browser("ui.openCategory", {"category": category})
+            if not isinstance(result, dict) or not result.get("ok"):
+                return result
+            # Only the count reaches the model, so it can't start reading the products out.
+            # If the shopper asks what's there, or says "the cheapest one", it calls get_screen.
+            return {
+                "ok": True,
+                "category": result.get("category"),
+                "productCount": result.get("count"),
+                "say": "Say only that the category is open and how many products are on screen, then ask "
+                "what they would like. Do not name products. If they ask what is there, call get_screen.",
+            }
         except BrowserRpcError:
             return "Opening the category failed right now. Apologise briefly and ask the shopper to try again."
 
@@ -342,7 +400,12 @@ class CartivaAssistant(Agent):
     @function_tool
     async def open_page(self, context: RunContext, page: Literal["home", "cart", "scan-list"]) -> dict | str:
         """Opens a page on the shopper's screen, e.g. "take me to the cart", "show my cart",
-        "go to the home page", "open scan list". To pay, use start_checkout instead.
+        "go to the home page". To pay, use start_checkout instead.
+
+        Use page "scan-list" whenever the shopper wants to scan, upload or photograph a shopping list,
+        or says they have a list: "I want to scan a list", "scan my list", "I have a shopping list",
+        "upload my list", "take a photo of my list", "can you read my list", "list scan karna hai",
+        "meri list hai". Then tell them to tap the upload box and pick a photo of the list.
 
         Args:
             page: "cart" for the cart page, "home" for the home page, "scan-list" for scanning
@@ -542,7 +605,12 @@ class CartivaAssistant(Agent):
         return ToolResult("Saying goodbye and ending the call.", reply_required=False)
 
 
-server = AgentServer()
+server = AgentServer(
+    # Keep one agent process started and waiting, so a call doesn't wait for a cold start.
+    num_idle_processes=1,
+    # Starting a process on Windows can take over 10 s (the default limit); don't fail the call for it.
+    initialize_process_timeout=30.0,
+)
 
 
 @server.rtc_session(agent_name="cartiva-agent")
@@ -555,25 +623,35 @@ async def entrypoint(ctx: JobContext) -> None:
         stt=inference.STT(model="deepgram/nova-3", language="multi"),
         llm=inference.LLM(model=LLM_MODEL),
         # Cartesia Sonic 3 speaks Hindi, English and Hinglish. Voice: an Indian-accent female voice.
-        tts=inference.TTS(model="cartesia/sonic-3", voice=TTS_VOICE, language="hi"),
+        # Starts in English; switched to Hindi only when the shopper speaks Hindi or Hinglish.
+        tts=inference.TTS(model="cartesia/sonic-3", voice=TTS_VOICE, language=VOICE_LANGUAGE["english"]),
         turn_handling=TurnHandlingOptions(
             turn_detection=inference.TurnDetector(),
             # Learn each shopper's pause length, so "Show me Amul … butter" isn't cut after "Amul".
-            endpointing={"mode": "dynamic"},
+            # Never wait more than 2 s after the shopper stops (the default waits longer, which felt laggy).
+            endpointing={"mode": "dynamic", "max_delay": 2.0},
             # Tell real interruptions ("wait, show me fruits") from backchannels ("mm-hmm", "haan").
             interruption={"mode": "adaptive"},
         ),
         user_away_timeout=AWAY_AFTER_SECONDS,  # user counts as "away" after this much silence
         max_tool_steps=MAX_TOOL_STEPS,
+        # Start preparing the reply while the shopper is still finishing their sentence: faster answers.
+        preemptive_generation=True,
         stt_context_options={"keyterms": STT_KEYTERMS},  # bias Deepgram toward our words
     )
+
+    # Timings of every step (end of turn, speech-to-text, LLM first token, first audio), to find lag.
+    @session.on("metrics_collected")
+    def on_metrics(ev: MetricsCollectedEvent) -> None:
+        metrics.log_metrics(ev.metrics)
 
     # ---------- debug: what the agent hears and does ----------
     @session.on("user_input_transcribed")
     def on_transcribed(ev: UserInputTranscribedEvent) -> None:
-        # interim = Deepgram's live guess while the shopper speaks; FINAL = what it settled on
-        kind = "FINAL  " if ev.is_final else "interim"
-        logger.info("HEARD %s [%s] %r", kind, ev.language, ev.transcript)
+        # Only the final transcript: logging every live guess (several per second) to the Windows
+        # console slowed the agent's loop, which is also what sends Cartiva's voice.
+        if ev.is_final:
+            logger.info("HEARD [%s] %r", ev.language, ev.transcript)
 
     @session.on("conversation_item_added")
     def on_item_added(ev: ConversationItemAddedEvent) -> None:
@@ -596,6 +674,7 @@ async def entrypoint(ctx: JobContext) -> None:
     # ---------- auto hang-up (silence / time limit) ----------
     background_tasks: set[asyncio.Task] = set()
     user_state = {"current": "listening"}
+    payment = {"in_progress": False}  # True while the Razorpay window is open
 
     def run_in_background(coro) -> None:
         """Starts a coroutine without blocking, and keeps a reference so it isn't lost."""
@@ -617,9 +696,11 @@ async def entrypoint(ctx: JobContext) -> None:
         await ctx.delete_room()
 
     async def check_if_still_there() -> None:
+        if payment["in_progress"]:  # they're typing card details in Razorpay, not gone
+            return
         await session.generate_reply(instructions="The shopper has been silent. Briefly ask if they are still there.")
         await asyncio.sleep(GRACE_SECONDS)
-        if user_state["current"] == "away":
+        if user_state["current"] == "away" and not payment["in_progress"]:
             await hang_up("I'll close the voice assistant now. Tap the mic anytime to talk again.")
 
     async def enforce_time_limit() -> None:
@@ -651,28 +732,48 @@ async def entrypoint(ctx: JobContext) -> None:
     # Set when the browser says a shopping list is being (or was just) scanned.
     list_coming = asyncio.Event()
 
+    # Open the voice and model connections now, so the first sentence ("Hi, I'm Cartiva")
+    # doesn't stutter while they connect.
+    for model in (session.tts, session.llm):
+        if model is not None:
+            model.prewarm()
+
     await session.start(agent=CartivaAssistant(), room=ctx.room)
+    # Don't listen until Cartiva has introduced itself (the greeting or the list readout turns it on).
+    session.input.set_audio_enabled(False)
     await ctx.connect()
 
     # Browser → agent: the payment finished (it can take a minute, so we're told instead of waiting).
+    # Browser → agent: the shopper opened the payment window (by voice or by tapping Pay).
+    @ctx.room.local_participant.register_rpc_method("payment.started")
+    async def on_payment_started(data: rtc.RpcInvocationData) -> str:
+        payment["in_progress"] = True  # don't treat card-typing silence as "away"
+        return "ok"
+
     @ctx.room.local_participant.register_rpc_method("payment.result")
     async def on_payment_result(data: rtc.RpcInvocationData) -> str:
+        payment["in_progress"] = False
         result = json.loads(data.payload)
         if result.get("ok"):
+            total = result.get("total")
             instructions = (
-                "The payment succeeded and the order is placed. Tell the shopper briefly, "
-                "in their language, and thank them."
+                "The payment was successful and the order is placed"
+                + (f" (total paid: {total})" if total else "")
+                + ". Say exactly that in one or two short sentences, in the shopper's language: the payment "
+                "was successful, the order is placed, and thank them. Do not read out the order reference."
             )
         else:
             instructions = (
-                f"The payment did not go through ({result.get('reason')}). Nothing was charged. "
-                "Tell the shopper briefly, in their language, and offer to try again."
+                f"The payment did not go through ({result.get('reason')}). Nothing was charged and the cart "
+                "is saved. Tell the shopper briefly, in their language, and offer to try again."
             )
-        session.generate_reply(instructions=instructions)
+        # Announced in full: the shopper may be clicking around the success page meanwhile.
+        session.generate_reply(instructions=instructions, allow_interruptions=False)
         return "ok"
 
     # ---------- shopping list review: Cartiva talks, and doesn't listen until it has finished ----------
     list_review = {"pending": False}  # True from upload until the readout has been spoken
+    introduced = {"done": False}  # Cartiva has said "Hi, I'm Cartiva" in this call (never twice)
 
     def stop_listening() -> None:
         session.input.set_audio_enabled(False)
@@ -685,10 +786,13 @@ async def entrypoint(ctx: JobContext) -> None:
         await handle.wait_for_playout()
 
     async def say_reading_list() -> None:
-        await speak_uninterrupted(
-            "In English, in one short sentence, say hello, that you are Cartiva, and that you are reading "
-            "their shopping list now. Do not call any tools."
-        )
+        # Mid-call (already introduced) there's no second hello: the readout follows straight away.
+        if not introduced["done"]:
+            introduced["done"] = True
+            await speak_uninterrupted(
+                "In English, in one short sentence, say hello, that you are Cartiva, and that you are reading "
+                "their shopping list now. Do not call any tools."
+            )
         if not list_review["pending"]:  # the readout already finished meanwhile
             start_listening()
 
@@ -720,7 +824,8 @@ async def entrypoint(ctx: JobContext) -> None:
             await speak_uninterrupted(
                 "The shopper's shopping list has just been read. Here it is as JSON: "
                 f"{json.dumps(shopping_list, ensure_ascii=False)}. "
-                "Speak in English. Do not call any tools now. First read the ready items with their amounts. Then, if any items "
+                "Speak in English. Do not greet or introduce yourself. Do not call any tools now. "
+                "First read the ready items with their amounts. Then, if any items "
                 "need a choice, ask about the FIRST one only (name its options with sizes) and stop to wait for "
                 "the answer; the other choices and the unavailable items come after the shopper answers. If "
                 "nothing needs a choice, say which items are not available (out of stock, or not sold here) "
@@ -774,9 +879,14 @@ async def entrypoint(ctx: JobContext) -> None:
     try:
         await asyncio.wait_for(list_coming.wait(), timeout=LIST_SIGNAL_WAIT_SECONDS)
     except asyncio.TimeoutError:
-        await session.generate_reply(
-            instructions='Greet the shopper in English with "Hi" or "Hello", say you are Cartiva, and ask what they need today.'
-        )
+        # A fixed greeting: no model round-trip, so it starts straight away and plays smoothly.
+        # It can't be interrupted, and Cartiva starts listening only once it has finished.
+        try:
+            introduced["done"] = True
+            greeting = session.say(GREETING, allow_interruptions=False)
+            await greeting.wait_for_playout()
+        finally:
+            session.input.set_audio_enabled(True)  # always listen afterwards, even if the greeting failed
 
 
 if __name__ == "__main__":

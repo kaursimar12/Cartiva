@@ -35,8 +35,21 @@ def detect_language(text: str) -> Language:
     return "english"
 
 
+# The voice's language: an English voice reads "2 kg" as "two kg"; a Hindi one would say "do kilo".
+VOICE_LANGUAGE: dict[Language, str] = {"english": "en", "hindi": "hi", "hinglish": "hi"}
+
 REPLY_RULES: dict[Language, str] = {
     "english": "The shopper just spoke English. Reply only in English, with no Hindi words.",
     "hindi": "The shopper just spoke Hindi. Reply in Hindi (Devanagari), keeping product and brand names in English.",
     "hinglish": "The shopper just spoke Hinglish. Reply in Hinglish: Hindi in Devanagari mixed with English words.",
 }
+
+
+def language_instructions(language: Language) -> str:
+    """The standing "reply in …" block appended to the agent's instructions. It stays in force for every
+    step of a reply (including the sentence spoken after a tool call) until the shopper switches."""
+    return (
+        "\n\n# Reply language right now\n"
+        f"{REPLY_RULES[language]} Numbers, amounts and prices too, in that language. "
+        "This holds for every sentence until the shopper speaks another language."
+    )

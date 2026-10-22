@@ -1,8 +1,9 @@
 "use client";
 
-import { useAgent, useSessionContext } from "@livekit/components-react";
+import { useSessionContext } from "@livekit/components-react";
 import { voiceSessionController } from "@/controllers/voice-session-controller";
 import { startProblem } from "@/lib/voice/voice-errors";
+import { useVoiceAgentStore } from "@/store/voice-agent-store";
 
 /** What a voice control says for each agent state (SRS FR-12). */
 const STATUS_LABELS: Record<string, string> = {
@@ -24,11 +25,19 @@ const STATUS_LABELS: Record<string, string> = {
  */
 export function useVoiceSession() {
   const session = useSessionContext();
-  const agent = useAgent();
+  // Not useAgent(): this hook is used by page components that mount and unmount mid-call (see the store).
+  const state = useVoiceAgentStore((s) => s.state);
+  const greeted = useVoiceAgentStore((s) => s.greeted);
 
-  const active = agent.state !== "disconnected" && agent.state !== "failed";
+  const active = state !== "disconnected" && state !== "failed";
   const reconnecting = session.connectionState === "reconnecting" || session.connectionState === "signalReconnecting";
-  const label = reconnecting ? STATUS_LABELS.reconnecting : (STATUS_LABELS[agent.state] ?? "Ask Cartiva");
+  // Until Cartiva has introduced itself it isn't really listening yet, so don't say "Listening…".
+  const joining = active && !greeted && state !== "speaking";
+  const label = reconnecting
+    ? STATUS_LABELS.reconnecting
+    : joining
+      ? "Cartiva is joining…"
+      : (STATUS_LABELS[state] ?? "Ask Cartiva");
 
   async function start() {
     if (active) return;
@@ -48,5 +57,5 @@ export function useVoiceSession() {
     }
   }
 
-  return { active, label, state: agent.state, start, toggle };
+  return { active, label, state, start, toggle };
 }
