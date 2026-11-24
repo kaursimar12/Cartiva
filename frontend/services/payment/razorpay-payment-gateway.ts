@@ -78,11 +78,16 @@ function loadCheckoutScript(): Promise<void> {
   });
 }
 
-/** Opens the Razorpay popup and waits until the shopper pays, fails, or closes it. */
+/**
+ * Opens the Razorpay popup and waits until the shopper pays or closes it.
+ * A failed attempt is NOT the end: Razorpay keeps the popup open so the shopper can retry
+ * (e.g. with another card), so we only remember why it failed and report that if they give up.
+ */
 function openCheckout(
   order: CreateOrderResponse,
 ): Promise<{ ok: true; payment: RazorpaySuccess } | { ok: false; reason: string }> {
   return new Promise((resolve) => {
+    let lastFailure: string | null = null;
     const Razorpay = window.Razorpay!;
     const checkout = new Razorpay({
       key: order.key_id,
@@ -94,12 +99,12 @@ function openCheckout(
       theme: { color: "#16a34a" },
       handler: (payment: RazorpaySuccess) => resolve({ ok: true, payment }),
       modal: {
-        ondismiss: () => resolve({ ok: false, reason: "Payment cancelled. No money was taken." }),
+        ondismiss: () => resolve({ ok: false, reason: lastFailure ?? "Payment cancelled. No money was taken." }),
       },
     });
-    checkout.on("payment.failed", (response) =>
-      resolve({ ok: false, reason: response.error.description ?? "The payment failed. No money was taken." }),
-    );
+    checkout.on("payment.failed", (response) => {
+      lastFailure = response.error.description ?? "The payment failed. No money was taken.";
+    });
     checkout.open();
   });
 }
