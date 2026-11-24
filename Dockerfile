@@ -14,6 +14,7 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY backend/ ./
 COPY frontend/data /app/frontend/data
 
-ENV PATH="/app/backend/.venv/bin:$PATH" DATA_DIR=/app/frontend/data
+# PYTHONPATH: worker.py imports `agent.*` and `app.*`, which live in /app/backend.
+ENV PATH="/app/backend/.venv/bin:$PATH" PYTHONPATH=/app/backend DATA_DIR=/app/frontend/data
 
 CMD ["python", "agent/worker.py", "start"]

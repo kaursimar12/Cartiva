@@ -1,0 +1,6 @@
+# Marker for the LiveKit CLI only — NOT installed by anything.
+# `lk agent create/deploy` must run from the repo root (so the Dockerfile can copy frontend/data),
+# and the CLI only accepts a folder whose project files list livekit-agents.
+# Real Python dependencies live in backend/pyproject.toml + backend/uv.lock (installed by the root
+# Dockerfile). Keep this version in step with backend/uv.lock when you upgrade.
+livekit-agents==1.8.6
