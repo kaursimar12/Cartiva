@@ -116,8 +116,10 @@ class FakeBrowser:
             results = [r for r in results if r["price"] <= p["maxPrice"]]
         if isinstance(p.get("minPrice"), (int, float)):
             results = [r for r in results if r["price"] >= p["minPrice"]]
-        self.screen = (f'Search results for "{p.get("query")}"', [r["id"] for r in results])
-        return {"ok": True, "count": len(results), "shownOnScreen": True,
+        show = p.get("showOnScreen") is not False  # like voice-controller.ts: false keeps the current page
+        if show:
+            self.screen = (f'Search results for "{p.get("query")}"', [r["id"] for r in results])
+        return {"ok": True, "count": len(results), "shownOnScreen": show,
                 "products": [agent_product(r) for r in results[:8]]}
 
     def _cart_add(self, p: dict[str, Any]) -> dict[str, Any]:

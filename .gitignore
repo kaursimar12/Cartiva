@@ -58,3 +58,6 @@ htmlcov/
 # misc
 .DS_Store
 *.pem
+
+# Recorded greeting take (agent/greeting_audio.py), re-recorded automatically
+/backend/.cache/

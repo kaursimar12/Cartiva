@@ -8,6 +8,11 @@ def test_keyterms_stay_under_the_budget() -> None:
     assert sum(len(term) for term in worker.STT_KEYTERMS) <= worker.STT_KEYTERM_BUDGET
 
 
+def test_budget_stays_below_the_measured_deepgram_limit() -> None:
+    # 684 characters were refused in Nov 2026 (642 worked); keep a margin below that.
+    assert worker.STT_KEYTERM_BUDGET <= 600
+
+
 def test_priority_words_are_always_included() -> None:
     assert worker.STT_KEYTERMS[: len(worker.STT_PRIORITY_KEYTERMS)] == worker.STT_PRIORITY_KEYTERMS
 

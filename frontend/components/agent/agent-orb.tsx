@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect } from "react";
 import { CheckIcon, CloseIcon } from "@/components/common/icons";
 import { agentEventController } from "@/controllers/agent-event-controller";
+import { useHeldFlag } from "@/hooks/use-held-flag";
 import { useVoiceActivityStore } from "@/store/voice-activity-store";
 import { useVoiceAgentStore } from "@/store/voice-agent-store";
 import { VoiceSphere, type SphereMode } from "./voice-sphere";
@@ -23,6 +24,8 @@ const STATE_TEXT: Record<string, string> = {
 
 /** Above this volume the shopper counts as speaking (filters out room noise). */
 const USER_SPEAKING_LEVEL = 0.04;
+/** How long the shopper still counts as speaking after their volume drops (gaps between words). */
+const SPEAKING_HOLD_MS = 800;
 
 /**
  * The agent's presence during a voice session: a glass voice sphere that sends out waves
@@ -41,7 +44,10 @@ export function AgentOrb() {
   const userLevel = useTrackVolume(microphoneTrack?.track as LocalAudioTrack | undefined); // 0…1, the shopper's mic
 
   const active = agent.state !== "disconnected" && agent.state !== "failed";
-  const userSpeaking = agent.state === "listening" && userLevel > USER_SPEAKING_LEVEL;
+  // Held for a moment after the volume drops, so pauses between words don't flip the caption.
+  // Only the volume is held: once Cartiva starts thinking or speaking, the caption follows at once.
+  const voiceHeard = useHeldFlag(userLevel > USER_SPEAKING_LEVEL, SPEAKING_HOLD_MS);
+  const userSpeaking = agent.state === "listening" && voiceHeard;
   const mode: SphereMode =
     agent.state === "speaking"
       ? "speaking"
