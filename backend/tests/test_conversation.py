@@ -109,6 +109,32 @@ async def test_remove_it(chat, browser: FakeBrowser) -> None:
     assert browser.cart == {"p001": 1}
 
 
+async def test_show_things_on_offer_opens_all_offers(chat, browser: FakeBrowser) -> None:
+    browser.cart = {"p001": 1}
+    await chat("Show me things on offer")
+
+    offers = browser.called("ui.openOffers")
+    assert offers, "the offers page must open on screen"
+    assert not offers[-1].get("category"), "no aisle was named, so show every offer"
+    assert browser.cart == {"p001": 1}, "talking about deals must never add them"
+
+
+async def test_show_only_discounted_vegetables_filters_the_offers(chat, browser: FakeBrowser) -> None:
+    await chat("Show only discounted vegetables")
+
+    offers = browser.called("ui.openOffers")
+    assert offers and offers[-1].get("category") == "vegetables"
+    assert browser.screen[1] and all(BY_ID[pid]["category"] == "vegetables" for pid in browser.screen[1])
+    assert browser.cart == {}
+
+
+async def test_sabzi_offers_in_hinglish(chat, browser: FakeBrowser) -> None:
+    await chat("sabzi pe kya offer hai?")
+
+    offers = browser.called("ui.openOffers")
+    assert offers and offers[-1].get("category") == "vegetables"
+
+
 async def test_take_me_to_the_cart_opens_it(chat, browser: FakeBrowser) -> None:
     browser.cart = {"p001": 1}
     await chat("Take me to my cart")

@@ -2,13 +2,13 @@
   {
     "id": "vegetables",
     "name": "Vegetables",
-    "description": "Fresh vegetables sourced daily.",
+    "description": "Tomatoes, onions, potatoes, greens and more, restocked every morning.",
     "image": "https://images.unsplash.com/photo-1597362925123-77861d3fbac7"
   },
   {
     "id": "fruits",
     "name": "Fruits",
-    "description": "Seasonal and everyday fresh fruits.",
+    "description": "Bananas, apples, oranges and seasonal picks like Alphonso mangoes.",
     "image": "https://images.unsplash.com/photo-1619566636858-adf3ef46400b"
   },
   {

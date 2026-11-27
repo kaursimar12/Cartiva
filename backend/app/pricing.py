@@ -5,7 +5,7 @@ frontend/data/pricing-cases.json.
 
 from dataclasses import dataclass
 
-from app.catalog import Catalog, Offer, Paise
+from app.catalog import Catalog, Offer, Paise, Product
 
 
 @dataclass(frozen=True)
@@ -32,11 +32,7 @@ def quote(catalog: Catalog, items: list[CartItem]) -> PriceBreakdown:
     for offer in catalog.offers:
         if not offer.active:
             continue
-        eligible = sum(
-            product.price * quantity
-            for product, quantity in lines
-            if offer.category is None or product.category == offer.category
-        )
+        eligible = sum(product.price * quantity for product, quantity in lines if _covers(offer, product))
         if eligible == 0 or eligible < offer.minimum_amount:
             continue
         applied.append((offer, _discount(offer, eligible)))
@@ -52,6 +48,13 @@ def quote(catalog: Catalog, items: list[CartItem]) -> PriceBreakdown:
         total=subtotal - discount + delivery_fee,
         applied_offer_ids=[offer.id for offer, _ in applied],
     )
+
+
+def _covers(offer: Offer, product: Product) -> bool:
+    """Same rule as offerCovers in frontend/models/entities/offer.ts: inside its category and product list."""
+    if offer.category is not None and product.category != offer.category:
+        return False
+    return offer.product_ids is None or product.id in offer.product_ids
 
 
 def _discount(offer: Offer, eligible: Paise) -> Paise:

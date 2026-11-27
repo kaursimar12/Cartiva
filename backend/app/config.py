@@ -28,6 +28,9 @@ class Settings(BaseSettings):
 
     # Optional, with defaults
     cors_origins: list[str] = ["http://localhost:3000"]
+    # Which voice agent the token sends into the room. Set CARTIVA_AGENT_NAME=cartiva-agent-dev in a local
+    # .env (and run the local worker) so laptop calls never reach the cloud agent, and vice versa.
+    cartiva_agent_name: str = "cartiva-agent"
     data_dir: Path = BACKEND_DIR.parent / "frontend" / "data"
 
 

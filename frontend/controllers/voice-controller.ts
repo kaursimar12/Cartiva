@@ -1,4 +1,4 @@
-import { catalogService } from "@/lib/container";
+import { catalogService, pricingService } from "@/lib/container";
 import { cartService } from "@/lib/client-container";
 import { formatPrice } from "@/lib/format";
 import { rupeesToPaise } from "@/models/entities/money";
@@ -32,6 +32,8 @@ function rupees(value: unknown): number | undefined {
 
 /** The product fields the agent needs, with the price already formatted. */
 function toAgentProduct(p: Product) {
+  const deal = catalogService.getDeal(p);
+  const dealPrice = catalogService.getDealPrice(p);
   return {
     productId: p.id,
     name: p.name,
@@ -40,6 +42,9 @@ function toAgentProduct(p: Product) {
     price: formatPrice(p.price),
     priceRupees: p.price / 100, // a plain number, so "cheapest" is a reliable comparison
     inStock: p.stock,
+    // Only present when the product has a deal, e.g. "20% OFF Carrot" and "₹24.00" (applied at checkout).
+    ...(deal && { deal: deal.title }),
+    ...(dealPrice !== null && { dealPrice: formatPrice(dealPrice) }),
   };
 }
 
@@ -168,12 +173,42 @@ export const voiceController = {
 
   /** Opens a fixed page (e.g. "take me to the cart"). Checkout has its own flow (startCheckout). */
   async openPage(input: { page?: unknown }, ui: VoiceUi) {
+    if (input.page === "offers") return this.openOffers({}, ui);
     const paths: Record<string, string> = { home: "/", cart: "/cart", "scan-list": "/scan-list" };
     const path = typeof input.page === "string" ? paths[input.page] : undefined;
     if (!path) return { ok: false, error: { code: "NOT_FOUND", message: "That page doesn't exist." } };
 
     await ui.navigate(path);
     return { ok: true, shownOnScreen: true, page: input.page };
+  },
+
+  /**
+   * Opens the offers page, optionally narrowed to one aisle ("show only discounted vegetables"),
+   * and tells the agent what's running so it can summarise it.
+   */
+  async openOffers(input: { category?: unknown }, ui: VoiceUi) {
+    const requested = typeof input.category === "string" && input.category ? input.category : undefined;
+    const category = requested ? catalogService.getCategory(requested) : undefined;
+    if (requested && !category) {
+      return { ok: false, error: { code: "NOT_FOUND", message: `There's no ${requested} section.` } };
+    }
+
+    await ui.navigate(category ? `/offers?category=${category.id}` : "/offers");
+    const deals = catalogService.getDealProducts(category?.id);
+    const storeOffers = catalogService
+      .getStoreOffers()
+      .filter((o) => !category || o.category === null || o.category === category.id);
+    const { fee, freeAbove } = pricingService.delivery;
+    return {
+      ok: true,
+      shownOnScreen: true,
+      category: category?.name ?? null,
+      delivery: `Free delivery above ${formatPrice(freeAbove)}, otherwise ${formatPrice(fee)}`,
+      storeOffers: storeOffers.map((o) => ({ title: o.title, description: o.description })),
+      dealCount: deals.length,
+      deals: deals.slice(0, MAX_RESULTS_FOR_AGENT).map(toAgentProduct),
+      products: deals.map((p) => ({ productId: p.id })), // every card on screen, for the agent's on-screen glow
+    };
   },
 
   /** What the shopper sees right now: the page and its products in on-screen order. */

@@ -1,7 +1,7 @@
 import type { AppliedOffer, CartItem, CartLine, OfferHint, PricingSummary } from "@/models/entities/cart";
 import type { DeliveryPolicy } from "@/models/entities/delivery";
 import type { Paise } from "@/models/entities/money";
-import type { DiscountType, Offer } from "@/models/entities/offer";
+import { offerCovers, type DiscountType, type Offer } from "@/models/entities/offer";
 import type { OfferRepository, ProductRepository } from "@/models/repositories/interfaces";
 import type { DiscountStrategy } from "./discount-strategies";
 
@@ -65,10 +65,9 @@ export class PricingService {
     return lines.reduce((sum, line) => sum + line.lineTotal, 0);
   }
 
+  /** Subtotal of the lines the offer covers (its category and/or product list, or the whole cart). */
   private eligibleAmount(offer: Offer, lines: CartLine[]): Paise {
-    return offer.category
-      ? this.subtotal(lines.filter((l) => l.product.category === offer.category))
-      : this.subtotal(lines);
+    return this.subtotal(lines.filter((l) => offerCovers(offer, l.product)));
   }
 
   private applicableOffers(lines: CartLine[]): AppliedOffer[] {

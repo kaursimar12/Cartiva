@@ -14,7 +14,7 @@ export function SectionHeader({ title, subtitle, href, linkLabel = "See all", id
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
       <div>
-        <h2 id={id} className="font-display text-3xl leading-none tracking-tight text-zinc-900 sm:text-4xl">
+        <h2 id={id} className="font-display text-2xl leading-tight text-zinc-900 sm:text-3xl">
           {title}
         </h2>
         {subtitle && <p className="mt-2 text-sm text-zinc-500">{subtitle}</p>}

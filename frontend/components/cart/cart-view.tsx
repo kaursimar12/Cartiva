@@ -31,7 +31,12 @@ export function CartView() {
     );
   }
 
-  const suggestions = catalogService.getSuggestions(lines.map((l) => l.product.id), 10);
+  const cartIds = lines.map((l) => l.product.id);
+  // Deals from the aisles you're already shopping in get their own highlighted row.
+  const deals = catalogService.getDealsNear(cartIds);
+  const dealIds = new Set(deals.map((p) => p.id));
+  const dealAisles = [...new Set(deals.map((p) => catalogService.getCategory(p.category)?.name ?? p.category))];
+  const suggestions = catalogService.getSuggestions(cartIds, 10 + deals.length).filter((p) => !dealIds.has(p.id)).slice(0, 10);
 
   return (
     <div>
@@ -50,7 +55,7 @@ export function CartView() {
         <div className="min-w-0 space-y-6">
           <section aria-labelledby="cart-items" className="rounded-3xl border border-hairline bg-surface px-5 sm:px-7">
             <div className="flex items-center justify-between border-b border-hairline py-5">
-              <h2 id="cart-items" className="font-display text-3xl leading-none">
+              <h2 id="cart-items" className="font-display text-2xl leading-tight">
                 Items
               </h2>
               <AnimatePresence mode="wait" initial={false}>
@@ -101,14 +106,47 @@ export function CartView() {
             </ul>
           </section>
 
+          {deals.length > 0 && (
+            <section
+              aria-labelledby="deals-heading"
+              className="rounded-3xl border border-brand-500/25 bg-brand-50/60 px-4 pt-5 pb-3 sm:px-6"
+            >
+              <div className="mb-1 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h2 id="deals-heading" className="flex items-center gap-2 font-display text-2xl leading-tight">
+                    <TagIcon className="h-6 w-6 text-brand-700" />
+                    Deals on what you’re buying
+                  </h2>
+                  <p className="mt-1 text-sm text-zinc-600">Also on offer in {dealAisles.join(", ")}</p>
+                </div>
+                <Link href="/offers" className="text-sm font-semibold text-brand-700 hover:underline">
+                  All offers
+                </Link>
+              </div>
+              <ul className="scrollbar-none -mx-4 grid snap-x scroll-px-4 sm:scroll-px-0 auto-cols-[minmax(10.5rem,1fr)] grid-flow-col gap-3 overflow-x-auto px-4 pt-3 pb-2 sm:mx-0 sm:auto-cols-[minmax(11rem,1fr)] sm:px-0">
+                {deals.map((product, index) => (
+                  <motion.li
+                    key={product.id}
+                    className="snap-start"
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(index, 8) * 0.05, duration: 0.45 }}
+                  >
+                    <ProductCard product={product} index={index} />
+                  </motion.li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {suggestions.length > 0 && (
             <section aria-labelledby="suggestions-heading">
               <div className="mb-4 flex items-end justify-between">
-                <h2 id="suggestions-heading" className="font-display text-3xl leading-none">
+                <h2 id="suggestions-heading" className="font-display text-2xl leading-tight">
                   You might also like
                 </h2>
               </div>
-              <ul className="scrollbar-none -mx-4 grid snap-x auto-cols-[minmax(10.5rem,1fr)] grid-flow-col gap-3 overflow-x-auto px-4 pt-3 pb-2 sm:mx-0 sm:auto-cols-[minmax(11rem,1fr)] sm:px-0">
+              <ul className="scrollbar-none -mx-4 grid snap-x scroll-px-4 sm:scroll-px-0 auto-cols-[minmax(10.5rem,1fr)] grid-flow-col gap-3 overflow-x-auto px-4 pt-3 pb-2 sm:mx-0 sm:auto-cols-[minmax(11rem,1fr)] sm:px-0">
                 {suggestions.map((product, index) => (
                   <motion.li
                     key={product.id}
@@ -127,7 +165,7 @@ export function CartView() {
 
         <aside className="space-y-4 lg:sticky lg:top-36 lg:self-start">
           <section aria-labelledby="bill-details" className="rounded-3xl border border-hairline bg-surface p-6 shadow-card sm:p-7">
-            <h2 id="bill-details" className="mb-5 font-display text-3xl leading-none">
+            <h2 id="bill-details" className="mb-5 font-display text-2xl leading-tight">
               Bill
             </h2>
             <PricingSummary pricing={pricing} />

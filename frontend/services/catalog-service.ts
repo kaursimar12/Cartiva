@@ -1,5 +1,5 @@
 import type { Paise } from "@/models/entities/money";
-import type { Offer } from "@/models/entities/offer";
+import { isDeal, offerCovers, type Offer } from "@/models/entities/offer";
 import type { Category, Product } from "@/models/entities/product";
 import type { CategoryRepository, OfferRepository, ProductRepository } from "@/models/repositories/interfaces";
 
@@ -110,9 +110,56 @@ export class CatalogService {
     return this.offers.findActive();
   }
 
-  /** Active offers a product counts toward: its own aisle's offers plus whole-cart offers. */
+  /** Active category and whole-cart offers (not product deals), for offer banners. */
+  getStoreOffers(): Offer[] {
+    return this.offers.findActive().filter((offer) => !isDeal(offer));
+  }
+
+  /** Active offers a product counts toward: its deal, its aisle's offers and whole-cart offers. */
   getOffersFor(product: Product): Offer[] {
-    return this.offers.findActive().filter((offer) => offer.category === null || offer.category === product.category);
+    return this.offers.findActive().filter((offer) => offerCovers(offer, product));
+  }
+
+  /** The active product deal on this product (e.g. "20% OFF Carrot"), if any. */
+  getDeal(product: Product): Offer | undefined {
+    return this.offers.findActive().find((offer) => isDeal(offer) && offerCovers(offer, product));
+  }
+
+  /**
+   * Price of one pack with its deal applied, for showing next to the struck-out price.
+   * Null without a deal, or for deals with a minimum or a flat amount (they don't map to one pack).
+   * Uses the same rounding as checkout (percentage rounds down to the paise).
+   */
+  getDealPrice(product: Product): Paise | null {
+    const deal = this.getDeal(product);
+    if (!deal || deal.discountType !== "percentage" || deal.minimumAmount > 0) return null;
+    return product.price - Math.floor((product.price * deal.discountValue) / 100);
+  }
+
+  /** Every product with an active deal (optionally only one category's), in-stock ones first. */
+  getDealProducts(categoryId?: string): Product[] {
+    const withDeal = this.products
+      .findAll()
+      .filter((p) => (!categoryId || p.category === categoryId) && this.getDeal(p) !== undefined);
+    return [...withDeal.filter((p) => p.stock), ...withDeal.filter((p) => !p.stock)];
+  }
+
+  /** Categories that have at least one product deal, in catalog order (for "discounted vegetables" filters). */
+  getDealCategories(): Category[] {
+    const withDeals = new Set(this.getDealProducts().map((p) => p.category));
+    return this.categories.findAll().filter((c) => withDeals.has(c.id));
+  }
+
+  /**
+   * Deals to point out next to a cart: in stock, not already in it, from the same aisles as the
+   * cart's products (buying tomatoes? carrots are 20% off).
+   */
+  getDealsNear(cartProductIds: string[], limit = 6): Product[] {
+    const inCart = new Set(cartProductIds);
+    const aisles = new Set(cartProductIds.map((id) => this.products.findById(id)?.category));
+    return this.getDealProducts()
+      .filter((p) => p.stock && !inCart.has(p.id) && aisles.has(p.category))
+      .slice(0, limit);
   }
 
   /** Partial-match search over name, brand, category and tags. Every query term must match. */

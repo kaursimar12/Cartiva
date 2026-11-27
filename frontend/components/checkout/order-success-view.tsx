@@ -30,7 +30,7 @@ export function OrderSuccessView() {
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-3xl text-white" aria-hidden>
           ✓
         </span>
-        <h1 className="mt-5 font-display text-5xl leading-none tracking-tight">Order placed!</h1>
+        <h1 className="mt-5 font-display text-4xl leading-tight">Order placed!</h1>
         <p className="mt-1 text-zinc-600">Your payment was successful and your order has been placed.</p>
         <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-3 rounded-xl bg-surface-muted p-4 text-left text-sm">
           <dt className="text-zinc-600">Order reference</dt>

@@ -183,7 +183,13 @@ call get_cart first to find the right productId and the current quantity. If mor
 item could match what the shopper said, ask which one. Confirm briefly after each change.
 You can open pages on the shopper's screen: navigate_category for a category ("go to fruits"),
 open_product for one product ("show me that one"), and open_page for the cart, home or scan list
-pages ("take me to the cart"). After opening a category, say only that it is open and how many
+pages ("take me to the cart").
+Offers: whenever the shopper asks about offers, deals, discounts or things on sale ("show me things
+on offer", "any offers?", "kya offer hai?"), call show_offers. If they name an aisle ("show only
+discounted vegetables", "dairy offers"), pass that category so only those products are shown.
+Then answer in one or two sentences: how many are on screen and at most two deals. A product with
+a "deal" field is discounted; its "dealPrice" is the price after the deal, and the discount is
+applied automatically at checkout. Never add a deal product unless the shopper asks for it. After opening a category, say only that it is open and how many
 products are on screen, then ask what they would like, for example "Here are the vegetables,
 eleven products on screen. What would you like?" Do not name the products; the screen shows them.
 Name products only if the shopper asks what is there.
@@ -474,7 +480,7 @@ class CartivaAssistant(Agent):
     @function_tool
     async def open_page(self, context: RunContext, page: Literal["home", "cart", "scan-list"]) -> dict | str:
         """Opens a page on the shopper's screen, e.g. "take me to the cart", "show my cart",
-        "go to the home page". To pay, use start_checkout instead.
+        "go to the home page". To pay, use start_checkout instead. For offers, use show_offers.
 
         Use page "scan-list" whenever the shopper wants to scan, upload or photograph a shopping list,
         or says they have a list: "I want to scan a list", "scan my list", "I have a shopping list",
@@ -489,6 +495,41 @@ class CartivaAssistant(Agent):
             return await call_browser("ui.openPage", {"page": page})
         except BrowserRpcError:
             return "Opening the page failed right now. Apologise briefly and ask the shopper to try again."
+
+    @function_tool
+    async def show_offers(
+        self,
+        context: RunContext,
+        category: Literal[
+            "vegetables", "fruits", "dairy", "beverages", "snacks",
+            "breakfast", "cleaning", "laundry", "personal-care",
+        ] | None = None,
+    ) -> dict | str:
+        """Opens the offers page on the shopper's screen: discounted products, store offers and the
+        free-delivery rule. Use it whenever they ask about offers, deals, discounts, sales or what's
+        cheaper today: "show me things on offer", "any offers?", "what's on sale", "kya offer hai",
+        "discount wali cheezein dikhao".
+
+        Pass a category to show ONLY that aisle's discounted products: "show only discounted
+        vegetables" → category "vegetables", "dairy offers" → "dairy", "sabzi pe offer" → "vegetables".
+        Never use search_products or navigate_category for discounted items.
+
+        Args:
+            category: The aisle to filter to, or leave it out for all offers.
+        """
+        try:
+            result = await call_browser("ui.openOffers", {"category": category} if category else {})
+            if not isinstance(result, dict) or not result.get("ok"):
+                return result
+            result.pop("products", None)  # only for the on-screen glow; the model reads "deals"
+            result["say"] = (
+                "Say the offers are on screen, how many discounted products there are, and name at most "
+                "two deals with their deal price. Mention the free-delivery rule only if they asked about "
+                "delivery or this is the full offers page. Do not add anything to the cart."
+            )
+            return result
+        except BrowserRpcError:
+            return "Opening the offers failed right now. Apologise briefly and ask the shopper to try again."
 
     @function_tool
     async def get_screen(self, context: RunContext) -> dict | str:
@@ -692,7 +733,9 @@ server = AgentServer(
 )
 
 
-@server.rtc_session(agent_name="cartiva-agent")
+# Must match the name the token endpoint dispatches (app/config.py → CARTIVA_AGENT_NAME). The cloud uses the
+# default; a local .env sets "cartiva-agent-dev" so laptop calls never reach the cloud agent, and vice versa.
+@server.rtc_session(agent_name=os.getenv("CARTIVA_AGENT_NAME", "cartiva-agent"))
 async def entrypoint(ctx: JobContext) -> None:
     """Runs once for every voice session (room) LiveKit gives us."""
     logger.info("starting voice session in room %s", ctx.room.name)

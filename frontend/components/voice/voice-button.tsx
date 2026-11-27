@@ -13,8 +13,9 @@ export function VoiceButton({ compact = false }: { compact?: boolean }) {
       onClick={() => void toggle()}
       aria-pressed={active}
       aria-label={active ? "Stop Cartiva voice assistant" : "Ask Cartiva voice assistant"}
-      className={`flex h-11 shrink-0 items-center gap-2 rounded-full px-3 text-sm font-medium transition-colors sm:px-4 ${
-        active ? "bg-zinc-900 text-background" : "border border-hairline bg-surface text-zinc-800 hover:bg-zinc-50"
+      // The main feature, so the strongest button in the header: filled brand green (dark while a call runs).
+      className={`flex h-11 shrink-0 items-center gap-2 rounded-full px-3 text-sm font-semibold transition-colors sm:px-5 ${
+        active ? "bg-zinc-900 text-background" : "bg-brand-600 text-white hover:bg-brand-700"
       }`}
     >
       <span className="relative flex h-5 w-5 items-center justify-center">

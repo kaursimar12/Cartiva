@@ -40,7 +40,13 @@ cart and checks out, while you watch it happen on screen.
 - Add, remove and change quantities, with **live stock limits**.
 - **Offers applied automatically:** category discounts (10% off vegetables over ₹300, 15% off laundry over ₹500)
   and a whole-cart discount (₹50 off over ₹999). Inactive offers never apply.
-- **Free delivery** above ₹499 (₹30 otherwise).
+- **Product deals:** single products on offer (e.g. 20% off Carrot, no minimum) show a deal badge and the
+  struck-out price; deals stack with category and whole-cart offers.
+- **Offers page** (`/offers`, linked in the category bar): store offers, the delivery rule and every product on deal,
+  with aisle filters (`/offers?category=vegetables`). Voice: "Show me things on offer" opens it; "Show only
+  discounted vegetables" (or "sabzi pe kya offer hai?") opens it filtered to that aisle.
+- **"Deals on what you're buying"** in the cart highlights discounted items from the aisles already in your cart.
+- **Free delivery** above ₹199 (₹30 otherwise).
 - **"Unlock more savings"** progress bars show how close you are to free delivery or the next offer.
 - **"You might also like"** suggestions from the same aisles.
 - Item count = number of different products (2 kg of tomatoes is 1 item).

@@ -36,6 +36,15 @@ export function validateCatalog(
     if (!Number.isInteger(o.minimumAmount) || o.minimumAmount < 0) errors.push(`${o.id}: invalid minimumAmount`);
     if (!isPositiveInteger(o.discountValue)) errors.push(`${o.id}: invalid discountValue`);
     if (o.discountType === "percentage" && o.discountValue > 100) errors.push(`${o.id}: percentage above 100`);
+    if (o.productIds !== null) {
+      if (o.productIds.length === 0) errors.push(`${o.id}: productIds is empty (use null for a category offer)`);
+      for (const id of o.productIds) {
+        const product = products.findById(id);
+        if (!product) errors.push(`${o.id}: unknown product "${id}"`);
+        else if (o.category && product.category !== o.category)
+          errors.push(`${o.id}: product "${id}" is not in category "${o.category}"`);
+      }
+    }
   }
 
   const policy = delivery.get();

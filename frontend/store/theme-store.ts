@@ -4,7 +4,8 @@ import { persist } from "zustand/middleware";
 export type Theme = "dark" | "light";
 
 /** Key shared with the pre-paint script in app/layout.tsx. */
-export const THEME_STORAGE_KEY = "cartiva-theme-v2"; // v2: light became the default
+// v3: dark became the default (a new key, so choices saved under the old light default don't stick).
+export const THEME_STORAGE_KEY = "cartiva-theme-v3";
 
 /** Theme preference container only. Changes go through themeController. */
 interface ThemeState {
@@ -13,7 +14,7 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>()(
-  persist((): ThemeState => ({ theme: "light", hasHydrated: false }), {
+  persist((): ThemeState => ({ theme: "dark", hasHydrated: false }), {
     name: THEME_STORAGE_KEY,
     partialize: (state) => ({ theme: state.theme }),
     // Rehydrated manually after mount to avoid server/client markup mismatches.

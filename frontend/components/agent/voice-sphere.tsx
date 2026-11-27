@@ -21,12 +21,23 @@ const WAVES = 3;
  * A glass voice sphere: black core, iridescent teal/blue/green rim, glowing edge.
  * Voice waves ripple out of it while someone speaks; `level` (0…1) is how loud.
  */
-export function VoiceSphere({ mode, level = 0, size = 88 }: { mode: SphereMode; level?: number; size?: number }) {
-  const reduce = useReducedMotion();
+/** `still`: render the sphere without any motion (e.g. on the home page while no call is running). */
+export function VoiceSphere({
+  mode,
+  level = 0,
+  size = 88,
+  still = false,
+}: {
+  mode: SphereMode;
+  level?: number;
+  size?: number;
+  still?: boolean;
+}) {
+  const reduce = useReducedMotion() || still;
   const loud = Math.min(level * 2.2, 1); // voice volume is usually small; stretch it to 0…1
   const waveColor = WAVE_COLOR[mode];
   const emitting = !reduce && waveColor !== undefined && loud > 0.06;
-  const spin = { animationDuration: `${SPIN_SECONDS[mode]}s` };
+  const spin = { animationDuration: `${SPIN_SECONDS[mode]}s`, animationPlayState: reduce ? "paused" : "running" };
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
@@ -74,7 +85,9 @@ export function VoiceSphere({ mode, level = 0, size = 88 }: { mode: SphereMode; 
         animate={
           emitting || mode === "speaking"
             ? { scale: 1 + loud * 0.12 }
-            : { scale: mode === "thinking" ? [0.96, 1.02, 0.96] : [0.98, 1.02, 0.98] }
+            : reduce
+              ? { scale: 1 }
+              : { scale: mode === "thinking" ? [0.96, 1.02, 0.96] : [0.98, 1.02, 0.98] }
         }
         transition={
           emitting || mode === "speaking"

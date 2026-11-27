@@ -53,6 +53,8 @@ export function startEffects(method: string, payload: Payload): AgentEffects {
       return { reveal: true, navigation: str(payload.category) ? `Opening ${str(payload.category)}…` : "Opening category…" };
     case "ui.openPage":
       return { navigation: str(payload.page) ? `Opening ${String(payload.page).replace("-", " ")}…` : "Opening page…" };
+    case "ui.openOffers":
+      return { reveal: true, navigation: str(payload.category) ? `Opening offers on ${str(payload.category)}…` : "Opening offers…" };
     case "checkout.start":
       return { navigation: "Opening checkout…" };
     default:
@@ -75,7 +77,8 @@ export function finishEffects(method: string, payload: Payload, result: unknown)
     case "cart.remove":
       return { ...base, focus: one(payload.productId, ok ? "removed" : "error") ?? null };
     case "catalog.search":
-    case "ui.openCategory": {
+    case "ui.openCategory":
+    case "ui.openOffers": {
       if (method === "catalog.search" && payload.showOnScreen === false) return base;
       const ids = ok ? productIdsIn(data.products) : [];
       return { ...base, focus: ids.length ? { productIds: ids, kind: "looking" } : null };

@@ -46,6 +46,42 @@ describe("CatalogService (real catalog)", () => {
     expect(fruit.some((o) => o.id === "offer004")).toBe(false); // fruits offer is inactive
   });
 
+  it("a product deal covers only its own product, plus the aisle and cart-wide offers", () => {
+    const carrot = catalogService.getProduct("p006")!;
+    expect(catalogService.getOffersFor(carrot).map((o) => o.id).sort()).toEqual(["offer001", "offer003", "offer005"]);
+    expect(catalogService.getDeal(carrot)?.id).toBe("offer005");
+    expect(catalogService.getDeal(catalogService.getProduct("p001")!)).toBeUndefined(); // tomato: no deal
+  });
+
+  it("prices one pack with its deal, rounding down like checkout", () => {
+    expect(catalogService.getDealPrice(catalogService.getProduct("p006")!)).toBe(2400); // carrot ₹30, 20% off
+    expect(catalogService.getDealPrice(catalogService.getProduct("p009")!)).toBe(4250); // capsicum ₹50, 15% off
+    expect(catalogService.getDealPrice(catalogService.getProduct("p001")!)).toBeNull();
+  });
+
+  it("keeps product deals out of the store-wide offer banners", () => {
+    const store = catalogService.getStoreOffers().map((o) => o.id).sort();
+    expect(store).toEqual(["offer001", "offer002", "offer003"]);
+    expect(catalogService.getDealProducts().map((p) => p.id)).toContain("p006");
+  });
+
+  it("filters deals to one aisle and lists the aisles that have deals", () => {
+    const veg = catalogService.getDealProducts("vegetables");
+    expect(veg.length).toBeGreaterThanOrEqual(5);
+    expect(veg.every((p) => p.category === "vegetables")).toBe(true);
+    expect(catalogService.getDealCategories().map((c) => c.id)).toContain("vegetables");
+    expect(catalogService.getDealProducts("no-such-aisle")).toEqual([]);
+  });
+
+  it("points out deals in the cart's aisles, never what's already in it", () => {
+    const deals = catalogService.getDealsNear(["p001"]); // tomato in the cart
+    expect(deals.length).toBeGreaterThan(0);
+    expect(deals.every((p) => p.category === "vegetables" && p.stock && p.id !== "p001")).toBe(true);
+    expect(deals.map((p) => p.id)).toContain("p006"); // carrot
+    expect(catalogService.getDealsNear(["p001", "p006"]).some((p) => p.id === "p006")).toBe(false);
+    expect(catalogService.getDealsNear([])).toEqual([]);
+  });
+
   it("filters by availability", () => {
     expect(catalogService.filter({ available: true }).every((p) => p.stock)).toBe(true);
   });

@@ -63,7 +63,7 @@ export function PayPanel({ total, status, step, confirmMessage, onStepChange }: 
             className="rounded-2xl border border-brand-500/30 bg-brand-50 p-5"
           >
             <p className="text-xs font-semibold tracking-[0.12em] text-brand-700 uppercase">Confirm payment</p>
-            <p className="tabular mt-1 font-display text-4xl leading-none text-zinc-900">{formatPrice(total)}</p>
+            <p className="tabular mt-1 font-display text-2xl leading-tight text-zinc-900">{formatPrice(total)}</p>
             <p id="confirm-title" className="mt-2 text-sm text-zinc-600">
               {confirmMessage}
             </p>

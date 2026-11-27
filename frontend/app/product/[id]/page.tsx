@@ -7,6 +7,8 @@ import { ProductRail } from "@/components/products/product-grid";
 import { ProductImage } from "@/components/products/product-image";
 import { ProductPurchasePanel } from "@/components/products/product-purchase-panel";
 import { StockBadge } from "@/components/products/stock-badge";
+import { DealBadge } from "@/components/products/deal-badge";
+import { isDeal } from "@/models/entities/offer";
 import { formatPrice } from "@/lib/format";
 import { catalogService, pricingService } from "@/lib/container";
 
@@ -31,6 +33,8 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
   const related = catalogService.getProductsByCategory(product.category).filter((p) => p.id !== product.id).slice(0, 8);
   const unitPrice = catalogService.unitPrice(product);
   const offers = catalogService.getOffersFor(product);
+  const deal = catalogService.getDeal(product);
+  const dealPrice = catalogService.getDealPrice(product);
   const inStock = catalogService.getStockStatus(product) !== "out-of-stock";
 
   const perks = [
@@ -59,7 +63,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
           <div className="relative">
             <ProductImage product={product} size="lg" priority />
             <div className="absolute top-4 left-4 flex flex-col items-start gap-2">
-              <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-zinc-900 uppercase shadow-sm backdrop-blur">
+              <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#16150f] uppercase shadow-sm backdrop-blur">
                 <BoltIcon className="h-3.5 w-3.5 text-brand-600" />
                 10 mins
               </span>
@@ -75,7 +79,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
           >
             {product.brand ?? category?.name}
           </Link>
-          <h1 className="mt-3 font-display text-5xl leading-[0.95] tracking-tight text-zinc-900 sm:text-6xl">{product.name}</h1>
+          <h1 className="mt-3 font-display text-3xl leading-tight text-zinc-900 sm:text-4xl">{product.name}</h1>
 
           <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
             <span className="rounded-full border border-hairline bg-surface px-3 py-1 font-medium text-zinc-700">{product.unit}</span>
@@ -87,7 +91,13 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
           </div>
 
           <div className="mt-6 flex items-end gap-3">
-            <p className="tabular text-5xl font-semibold tracking-tight text-zinc-900">{formatPrice(product.price)}</p>
+            <p className="tabular text-5xl font-semibold tracking-tight text-zinc-900">{formatPrice(dealPrice ?? product.price)}</p>
+            {dealPrice !== null && (
+              <s className="tabular mb-2 text-lg text-zinc-400" aria-label={`was ${formatPrice(product.price)}`}>
+                {formatPrice(product.price)}
+              </s>
+            )}
+            {deal && <DealBadge deal={deal} className="mb-2.5 text-xs" />}
             {inStock && (
               <span className="mb-2 flex items-center gap-1.5 rounded-full bg-brand-500/10 px-2.5 py-1 text-xs font-medium text-brand-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-brand-500" />
@@ -123,7 +133,9 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
                   <div className="leading-tight">
                     <p className="text-sm font-semibold text-zinc-900">{offer.title}</p>
                     <p className="tabular text-xs text-zinc-500">
-                      {offer.category ? `${category?.name} above` : "Orders above"} {formatPrice(offer.minimumAmount)}
+                      {isDeal(offer)
+                        ? "On this product · no minimum"
+                        : `${offer.category ? `${category?.name} above` : "Orders above"} ${formatPrice(offer.minimumAmount)}`}
                     </p>
                   </div>
                 </div>
@@ -137,7 +149,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
           </p>
 
           <section aria-labelledby="about" className="mt-10">
-            <h2 id="about" className="font-display text-3xl leading-none">
+            <h2 id="about" className="font-display text-2xl leading-tight">
               About this product
             </h2>
             <p className="mt-3 text-[15px] leading-relaxed text-zinc-600">{product.description}</p>

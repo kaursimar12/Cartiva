@@ -9,10 +9,23 @@ import re
 from pathlib import Path
 from typing import Any
 
-PRODUCTS: list[dict[str, Any]] = json.loads(
-    (Path(__file__).resolve().parents[2] / "frontend" / "data" / "products.json").read_text(encoding="utf-8")
-)
+from app.catalog import Catalog
+from app.pricing import CartItem, quote
+
+DATA_DIR = Path(__file__).resolve().parents[2] / "frontend" / "data"
+
+
+def _load(name: str) -> Any:
+    return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
+
+
+PRODUCTS: list[dict[str, Any]] = _load("products.json")
+OFFERS: list[dict[str, Any]] = _load("offers.json")
+DELIVERY: dict[str, Any] = _load("delivery.json")
 BY_ID = {p["id"]: p for p in PRODUCTS}
+# Real pricing (the server's copy of the website's rules), so cart totals match the app.
+CATALOG = Catalog.from_json(PRODUCTS, OFFERS, DELIVERY)
+DEALS = {pid: o for o in OFFERS if o["active"] and o.get("productIds") for pid in o["productIds"]}
 CATEGORIES = {
     "vegetables": "Vegetables", "fruits": "Fruits", "dairy": "Dairy", "beverages": "Beverages",
     "snacks": "Snacks", "breakfast": "Breakfast", "cleaning": "Cleaning", "laundry": "Laundry",
@@ -25,10 +38,17 @@ def rupees(amount: float) -> str:
 
 
 def agent_product(p: dict[str, Any]) -> dict[str, Any]:
-    return {
+    out = {
         "productId": p["id"], "name": p["name"], "brand": p["brand"], "unit": p["unit"],
         "price": rupees(p["price"]), "priceRupees": p["price"], "inStock": p["stock"],
     }
+    deal = DEALS.get(p["id"])
+    if deal:  # same extra fields as toAgentProduct in voice-controller.ts
+        out["deal"] = deal["title"]
+        if deal["discountType"] == "percentage" and deal["minimumAmount"] == 0:
+            paise = round(p["price"] * 100)
+            out["dealPrice"] = rupees((paise - paise * deal["discountValue"] // 100) / 100)
+    return out
 
 
 def _variants(term: str) -> list[str]:
@@ -105,10 +125,10 @@ class FakeBrowser:
              "lineTotal": rupees(BY_ID[pid]["price"] * q)}
             for pid, q in self.cart.items()
         ]
-        subtotal = sum(BY_ID[pid]["price"] * q for pid, q in self.cart.items())
-        return {"ok": True, "items": items, "subtotal": rupees(subtotal), "discount": "₹0",
-                "deliveryFee": "₹0" if subtotal >= 499 or not subtotal else "₹30",
-                "total": rupees(subtotal + (0 if subtotal >= 499 or not subtotal else 30))}
+        price = quote(CATALOG, [CartItem(product_id=pid, quantity=q) for pid, q in self.cart.items()])
+        return {"ok": True, "items": items, "subtotal": rupees(price.subtotal / 100),
+                "discount": rupees(price.discount / 100), "deliveryFee": rupees(price.delivery_fee / 100),
+                "total": rupees(price.total / 100)}
 
     def _catalog_search(self, p: dict[str, Any]) -> dict[str, Any]:
         results = search(str(p.get("query") or ""))
@@ -174,10 +194,28 @@ class FakeBrowser:
 
     def _ui_openPage(self, p: dict[str, Any]) -> dict[str, Any]:
         page = p.get("page")
+        if page == "offers":
+            return self._ui_openOffers({})
         if page not in ("home", "cart", "scan-list"):
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That page doesn't exist."}}
         self.screen = (page, [])
         return {"ok": True, "shownOnScreen": True, "page": page}
+
+    def _ui_openOffers(self, p: dict[str, Any]) -> dict[str, Any]:
+        # Same shape as voiceController.openOffers.
+        category = p.get("category") or None
+        if category is not None and category not in CATEGORIES:
+            return {"ok": False, "error": {"code": "NOT_FOUND", "message": f"There's no {category} section."}}
+        deal_ids = [pid for pid in BY_ID if pid in DEALS and (category is None or BY_ID[pid]["category"] == category)]
+        self.screen = (f"Discounted {CATEGORIES[category]}" if category else "Offers", deal_ids)
+        return {"ok": True, "shownOnScreen": True, "category": CATEGORIES.get(category or ""),
+                "delivery": f"Free delivery above {rupees(DELIVERY['freeAbove'])}, otherwise {rupees(DELIVERY['fee'])}",
+                "storeOffers": [{"title": o["title"], "description": o["description"]} for o in OFFERS
+                                if o["active"] and not o.get("productIds")
+                                and (category is None or o["category"] in (None, category))],
+                "dealCount": len(deal_ids),
+                "deals": [agent_product(BY_ID[pid]) for pid in deal_ids[:8]],
+                "products": [{"productId": pid} for pid in deal_ids]}
 
     def _ui_getScreen(self, _: dict[str, Any]) -> dict[str, Any]:
         title, ids = self.screen

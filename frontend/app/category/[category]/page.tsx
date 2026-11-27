@@ -34,7 +34,7 @@ export default async function CategoryPage(props: PageProps<"/category/[category
           <Image src={category.image} alt="" fill sizes="80px" className="object-cover" priority />
         </span>
         <div>
-          <h1 className="font-display text-4xl leading-none tracking-tight text-zinc-900 sm:text-5xl">{category.name}</h1>
+          <h1 className="font-display text-3xl leading-tight text-zinc-900 sm:text-4xl">{category.name}</h1>
           <p className="mt-0.5 text-sm text-zinc-600">{category.description}</p>
         </div>
       </header>

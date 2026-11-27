@@ -37,6 +37,7 @@ class Offer:
     id: str
     title: str
     category: str | None  # None = applies to the whole cart
+    product_ids: tuple[str, ...] | None  # a "deal" limited to these products; None = whole category/cart
     minimum_amount: Paise
     discount_type: Literal["percentage", "flat"]
     discount_value: int  # percent for "percentage", paise for "flat"
@@ -76,6 +77,7 @@ class Catalog:
                     id=o["id"],
                     title=o.get("title", o["id"]),
                     category=o["category"],
+                    product_ids=tuple(o["productIds"]) if o.get("productIds") is not None else None,
                     minimum_amount=rupees_to_paise(o["minimumAmount"]),
                     discount_type=o["discountType"],
                     discount_value=(

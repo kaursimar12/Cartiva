@@ -75,7 +75,7 @@ export function CheckoutView() {
         <section aria-labelledby="order-summary" className="space-y-4">
           <div className="rounded-3xl border border-hairline bg-surface p-5 sm:p-7">
             <div className="flex items-baseline justify-between">
-              <h2 id="order-summary" className="font-display text-3xl leading-none">
+              <h2 id="order-summary" className="font-display text-2xl leading-tight">
                 Your order
               </h2>
               <Link href="/cart" className="flex items-center gap-0.5 text-sm font-semibold text-brand-700 hover:text-brand-800">
@@ -162,7 +162,7 @@ export function CheckoutView() {
               voiceWaiting ? "glow-brand border-brand-500/60" : "border-hairline shadow-card"
             }`}
           >
-            <h2 id="payment" className="mb-5 font-display text-3xl leading-none">
+            <h2 id="payment" className="mb-5 font-display text-2xl leading-tight">
               Bill
             </h2>
             <PricingSummary pricing={pricing} />

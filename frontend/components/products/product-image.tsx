@@ -3,7 +3,7 @@ import type { Product } from "@/models/entities/product";
 
 const sizes = {
   sm: { box: "h-16 w-16 rounded-xl", sizes: "64px" },
-  md: { box: "aspect-square w-full rounded-xl", sizes: "(min-width: 1280px) 220px, (min-width: 640px) 30vw, 45vw" },
+  md: { box: "aspect-square w-full rounded-lg", sizes: "(min-width: 1280px) 180px, (min-width: 640px) 25vw, 45vw" },
   lg: { box: "aspect-square w-full rounded-3xl", sizes: "(min-width: 768px) 45vw, 100vw" },
 } as const;
 
@@ -29,7 +29,7 @@ export function ProductImage({
           fill
           sizes={imageSizes}
           priority={priority}
-          className={`object-cover mix-blend-multiply transition-transform duration-500 ease-luxe group-hover:scale-[1.05] ${
+          className={`object-cover mix-blend-multiply ${
             product.stock ? "" : "opacity-40 grayscale"
           }`}
         />

@@ -10,7 +10,8 @@ import type { CategoryRepository, DeliveryPolicyRepository, OfferRepository, Pro
 
 /** JSON stores money in rupees; the domain uses paise. These are the only conversion points. */
 export type ProductJson = Product;
-export type OfferJson = Offer;
+/** `productIds` may be left out in JSON for category and whole-cart offers. */
+export type OfferJson = Omit<Offer, "productIds"> & { productIds?: string[] | null };
 export type DeliveryJson = DeliveryPolicy;
 
 export function productFromJson(raw: ProductJson): Product {
@@ -20,6 +21,7 @@ export function productFromJson(raw: ProductJson): Product {
 export function offerFromJson(raw: OfferJson): Offer {
   return {
     ...raw,
+    productIds: raw.productIds ?? null,
     minimumAmount: rupeesToPaise(raw.minimumAmount),
     discountValue: raw.discountType === "flat" ? rupeesToPaise(raw.discountValue) : raw.discountValue,
   };

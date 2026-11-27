@@ -30,6 +30,7 @@ export function registerVoiceRpc(room: Room, ui: VoiceUi): () => void {
     "ui.openCategory": (payload) => voiceController.openCategory(payload, ui),
     "ui.openProduct": (payload) => voiceController.openProduct(payload, ui),
     "ui.openPage": (payload) => voiceController.openPage(payload, ui),
+    "ui.openOffers": (payload) => voiceController.openOffers(payload, ui),
     "ui.getScreen": () => voiceController.getScreen(),
     "ui.highlight": (payload) => voiceController.highlightProducts(payload),
     "list.get": () => voiceController.getShoppingList(ui),
