@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { BRANDS } from "@/data/brands";
 import { catalogService } from "@/lib/container";
+import {
+  JsonCategoryRepository,
+  JsonOfferRepository,
+  JsonProductRepository,
+} from "@/models/repositories/json-catalog-repository";
+import { CatalogService } from "@/services/catalog-service";
 import { ShoppingListService } from "./shopping-list-service";
 import { packsNeeded, parsePack } from "./units";
 
@@ -67,6 +74,57 @@ describe("ShoppingListService (real catalog)", () => {
   it("lets the shopper choose an option", () => {
     const chosen = service.choose(line("Surf Excel"), "p054");
     expect(chosen).toMatchObject({ status: "found", productId: "p054", packs: 1 });
+  });
+});
+
+describe("list words must name the product, not a flavour or a stray substring", () => {
+  it.each([
+    ["oats", "Quaker Oats"], // not Paper Boat ("b-oat")
+    ["aloo", "Potato"], // not Aloo Bhujia
+    ["soap", "Dove Cream Beauty Bar"], // not dish soap
+  ])("Cartiva: %s → %s", (word, product) => {
+    const result = line(word);
+    expect(result.status).toBe("found");
+    expect(catalogService.getProduct(result.productId!)?.name).toBe(product);
+  });
+
+  it("Cartiva: salt is not Lay's Classic Salted", () => {
+    expect(line("salt").status).toBe("not-found");
+  });
+});
+
+describe.each(["pepsico", "coca-cola"])("a normal grocery list on the %s store", (brandId) => {
+  const bundle = BRANDS[brandId];
+  const catalog = new CatalogService(
+    new JsonProductRepository(bundle.products),
+    new JsonCategoryRepository(bundle.categories),
+    new JsonOfferRepository(bundle.offers),
+  );
+  const store = new ShoppingListService(catalog);
+  const scan = (name: string, quantity: number | null = null, unit: string | null = null) =>
+    store.toLine({ name, quantity, unit, original: name }, "t");
+
+  it.each([
+    ["tomato", 1, "kg"],
+    ["onion", 2, "kg"],
+    ["potato", 1, "kg"],
+    ["sugar", 1, "kg"],
+    ["salt", 1, "kg"],
+    ["masala", null, null],
+    ["milk", 1, "l"],
+    ["rice", 5, "kg"],
+    ["Surf Excel", null, null],
+  ])("%s is not sold here (no flavour or diet-drink match)", (name, quantity, unit) => {
+    expect(scan(name, quantity as number | null, unit as string | null).status).toBe("not-found");
+  });
+
+  it("cold drink still offers the store's soft drinks", () => {
+    expect(scan("cold drink", 2).status).toBe("choose");
+  });
+
+  it("water means water, not sports drinks or soda", () => {
+    const water = scan("water");
+    for (const id of water.options) expect(catalog.getProduct(id)?.tags).toContain("water");
   });
 });
 

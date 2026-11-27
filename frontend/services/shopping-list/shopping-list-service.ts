@@ -12,6 +12,15 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 }
 
+/** "tomatoes" → "tomato", "eggs" → "egg", so a list word and a product word compare equal. */
+function singular(word: string): string {
+  if (word.length > 4 && word.endsWith("oes")) return word.slice(0, -2);
+  if (word.length > 3 && word.endsWith("s") && !word.endsWith("ss")) return word.slice(0, -1);
+  return word;
+}
+
+const singularPhrase = (text: string) => normalize(text).split(" ").map(singular).join(" ");
+
 /** Turns scanned list items into reviewable lines: which product, how many packs, available or not. */
 export class ShoppingListService {
   constructor(private readonly catalog: CatalogService) {}
@@ -78,14 +87,35 @@ export class ShoppingListService {
     return { ...line, packs: Math.min(packs, product.availableQuantity), limited: packs > product.availableQuantity };
   }
 
-  /** Search the catalog, keeping only the most common category ("milk" → dairy, not chocolate). */
+  /**
+   * Search the catalog, keeping only products the list item names ("onion" is not Lay's Cream & Onion) and
+   * only the most common category ("milk" → dairy, not chocolate).
+   */
   private candidates(name: string): Product[] {
-    const results = this.catalog.search(name);
+    const results = this.catalog.search(name).filter((p) => this.namesProduct(name, p));
     if (results.length === 0) return [];
     const counts = new Map<string, number>();
     for (const p of results) counts.set(p.category, (counts.get(p.category) ?? 0) + 1);
     const category = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
     return results.filter((p) => p.category === category).slice(0, MAX_OPTIONS);
+  }
+
+  /**
+   * True when the item (or one of its words) is what the product IS: its full name, the first word of its
+   * name, its brand, a whole tag or its aisle. A word found only in a flavour ("Cream & Onion") or inside a
+   * longer tag ("sugar free") doesn't count, so a grocery list on a snacks store doesn't pick up chips.
+   */
+  private namesProduct(item: string, product: Product): boolean {
+    const name = singularPhrase(product.name);
+    const brand = singularPhrase(product.brand ?? "");
+    const aisle = singularPhrase(this.catalog.getCategory(product.category)?.name ?? product.category);
+    const identity = new Set(
+      [name, name.split(" ")[0], brand, ...brand.split(" "), aisle, ...product.tags.map(singularPhrase)].filter(
+        (token) => token.length >= 3,
+      ),
+    );
+    const phrase = singularPhrase(item);
+    return identity.has(phrase) || phrase.split(" ").some((word) => identity.has(word));
   }
 
   /** Picks a product only when the list clearly means one; otherwise the shopper chooses. */
