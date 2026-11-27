@@ -6,6 +6,11 @@ import cartivaCategories from "./cartiva/categories.json";
 import cartivaDelivery from "./cartiva/delivery.json";
 import cartivaOffers from "./cartiva/offers.json";
 import cartivaProducts from "./cartiva/products.json";
+import cocaColaBrand from "./coca-cola/brand.json";
+import cocaColaCategories from "./coca-cola/categories.json";
+import cocaColaDelivery from "./coca-cola/delivery.json";
+import cocaColaOffers from "./coca-cola/offers.json";
+import cocaColaProducts from "./coca-cola/products.json";
 
 /** One storefront's data: its brand settings and its catalog (all in data/brands/<id>/). */
 export interface BrandBundle {
@@ -27,6 +32,13 @@ export const BRANDS: Record<string, BrandBundle> = {
     categories: cartivaCategories as Category[],
     offers: cartivaOffers as OfferJson[],
     delivery: cartivaDelivery as DeliveryJson,
+  },
+  "coca-cola": {
+    brand: cocaColaBrand as Brand,
+    products: cocaColaProducts as ProductJson[],
+    categories: cocaColaCategories as Category[],
+    offers: cocaColaOffers as OfferJson[],
+    delivery: cocaColaDelivery as DeliveryJson,
   },
 };
 

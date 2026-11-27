@@ -51,6 +51,11 @@ function normalize(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").replace(/\s+/g, " ").trim();
 }
 
+/** The pack size as search words, with "L" also spelled out: "1.25 L" → "1.25 L 1.25 litre 1.25 liter". */
+function packWords(unit: string): string {
+  return [unit, unit.replace(/\bL\b/g, "litre"), unit.replace(/\bL\b/g, "liter")].join(" ");
+}
+
 /** Simple plural handling so "tomatoes" matches "tomato" and "liquids" matches "liquid". */
 function termVariants(term: string): string[] {
   const variants = [term];
@@ -233,7 +238,8 @@ export class CatalogService {
 
   private searchableText(product: Product): string {
     const categoryName = this.categories.findById(product.category)?.name ?? product.category;
-    return normalize([product.name, product.brand ?? "", categoryName, ...product.tags].join(" "));
+    // The pack size counts too, so "Maaza 600 ml" or "Thums Up 1.25 litre" finds that exact pack.
+    return normalize([product.name, product.brand ?? "", categoryName, packWords(product.unit), ...product.tags].join(" "));
   }
 
   /** Higher is better; 0 means no match. */

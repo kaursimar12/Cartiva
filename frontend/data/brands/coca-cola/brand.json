@@ -1,0 +1,121 @@
+{
+  "id": "coca-cola",
+  "storeName": "Coca-Cola Store",
+  "wordmark": "coca-cola store",
+  "conceptFor": "The Coca-Cola Company",
+  "meta": {
+    "title": "Coca-Cola Store — shop your drinks by voice (concept)",
+    "description": "A concept voice-shopping store for Coca-Cola drinks in India: Coca-Cola, Thums Up, Sprite, Maaza, Minute Maid, Kinley and more."
+  },
+  "tagline": "Coca-Cola, Thums Up, Sprite, Maaza and more, delivered in about 10 minutes.",
+  "orderDescription": "Drinks order",
+  "deliveryTime": "10 minutes",
+  "deliveryAreas": [
+    "Sector 62, Noida",
+    "Sector 18, Noida",
+    "Indirapuram, Ghaziabad",
+    "Connaught Place, New Delhi",
+    "DLF Phase 3, Gurugram"
+  ],
+  "freshnessPromise": {
+    "title": "Factory sealed",
+    "text": "Every can and bottle sealed and genuine"
+  },
+  "assistant": {
+    "name": "Meera",
+    "languages": "English, Hindi or Hinglish"
+  },
+  "voiceExamples": [
+    "“Add 2 Thums Up”",
+    "“Show only discounted juices”",
+    "“Do Maaza add kar do”"
+  ],
+  "search": {
+    "placeholder": "Search \"Thums Up\", \"Maaza\", \"Sprite\"…",
+    "suggestions": ["Coca-Cola", "Thums Up", "Sprite", "Maaza", "Kinley", "Schweppes"]
+  },
+  "featuredAisle": {
+    "categoryId": "juices",
+    "label": "juices and fruit drinks"
+  },
+  "wholeOrderImageCategory": "colas",
+  "dealExample": "20% off Maaza 1.2 L",
+  "listScan": {
+    "itemKind": "drinks",
+    "examples": ["Coca-Cola", "Thums Up", "Maaza", "mineral water"],
+    "hindiExamples": "\"thanda\" → \"cold drink\", \"paani\" → \"water\", \"aam ka juice\" → \"mango drink\""
+  },
+  "palette": {
+    "light": {
+      "50": "#fff1f1",
+      "100": "#ffdfe0",
+      "200": "#ffc5c6",
+      "400": "#ff5a5f",
+      "500": "#f40009",
+      "600": "#d10008",
+      "700": "#ad0007",
+      "800": "#8f080d",
+      "900": "#770d12"
+    },
+    "dark": {
+      "50": "#2a0a0b",
+      "100": "#3d0e10",
+      "200": "#5c1418",
+      "400": "#ff6b6f",
+      "500": "#ff3b41",
+      "600": "#d10008",
+      "700": "#ff6b6f",
+      "800": "#ff8a8e",
+      "900": "#ffd5d6"
+    }
+  },
+  "agent": {
+    "greeting": "Hi, I'm Meera from the Coca-Cola Store! What would you like to drink today?",
+    "ttsVoice": "3b554273-4299-48b9-9aaf-eefd438e3941",
+    "sttPriorityKeyterms": [
+      "cart",
+      "checkout",
+      "Meera",
+      "okay",
+      "bye",
+      "Coca-Cola",
+      "Coke",
+      "Thums Up",
+      "Sprite",
+      "Limca",
+      "Fanta",
+      "Maaza",
+      "Minute Maid",
+      "Kinley",
+      "Schweppes",
+      "can",
+      "bottle",
+      "litre",
+      "thanda",
+      "paani",
+      "scan",
+      "shopping list"
+    ],
+    "prompt": {
+      "store_description": "the Coca-Cola Store, a concept store in India that sells only The Coca-Cola Company's drinks",
+      "shop_for": "drinks",
+      "language_examples": "- Shopper: \"What can you do?\" → \"I can help you shop for Coca-Cola drinks. What would you like today?\"\n- Shopper: \"आप क्या कर सकते हो?\" → \"मैं आपको Coca-Cola के drinks खरीदने में मदद कर सकती हूँ। आपको क्या चाहिए?\"\n- Shopper: \"Mujhe Maaza chahiye\" → (search first) \"मुझे Maaza मिल गया, screen पर देखिए। कौन सा size चाहिए?\"",
+      "search_example": "\"I found four Thums Up packs, they're on your\nscreen. Which one would you like?\"",
+      "current_page_example": "e.g. they are on Juices and say \"add 2 Sprite cans\"",
+      "plain_product_example": "(for \"a Coke can\" choose \"Coca-Cola Can\", not \"Diet Coke Can\" or \"Coke Zero Can\")",
+      "pack_size_example": "(for \"750 ml\" choose the 750 ml bottle, for \"a can\" the 300 ml can)",
+      "ambiguous_example": "(for example \"Thums Up\" comes as a 300 ml can and\n750 ml, 1.25 L and 2.25 L bottles)",
+      "category_example": "(\"go to juices\")",
+      "offers_aisle_example": "(\"show only\ndiscounted juices\", \"cola offers\")",
+      "category_open_example": "\"Here are the colas,\nten drinks on screen. What would you like?\"",
+      "tie_example": "\"Sprite and Limca both cost forty rupees. Which one should I add?\"",
+      "hindi_number_example": "\"do Sprite can add kar do\" means 2 Sprite cans (quantity 2),\nnot 1: a \"do\" right before a product or pack is the number 2.",
+      "highlight_example": "(\"the cheapest is Kinley Mineral Water\")",
+      "list_readout_example": "(\"two Thums Up cans, a bottle of Maaza\")",
+      "list_choice_example": "(for example which size of Thums Up they want)",
+      "misheard_words": "(\"thumbs up\" or \"thumps up\" for \"Thums Up\",\n  \"partner\" for \"cart\")",
+      "misheard_remove_example": "\"Remove the masala\" with Maaza in the cart →\n    \"Did you mean the Maaza?\"",
+      "misheard_extra_word_example": "(\"add two Sprite cans to\n    my partner\", where \"partner\" is \"cart\")"
+    }
+  }
+}

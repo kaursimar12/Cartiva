@@ -1,0 +1,32 @@
+[
+  {
+    "id": "colas",
+    "name": "Colas",
+    "description": "Coca-Cola, Diet Coke, Coke Zero and Thums Up in cans and bottles.",
+    "image": "https://images.unsplash.com/photo-1622483767028-3f66f32aef97"
+  },
+  {
+    "id": "fizzy-flavours",
+    "name": "Fizzy Flavours",
+    "description": "Sprite, Limca and Fanta for a fruity, fizzy break.",
+    "image": "https://images.unsplash.com/photo-1567671899076-51a64ddb7c5d"
+  },
+  {
+    "id": "juices",
+    "name": "Juices & Fruit Drinks",
+    "description": "Maaza mango and Minute Maid Pulpy Orange.",
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696"
+  },
+  {
+    "id": "water-and-soda",
+    "name": "Water & Soda",
+    "description": "Kinley water, Kinley club soda and smartwater.",
+    "image": "https://images.unsplash.com/photo-1616118132534-381148898bb4"
+  },
+  {
+    "id": "mixers",
+    "name": "Mixers",
+    "description": "Schweppes tonic water and ginger ale.",
+    "image": "https://images.unsplash.com/photo-1581636625402-29b2a704ef13"
+  }
+]

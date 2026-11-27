@@ -1,0 +1,113 @@
+[
+  {
+    "id": "cc-offer-colas",
+    "title": "10% OFF Colas",
+    "description": "10% off on colas when colas in your cart total ₹250 or more.",
+    "category": "colas",
+    "minimumAmount": 250,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "cc-offer-order",
+    "title": "₹30 OFF",
+    "description": "Flat ₹30 off on orders of ₹499 or more.",
+    "category": null,
+    "minimumAmount": 499,
+    "discountType": "flat",
+    "discountValue": 30,
+    "active": true
+  },
+  {
+    "id": "cc-deal-01",
+    "title": "15% OFF Coca-Cola 2.25 L",
+    "description": "15% off Coca-Cola 2.25 L. No minimum order.",
+    "category": "colas",
+    "productIds": [
+      "cc04"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 15,
+    "active": true
+  },
+  {
+    "id": "cc-deal-02",
+    "title": "10% OFF Thums Up 1.25 L",
+    "description": "10% off Thums Up 1.25 L. No minimum order.",
+    "category": "colas",
+    "productIds": [
+      "cc09"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "cc-deal-03",
+    "title": "15% OFF Sprite 2.25 L",
+    "description": "15% off Sprite 2.25 L. No minimum order.",
+    "category": "fizzy-flavours",
+    "productIds": [
+      "cc13"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 15,
+    "active": true
+  },
+  {
+    "id": "cc-deal-04",
+    "title": "20% OFF Maaza 1.2 L",
+    "description": "20% off Maaza Mango Drink 1.2 L. No minimum order.",
+    "category": "juices",
+    "productIds": [
+      "cc20"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 20,
+    "active": true
+  },
+  {
+    "id": "cc-deal-05",
+    "title": "10% OFF Minute Maid 1 L",
+    "description": "10% off Minute Maid Pulpy Orange 1 L. No minimum order.",
+    "category": "juices",
+    "productIds": [
+      "cc22"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "cc-deal-06",
+    "title": "10% OFF Kinley 2 L",
+    "description": "10% off Kinley Mineral Water 2 L. No minimum order.",
+    "category": "water-and-soda",
+    "productIds": [
+      "cc24"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "cc-deal-07",
+    "title": "10% OFF Tonic Water",
+    "description": "10% off Schweppes Indian Tonic Water. No minimum order.",
+    "category": "mixers",
+    "productIds": [
+      "cc27"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  }
+]

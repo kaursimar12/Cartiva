@@ -13,6 +13,13 @@ describe("CatalogService (real catalog)", () => {
     expect(catalogService.search("tom").length).toBeGreaterThan(0);
   });
 
+  it("matches pack sizes, with litres spelled out or not", () => {
+    const sizes = (q: string) => catalogService.search(q).map((p) => p.unit);
+    expect(sizes("surf excel 2 kg")).toEqual(["2 kg"]);
+    expect(sizes("toned milk 1 litre")).toEqual(["1 L"]);
+    expect(sizes("surf excel").length).toBeGreaterThan(1); // no size: every pack
+  });
+
   it("returns nothing for an unknown query", () => {
     expect(catalogService.search("xyzzy")).toEqual([]);
   });

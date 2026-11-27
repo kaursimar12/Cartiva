@@ -202,6 +202,8 @@ class CartivaAssistant(Agent):
         Args:
             query: One product to look for, always in English, e.g. "tomato", "vegetables",
                 "dishwashing liquid", "Surf Excel". Never combine products ("tomato potato").
+                Keep the pack size or "can"/"bottle" when the shopper said one ("Thums Up 750 ml",
+                "Sprite can"): the search matches pack sizes, so that exact pack comes back.
                 Translate Hindi words first, e.g. "टमाटर" → "tomato", "दूध" → "milk",
                 "सब्ज़ियाँ" → "vegetables".
             max_price: Highest price in rupees, only if the shopper gives one,
@@ -309,6 +311,8 @@ class CartivaAssistant(Agent):
     ) -> dict | str:
         """Opens a category page on the shopper's screen, e.g. "go to fruits", "show me dairy",
         "डेयरी दिखाओ". Returns the category name and how many products are on screen.
+        Only for a whole aisle. When the shopper names a product ("show tomatoes", "टमाटर दिखाओ",
+        "Maaza dikhao"), use search_products instead, even if you know its aisle.
 
         Args:
             category: The category id to open, one of this store's aisles listed in your instructions.
@@ -391,8 +395,9 @@ class CartivaAssistant(Agent):
             result.pop("products", None)  # only for the on-screen glow; the model reads "deals"
             result["say"] = (
                 "Say the offers are on screen, how many discounted products there are, and name at most "
-                "two deals with their deal price. Mention the free-delivery rule only if they asked about "
-                "delivery or this is the full offers page. Do not add anything to the cart."
+                "two deals by product and discount (for example \"twenty percent off Maaza\"), without prices "
+                "unless they ask. Keep it to two short sentences. Mention the free-delivery rule only if they "
+                "asked about delivery. Do not add anything to the cart."
             )
             return self._in_reply_language(result)
         except BrowserRpcError:

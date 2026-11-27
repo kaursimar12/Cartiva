@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { ChevronRightIcon, TagIcon } from "@/components/common/icons";
 import { ProductRail } from "@/components/products/product-grid";
+import { brand } from "@/lib/brand";
 import { catalogService } from "@/lib/container";
 
 /** "Deals of the day" as an ad band: bold headline with the real numbers, then the discounted products. */
 export function DealsShowcase() {
   const deals = catalogService.getDealProducts().filter((p) => p.stock);
+  const ink = brand.palette?.light[900] ?? "#14532d"; // dark text on the band's light chips
   if (deals.length === 0) return null;
 
   const best = Math.max(
@@ -16,10 +18,16 @@ export function DealsShowcase() {
     <section
       aria-labelledby="deals-heading"
       className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#14532d] to-[#166534] px-4 pt-6 pb-4 text-white sm:px-6"
+      // Brands with their own colours get the band in their deepest shades (fixed hex, same in light and dark mode).
+      style={
+        brand.palette
+          ? { backgroundImage: `linear-gradient(to bottom right, ${brand.palette.light[900]}, ${brand.palette.light[700]})` }
+          : undefined
+      }
     >
       <div className="flex flex-wrap items-end justify-between gap-4 px-1">
         <div>
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-[#facc15] px-3 py-1 text-xs font-bold tracking-wide text-[#14532d] uppercase">
+          <p className="inline-flex items-center gap-1.5 rounded-full bg-[#facc15] px-3 py-1 text-xs font-bold tracking-wide uppercase" style={{ color: ink }}>
             <TagIcon className="h-3.5 w-3.5" />
             Deals of the day
           </p>
@@ -30,7 +38,8 @@ export function DealsShowcase() {
         </div>
         <Link
           href="/offers"
-          className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#14532d] hover:bg-white/90"
+          className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-semibold hover:bg-white/90"
+          style={{ color: ink }}
         >
           See all deals
           <ChevronRightIcon className="h-4 w-4" />

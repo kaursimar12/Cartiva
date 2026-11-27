@@ -68,7 +68,11 @@ class StoreData:
             return []
 
         def haystack(p: dict[str, Any]) -> str:
-            return " ".join([p["name"], p.get("brand") or "", self.categories[p["category"]], *p.get("tags", [])]).lower()
+            # Same words as CatalogService.searchableText, including the pack size ("1.25 L" → also "litre").
+            unit = p["unit"]
+            pack = " ".join([unit, re.sub(r"\bL\b", "litre", unit), re.sub(r"\bL\b", "liter", unit)])
+            text = " ".join([p["name"], p.get("brand") or "", self.categories[p["category"]], pack, *p.get("tags", [])])
+            return re.sub(r"[^a-z0-9\s-]", " ", text.lower())
 
         hits = [p for p in self.products if all(any(v in haystack(p) for v in _variants(t)) for t in terms)]
         return sorted(hits, key=lambda p: p["price"])
