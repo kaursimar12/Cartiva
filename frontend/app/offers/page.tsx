@@ -6,6 +6,7 @@ import { Reveal } from "@/components/common/reveal";
 import { SectionHeader } from "@/components/common/section-header";
 import { OfferList } from "@/components/offers/offer-list";
 import { ProductBrowser } from "@/components/products/product-browser";
+import { brand } from "@/lib/brand";
 import { catalogService, pricingService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
 
@@ -40,10 +41,21 @@ export default async function OffersPage(props: PageProps<"/offers">) {
 
   return (
     <div className="space-y-12">
-      {/* Ad-style hero: the real best discount and deal count, with photos of the discounted products. */}
-      <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#9a3412] to-[#c2410c] text-white">
+      {/* Ad-style hero: the real best discount and deal count, with photos of the discounted products.
+          Cartiva's is sale orange; brands with their own colours get their deepest shades (like the home deals band). */}
+      <header
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#9a3412] to-[#c2410c] text-white"
+        style={
+          brand.palette
+            ? { backgroundImage: `linear-gradient(to bottom right, ${brand.palette.light[900]}, ${brand.palette.light[700]})` }
+            : undefined
+        }
+      >
         <div className="relative z-10 max-w-2xl p-7 sm:p-10">
-          <p className="inline-flex rounded-full bg-[#facc15] px-3 py-1 text-xs font-bold tracking-wide text-[#7c2d12] uppercase">
+          <p
+            className="inline-flex rounded-full bg-[#facc15] px-3 py-1 text-xs font-bold tracking-wide text-[#7c2d12] uppercase"
+            style={brand.palette ? { color: brand.palette.light[900] } : undefined}
+          >
             {category ? `${category.name} offers` : "Today’s offers"}
           </p>
           <h1 className="mt-4 text-4xl leading-tight font-bold tracking-tight sm:text-5xl">

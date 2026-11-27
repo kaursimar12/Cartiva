@@ -25,9 +25,13 @@ const THEMES: BannerTheme[] = [
   { bg: "#134e4a", accent: "#99f6e4", light: "#99f6e4" },
 ];
 
-/** A brand with its own colours leads with them (its deepest shade); the default store keeps the green. */
+/** A brand with its own colours uses them (a deep and a bright shade); the default store keeps the green. */
 const BRAND_THEMES: BannerTheme[] = brand.palette
-  ? [{ bg: brand.palette.light[800], accent: brand.palette.light[200], light: brand.palette.light[100] }, ...THEMES.slice(1)]
+  ? [
+      { bg: brand.palette.light[800], accent: brand.palette.light[200], light: brand.palette.light[100] },
+      { bg: brand.palette.light[600], accent: brand.palette.light[100], light: brand.palette.light[50] },
+      ...THEMES.slice(2),
+    ]
   : THEMES;
 
 function themeFor(offer: Offer): BannerTheme {

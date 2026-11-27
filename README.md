@@ -13,6 +13,7 @@ cart and checks out, while you watch it happen on screen.
 ## Contents
 - [Features](#-features)
 - [How it works](#-how-it-works)
+- [Three stores, one codebase](#-three-stores-one-codebase)
 - [Flowcharts](#-flowcharts)
 - [Voice tools](#-voice-tools)
 - [Tech stack](#-tech-stack)
@@ -214,6 +215,48 @@ flowchart TB
 
 ---
 
+## 🏷️ Three stores, one codebase
+
+The same app runs as three demo stores. Each is a separate website build; they share **one API** and **one voice
+agent**, which picks the store per call.
+
+| Store | Brand id | Assistant | Link |
+|---|---|---|---|
+| Cartiva (grocery) | `cartiva` | Cartiva | https://cartiva-kohl.vercel.app |
+| Coca-Cola concept store | `coca-cola` | CocaVoice | https://cartiva-for-cocacola.vercel.app |
+| PepsiCo concept store | `pepsico` | PepsiCoVoice | https://cartiva-for-pepsico.vercel.app |
+
+> The Coca-Cola and PepsiCo stores are **concept demos by Cartiva, not affiliated with those companies**. They use
+> brand colours and names only (no logos), stock photos and illustrative prices.
+
+```mermaid
+flowchart LR
+    V1["Vercel: cartiva-kohl<br/>NEXT_PUBLIC_BRAND=cartiva"] --> API
+    V2["Vercel: cartiva-for-cocacola<br/>NEXT_PUBLIC_BRAND=coca-cola"] --> API
+    V3["Vercel: cartiva-for-pepsico<br/>NEXT_PUBLIC_BRAND=pepsico"] --> API
+    API["Render: one FastAPI<br/>token · payment · list scan"] -- "dispatch metadata {brand}" --> AG["LiveKit Cloud: one agent<br/>greeting · voice · prompt · catalogue per brand"]
+```
+
+- **Brand registry:** `frontend/data/brands/<brand>/` holds `products.json`, `categories.json`, `offers.json`,
+  `delivery.json` and `brand.json` (store name, colours, copy, assistant name, greeting, voice, speech keyterms and
+  the agent's prompt examples). The website, the API (`BRANDS_DIR`) and the agent all read the same files.
+- **Website:** `NEXT_PUBLIC_BRAND` picks the store at build time (default `cartiva`; an unknown id fails the build).
+- **API:** the token, payment and list-scan endpoints take an optional `brand` (default `cartiva`; unknown →
+  `400 UNKNOWN_BRAND`). Payment totals are recomputed from that brand's catalogue.
+- **Voice agent:** the token puts `{"brand": …}` in the agent dispatch; the agent builds that store's instructions,
+  greeting, voice and aisle list for the call.
+
+### Add a store
+1. Create `frontend/data/brands/<id>/` with the five files (copy `coca-cola/` as a model) and register it in
+   `frontend/data/brands/index.ts`.
+2. Add `backend/evals/scenarios/<id>.yaml` and run the evals (below).
+3. Push, then `lk agent deploy` (from the repo root) so the cloud agent knows the new store.
+4. Create a Vercel project from this repo (root `frontend`) with `NEXT_PUBLIC_BRAND=<id>` and
+   `NEXT_PUBLIC_BACKEND_URL=<API URL>`.
+5. Add the new site's URL to the API's `CORS_ORIGINS` on Render and redeploy the API.
+
+---
+
 ## 🔀 Flowcharts
 
 ### 1. One app, two ways to shop
@@ -392,11 +435,13 @@ cartiva/
 │   ├── models/               # Entities + repository interfaces (JSON / Zustand implementations)
 │   ├── store/                # Zustand state containers
 │   ├── lib/                  # Composition root (container.ts), voice RPC wiring
-│   └── data/                 # products.json, categories.json, offers.json, delivery.json, pricing-cases.json
+│   └── data/                 # brands/<brand>/ (catalogue + brand.json per store), pricing-cases.json
 ├── backend/
 │   ├── app/                  # FastAPI: LiveKit token, Razorpay, list scanning
-│   ├── agent/                # LiveKit voice agent: worker.py, rpc.py, language.py
+│   ├── agent/                # LiveKit voice agent: worker.py, instructions.py, brand_profile.py, rpc.py, language.py
+│   ├── evals/                # Budget voice evals: scenarios/<brand>.yaml, run.py, results/
 │   └── tests/                # pytest
+├── docs/                     # HANDOFF.md, DEMO-SCRIPTS.md
 ├── PRD.md · PLAN.md · SRS-PRD.md   # Product requirements and build plan
 └── README.md
 ```
@@ -460,6 +505,8 @@ Open **http://localhost:3000**, tap **Ask Cartiva**, allow the microphone, and s
 | Card | `4100 2800 0000 1007` |
 | Expiry / CVV | any future date / any 3 digits |
 | Bank page | click **Success** (or **Failure** to test the error path) |
+| Netbanking (quickest) | pick any bank → **Success** |
+| UPI | `success@razorpay` |
 
 ### Try saying
 - "Show me vegetables" → "Add 2 kg potatoes"
@@ -487,6 +534,21 @@ uv run pytest tests/test_pricing.py tests/test_payment.py tests/test_shopping_li
 `backend/tests/test_conversation.py` runs real conversations through the AI model. It **uses LiveKit
 Inference credit**, so run it only when needed.
 
+### Voice evals (budget, code-graded)
+`backend/evals/` checks the real agent prompt and tools against a fake browser, for every store:
+`scenarios/<brand>.yaml` lists turns and expected outcomes (cart contents, payments started, tools called and
+their arguments, asks a question, Hindi script, short replies). **Graded by code, no judge model.** Each
+scenario runs once; a failure is re-run twice and reported as `pass`, `flaky` or `fail`.
+
+```bash
+cd backend
+uv run python -m evals.run --brand all          # or --brand pepsico, --only <scenario id or category>
+```
+
+It uses the OpenAI API directly (about **$0.07 per store**, ~$0.22 for all three), not LiveKit's voice credit.
+Results go to `backend/evals/results/<time>_<brand>.md` and `.json`. **Gate:** safety scenarios 100%, overall
+≥ 90%. Latest full run (`2026-11-27_1959_all`): Cartiva 30/30, Coca-Cola 31/31, PepsiCo 32/33.
+
 Pricing has **shared golden cases** (`frontend/data/pricing-cases.json`) checked by both the TypeScript and the
 Python implementation, so the browser and the server always agree on totals.
 
@@ -495,9 +557,9 @@ Python implementation, so the browser and the server always agree on totals.
 ## 📌 Status and limitations
 - ✅ Store, cart, offers, checkout, Razorpay test payments, voice shopping, agentic UI, list scanning, English /
   Hindi / Hinglish.
-- 🔜 **Deploy the voice agent to LiveKit Cloud.** It currently runs locally, so its voice depends on the laptop's
-  CPU and network. Hosting it removes that.
+- ✅ Deployed on free tiers: three Vercel sites, one Render API, one LiveKit Cloud agent serving all three stores.
 - 🔜 Real product photos (current images are stock photos).
+- ℹ️ Known eval miss (PepsiCo): a bare "Add Pepsi" adds the 300 ml can instead of asking which size.
 - ℹ️ No database or user accounts: the cart lives in the browser, and the last order in the session.
 - ℹ️ On LiveKit's free plan, the speech and voice quota can run out after heavy testing. The app keeps working by
   tapping; voice returns when the quota resets.

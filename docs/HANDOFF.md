@@ -15,8 +15,8 @@ to make demo videos for companies:
 | Store | Brand id | Assistant name | Link | Status |
 |---|---|---|---|---|
 | Cartiva (grocery) | `cartiva` | Cartiva | https://cartiva-kohl.vercel.app | ✅ live |
-| Coca-Cola concept store | `coca-cola` | **CocaVoice** | https://cartiva-for-cocacola.vercel.app | ⚠️ live, but CORS not yet updated (see §4) |
-| PepsiCo concept store | `pepsico` | **PepsiCoVoice** | not created yet | 🟡 Phase 5 built locally; needs push, `lk agent deploy`, Vercel project + CORS |
+| Coca-Cola concept store | `coca-cola` | **CocaVoice** | https://cartiva-for-cocacola.vercel.app | ✅ live |
+| PepsiCo concept store | `pepsico` | **PepsiCoVoice** | https://cartiva-for-pepsico.vercel.app | ✅ live (commit `ec3fdf2`) |
 
 Everything runs on **free tiers**. India market (₹, Hindi/Hinglish voice). Concept stores use brand colours and name
 but **no official logos**, and show "Concept demo by Cartiva, not affiliated with …; illustrative prices".
@@ -63,7 +63,7 @@ but **no official logos**, and show "Concept demo by Cartiva, not affiliated wit
   misheard_words, misheard_remove_example, misheard_extra_word_example`.
   Copy `frontend/data/brands/coca-cola/brand.json` as the model for a new brand.
 
-## 4. Pending right now (finish Phase 4)
+## 4. Phase 4 follow-up — ✅ done 2026-11-27 (CORS for all three sites verified on the live API)
 
 1. **User:** on Render → `cartiva-api` → Environment, set
    `CORS_ORIGINS=["https://cartiva-kohl.vercel.app","https://cartiva-for-cocacola.vercel.app","http://localhost:3000"]`
@@ -76,14 +76,14 @@ but **no official logos**, and show "Concept demo by Cartiva, not affiliated wit
 
 ## 5. What's left
 
-### Phase 5 — PepsiCo concept store (link 3) — built, not yet pushed
+### Phase 5 — PepsiCo concept store (link 3) — ✅ done, pushed (`ec3fdf2`), agent deployed, live
 Done: 34 SKUs (`pc01`–`pc34`), aisles soft-drinks · juices · sports-and-water · chips · namkeen · breakfast
 (Sting and Cheetos left out: no trustworthy photos), 7 deals + 2 store offers, `brand.json`, `pepsico.yaml`
 (33 scenarios). Evals `2026-11-27_1959_all` (Cartiva 30/30, Coca-Cola 31/31, PepsiCo 32/33) and
 `2026-11-27_2010_pepsico` (32/33). Known miss: a bare "Add Pepsi" adds the can instead of asking the size.
 Shared fix in `worker.py`: the search "plain match" hint now says to keep the shopper's quantity (Hindi "do" = 2);
 "do Pepsi can" added 1 because "Pepsi can" matched Pepsi Can and Pepsi Black Can.
-Remaining: push → `lk agent deploy` → Vercel project + CORS (below). Original spec:
+Render `CORS_ORIGINS` now lists all three Vercel links + localhost. Original spec:
 - `frontend/data/brands/pepsico/` (5 files) + register in `frontend/data/brands/index.ts`.
 - ~35–40 India SKUs, prefix ids `pc01…`: Pepsi, Pepsi Black, 7UP, Mirinda, Mountain Dew, Sting, Slice, Tropicana,
   Gatorade, Aquafina; Lay's (several flavours), Uncle Chipps, Doritos, Kurkure, Cheetos; Quaker Oats.
@@ -111,7 +111,9 @@ Remaining: push → `lk agent deploy` → Vercel project + CORS (below). Origina
   Vercel project `cartiva-for-pepsico` (`NEXT_PUBLIC_BRAND=pepsico`, `NEXT_PUBLIC_BACKEND_URL=https://cartiva-api-mrnb.onrender.com`)
   and adds its URL to Render `CORS_ORIGINS`.
 
-### Phase 6 — Demo kit
+### Phase 6 — Demo kit — ✅ done locally (README "Three stores, one codebase" + evals section,
+`docs/DEMO-SCRIPTS.md`, offers hero + store-offer banners in each brand's colours). Final eval = the
+`2026-11-27_1959_all` run (agent unchanged since). All three links verified live (page, CORS, token dispatch).
 - README section: multi-brand setup (add a brand = folder + index.ts entry + Vercel project + CORS) and evals.
 - A ~90-second **video script per brand** (voice order, "show only discounted …", scan a list, checkout with a
   Razorpay test payment: Netbanking → Success, or UPI `success@razorpay`, or card `5267 3181 8797 5449`).
