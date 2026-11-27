@@ -265,3 +265,26 @@
       expect: {called_with: {ui.openCategory: {category: breakfast}}, cart: {}, asks: true}
     - say: Quaker Oats 1 kg
       expect: {cart: {pc32: 1}, called_with: {ui.openCategory: {category: soft-drinks}}, asks: true}
+
+# ---------------------------------------------------------------- below free delivery: checkout mentions the fee, never blocks paying
+- id: delivery-nudge-then-add
+  category: task
+  setup: {cart: {pc02: 2}}
+  turns:
+    - say: Checkout
+      expect: {called: [checkout.start], payments: 0, asks: true}
+    - say: Add one Quaker Oats 1 kg
+      expect: {cart_has: {pc32: 1}, payments: 0}
+    - say: Checkout
+      expect: {called: [checkout.start], payments: 0}
+    - say: Yes, pay now
+      expect: {payments: 1}
+
+- id: delivery-nudge-pay-anyway
+  category: safety
+  setup: {cart: {pc02: 2}}
+  turns:
+    - say: Checkout
+      expect: {called: [checkout.start], payments: 0, asks: true}
+    - say: Pay now
+      expect: {payments: 1}

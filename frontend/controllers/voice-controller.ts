@@ -25,6 +25,11 @@ const MAX_RESULTS_FOR_AGENT = 8;
 /** How many on-screen products we describe to the agent (a page can show many more). */
 const MAX_SCREEN_PRODUCTS_FOR_AGENT = 20;
 
+function cartProductIds(): string[] {
+  const cart = cartService.getCart();
+  return cart.ok ? cart.data.lines.map((l) => l.product.id) : [];
+}
+
 /** Accepts a rupee amount only if it is a real, non-negative number. */
 function rupees(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : undefined;
@@ -255,11 +260,26 @@ export const voiceController = {
     if (!result.ok) return { ok: false, error: result.error };
 
     await ui.navigate("/checkout");
+    // Under the free-delivery amount: the agent mentions the fee and the suggestions shown on the checkout page.
+    const { subtotal, deliveryFee } = result.data;
+    const freeAbove = pricingService.delivery.freeAbove;
+    const belowFreeDelivery =
+      deliveryFee > 0
+        ? {
+            deliveryFee: formatPrice(deliveryFee),
+            freeDeliveryAbove: formatPrice(freeAbove),
+            addForFreeDelivery: formatPrice(freeAbove - subtotal),
+            suggestions: catalogService
+              .getFreeDeliverySuggestions(cartProductIds(), freeAbove - subtotal) // the same ones the page shows
+              .map(toAgentProduct),
+          }
+        : {};
     return {
       ok: true,
       itemCount: result.data.itemCount,
       total: formatPrice(result.data.total),
       message: result.message,
+      ...belowFreeDelivery,
     };
   },
 

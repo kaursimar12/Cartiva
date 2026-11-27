@@ -46,6 +46,25 @@ describe("CatalogService (real catalog)", () => {
     expect(suggestions[0].category).toBe("vegetables");
   });
 
+  it("suggests products that unlock free delivery: the cheapest ones that close the gap first", () => {
+    const remaining = 5000; // ₹50 short
+    const picks = catalogService.getFreeDeliverySuggestions(["p001"], remaining, 4);
+    expect(picks).toHaveLength(4);
+    expect(picks.every((p) => p.stock && p.id !== "p001")).toBe(true);
+    expect(picks.every((p) => p.price >= remaining)).toBe(true);
+    expect(picks.map((p) => p.price)).toEqual([...picks.map((p) => p.price)].sort((a, b) => a - b));
+    const cheapestCloser = Math.min(
+      ...catalogService.getAllProducts().filter((p) => p.stock && p.id !== "p001" && p.price >= remaining).map((p) => p.price),
+    );
+    expect(picks[0].price).toBe(cheapestCloser);
+  });
+
+  it("when nothing closes the gap alone, suggests the priciest products that get closest", () => {
+    const picks = catalogService.getFreeDeliverySuggestions([], 10_000_000, 3);
+    const top = catalogService.getAllProducts().filter((p) => p.stock).map((p) => p.price).sort((a, b) => b - a).slice(0, 3);
+    expect(picks.map((p) => p.price)).toEqual(top);
+  });
+
   it("lists the offers a product counts toward, never inactive ones", () => {
     const offers = catalogService.getOffersFor(catalogService.getProduct("p001")!); // tomato
     expect(offers.map((o) => o.id).sort()).toEqual(["offer001", "offer003"]);

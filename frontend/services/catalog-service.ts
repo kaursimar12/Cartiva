@@ -103,6 +103,22 @@ export class CatalogService {
     return [...sameAisle, ...featured].slice(0, limit);
   }
 
+  /**
+   * Products that help a cart reach free delivery: in stock and not already in it. First the products
+   * that close the gap on their own, cheapest first (deals first at the same price); then the priciest of
+   * the rest, which get closest. `remaining` is measured on list prices, like the delivery rule.
+   */
+  getFreeDeliverySuggestions(cartProductIds: string[], remaining: Paise, limit = 4): Product[] {
+    const inCart = new Set(cartProductIds);
+    const hasDeal = (p: Product) => (this.getDeal(p) ? 1 : 0);
+    const candidates = this.products.findAll().filter((p) => p.stock && !inCart.has(p.id));
+    const closesGap = candidates
+      .filter((p) => p.price >= remaining)
+      .sort((a, b) => a.price - b.price || hasDeal(b) - hasDeal(a));
+    const getsCloser = candidates.filter((p) => p.price < remaining).sort((a, b) => b.price - a.price);
+    return [...closesGap, ...getsCloser].slice(0, limit);
+  }
+
   getCategories(): Category[] {
     return this.categories.findAll();
   }

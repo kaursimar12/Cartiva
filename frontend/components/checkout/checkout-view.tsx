@@ -15,6 +15,7 @@ import { formatPrice } from "@/lib/format";
 import { useAgentEventStore } from "@/store/agent-event-store";
 import { useCheckoutStore } from "@/store/checkout-store";
 import { CheckoutSteps } from "./checkout-steps";
+import { FreeDeliveryNudge } from "./free-delivery-nudge";
 import { PayPanel } from "./pay-panel";
 import { brand } from "@/lib/brand";
 
@@ -114,6 +115,10 @@ export function CheckoutView() {
               ))}
             </ul>
           </div>
+
+          {freeDeliveryRemaining !== null && idle && (
+            <FreeDeliveryNudge remaining={freeDeliveryRemaining} cartProductIds={lines.map((l) => l.product.id)} />
+          )}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-surface p-4">

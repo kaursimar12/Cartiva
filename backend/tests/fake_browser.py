@@ -253,8 +253,21 @@ class FakeBrowser:
         if not self.cart:
             return {"ok": False, "error": {"code": "EMPTY_CART", "message": "Your cart is empty."}}
         total = self._cart_get({})["total"]
-        return {"ok": True, "itemCount": len(self.cart), "total": total,
-                "message": f"Your total is {total}. Would you like to proceed to payment?"}
+        result: dict[str, Any] = {"ok": True, "itemCount": len(self.cart), "total": total,
+                                  "message": f"Your total is {total}. Would you like to proceed to payment?"}
+        # Same as voiceController.startCheckout: below the free-delivery amount, add the gap and suggestions
+        # (catalogService.getFreeDeliverySuggestions: products that close the gap, cheapest first).
+        price = quote(self.store.catalog, [CartItem(product_id=pid, quantity=q) for pid, q in self.cart.items()])
+        if price.delivery_fee > 0:
+            remaining = self.store.delivery["freeAbove"] - price.subtotal / 100
+            pool = [p for p in self.store.products if p["stock"] and p["id"] not in self.cart]
+            closes = sorted((p for p in pool if p["price"] >= remaining), key=lambda p: p["price"])
+            closer = sorted((p for p in pool if p["price"] < remaining), key=lambda p: -p["price"])
+            result |= {"deliveryFee": rupees(price.delivery_fee / 100),
+                       "freeDeliveryAbove": rupees(self.store.delivery["freeAbove"]),
+                       "addForFreeDelivery": rupees(remaining),
+                       "suggestions": [self.store.agent_product(p) for p in (closes + closer)[:4]]}
+        return result
 
     def _checkout_confirm(self, _: dict[str, Any]) -> dict[str, Any]:
         # Like the real browser: opens the payment window and returns at once (result comes later).

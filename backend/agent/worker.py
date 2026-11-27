@@ -492,11 +492,15 @@ class CartivaAssistant(Agent):
             if not isinstance(result, dict) or not result.get("ok"):
                 return result
             result.pop("products", None)  # only for the on-screen glow; the model reads "deals"
+            # Only the count is spoken: the screen already shows each discount (the shopper asked for this).
+            what = f"discounted {str(result['category']).lower()}" if result.get("category") else "discounted products"
+            count = result.get("dealCount", 0)
             result["say"] = (
-                "Say the offers are on screen, how many discounted products there are, and name at most "
-                "two deals by product and discount (for example \"twenty percent off Maaza\"), without prices "
-                "unless they ask. Keep it to two short sentences. Mention the free-delivery rule only if they "
-                "asked about delivery. Do not add anything to the cart."
+                f"Say only how many {what} are on screen ({count}), for example "
+                f"\"There are {count} {what} on your screen.\", "
+                "then ask what they would like. Do not name products, discounts or prices unless the shopper "
+                "asks (then use deals). Mention the free-delivery rule only if they asked about delivery. "
+                "Do not add anything to the cart."
             )
             return self._in_reply_language(result)
         except BrowserRpcError:
@@ -559,6 +563,17 @@ class CartivaAssistant(Agent):
 
         if result.get("ok"):
             self._pending_checkout_total = result["total"]
+            if result.get("addForFreeDelivery"):
+                # Below the free-delivery amount: mention the fee and that suggestions are on screen, then ask the
+                # usual yes/no question about paying (an either/or question made a bare "yes" ambiguous). If they
+                # add something instead, the cart change cancels this checkout; they say "checkout" again.
+                result["say"] = (
+                    f"Say just this (amounts in words, in the shopper's language): \"Your total is {result['total']} "
+                    f"with {result['deliveryFee']} delivery. Add {result['addForFreeDelivery']} more for free delivery; "
+                    f"see the suggestions below. Shall I pay {result['total']} now?\" If they name a product instead, "
+                    "add it and do not start checkout again until they ask."
+                )
+                return self._in_reply_language(result)
         return result
 
     @function_tool

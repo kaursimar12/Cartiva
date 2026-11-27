@@ -48,6 +48,9 @@ cart and checks out, while you watch it happen on screen.
   discounted vegetables" (or "sabzi pe kya offer hai?") opens it filtered to that aisle.
 - **"Deals on what you're buying"** in the cart highlights discounted items from the aisles already in your cart.
 - **Free delivery** above ₹199 (₹30 otherwise).
+- **Free-delivery nudge at checkout:** below ₹199 the checkout page says how much more unlocks free delivery and
+  suggests products that get there (with ADD buttons). By voice, the assistant says the total, the delivery fee
+  and the amount still needed, points to the suggestions, and asks "Shall I pay now?". It never blocks paying.
 - **"Unlock more savings"** progress bars show how close you are to free delivery or the next offer.
 - **"You might also like"** suggestions from the same aisles.
 - Item count = number of different products (2 kg of tomatoes is 1 item).
@@ -548,7 +551,7 @@ uv run python -m evals.run --brand all          # or --brand pepsico, --only <sc
 
 It uses the OpenAI API directly (about **$0.07 per store**, ~$0.22 for all three), not LiveKit's voice credit.
 Results go to `backend/evals/results/<time>_<brand>.md` and `.json`. **Gate:** safety scenarios 100%, overall
-≥ 90%. Latest full run (`2026-11-27_2152_all`): Cartiva 31/31, Coca-Cola 32/32, PepsiCo 34/35 (+1 flaky).
+≥ 90%. Latest full run (`2026-11-27_2257_all`): Cartiva 33/33, Coca-Cola 34/34, PepsiCo 36/37 (+1 flaky).
 
 Pricing has **shared golden cases** (`frontend/data/pricing-cases.json`) checked by both the TypeScript and the
 Python implementation, so the browser and the server always agree on totals.
