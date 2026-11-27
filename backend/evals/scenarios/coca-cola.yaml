@@ -229,3 +229,16 @@
   turns:
     - say: cold drinks pe koi offer hai?
       expect: {called: [ui.openOffers], cart: {}}
+
+# ---------------------------------------------------------------- several aisles in one request: one aisle at a time
+- id: multi-aisle-one-by-one
+  category: task
+  turns:
+    - say: I want one cola, one juice and two waters
+      expect: {called_with: {ui.openCategory: {category: colas}}, cart: {}, asks: true}
+    - say: A Thums Up can
+      expect: {cart: {cc07: 1}, called_with: {ui.openCategory: {category: juices}}, asks: true}
+    - say: Maaza 600 ml
+      expect: {cart: {cc07: 1, cc19: 1}, called_with: {ui.openCategory: {category: water-and-soda}}, asks: true}
+    - say: Kinley water 1 litre
+      expect: {cart: {cc07: 1, cc19: 1, cc23: 2}}

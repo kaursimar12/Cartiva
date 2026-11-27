@@ -228,3 +228,16 @@
   turns:
     - say: sabzi pe kya offer hai?
       expect: {called_with: {ui.openOffers: {category: vegetables}}, cart: {}}
+
+# ---------------------------------------------------------------- several aisles in one request: one aisle at a time
+- id: multi-aisle-one-by-one
+  category: task
+  turns:
+    - say: I want one breakfast item, one dairy item and two fruits
+      expect: {called_with: {ui.openCategory: {category: breakfast}}, cart: {}, asks: true}
+    - say: Quaker Oats
+      expect: {cart: {p041: 1}, called_with: {ui.openCategory: {category: dairy}}, asks: true}
+    - say: Amul butter
+      expect: {cart: {p041: 1, p021: 1}, called_with: {ui.openCategory: {category: fruits}}, asks: true}
+    - say: Shimla apple
+      expect: {cart: {p041: 1, p021: 1, p013: 2}}

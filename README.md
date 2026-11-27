@@ -393,6 +393,7 @@ Every tool is a thin wrapper that calls a browser action; no business rules live
 |---|---|
 | `search_products` | Search the catalogue (optionally by price); shows results on screen, or looks up silently when only an ID is needed |
 | `navigate_category` | Open a category page |
+| `shop_aisles_one_by_one` | "One breakfast item, one soft drink and two juices": opens one aisle at a time, asks which one, adds it, then opens the next (the code tracks the aisles still to do) |
 | `open_product` | Open a product page |
 | `open_page` | Open the cart, home or scan-list page |
 | `get_screen` | Read what's on screen (for "the cheapest one", "the second one") |
@@ -547,7 +548,7 @@ uv run python -m evals.run --brand all          # or --brand pepsico, --only <sc
 
 It uses the OpenAI API directly (about **$0.07 per store**, ~$0.22 for all three), not LiveKit's voice credit.
 Results go to `backend/evals/results/<time>_<brand>.md` and `.json`. **Gate:** safety scenarios 100%, overall
-≥ 90%. Latest full run (`2026-11-27_1959_all`): Cartiva 30/30, Coca-Cola 31/31, PepsiCo 32/33.
+≥ 90%. Latest full run (`2026-11-27_2152_all`): Cartiva 31/31, Coca-Cola 32/32, PepsiCo 34/35 (+1 flaky).
 
 Pricing has **shared golden cases** (`frontend/data/pricing-cases.json`) checked by both the TypeScript and the
 Python implementation, so the browser and the server always agree on totals.
@@ -559,7 +560,7 @@ Python implementation, so the browser and the server always agree on totals.
   Hindi / Hinglish.
 - ✅ Deployed on free tiers: three Vercel sites, one Render API, one LiveKit Cloud agent serving all three stores.
 - 🔜 Real product photos (current images are stock photos).
-- ℹ️ Known eval miss (PepsiCo): a bare "Add Pepsi" adds the 300 ml can instead of asking which size.
+- ℹ️ Known flaky eval (PepsiCo): a bare "Add Pepsi" sometimes adds the 300 ml can instead of asking which size.
 - ℹ️ No database or user accounts: the cart lives in the browser, and the last order in the session.
 - ℹ️ On LiveKit's free plan, the speech and voice quota can run out after heavy testing. The app keeps working by
   tapping; voice returns when the quota resets.

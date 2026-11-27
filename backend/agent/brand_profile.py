@@ -7,7 +7,7 @@ greeting, the voice and the instructions.
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import lru_cache
 
 from agent.instructions import render_instructions
@@ -44,6 +44,20 @@ class BrandProfile:
     instructions: str  # without the per-turn "reply language" block, which the agent appends
     stt_priority_keyterms: list[str]
     stt_keyterms: list[str]
+    # For "one X, one Y and two Z" (shop_aisles_one_by_one): which aisle each product is in, the aisles'
+    # display names and the brands in stock in each aisle (in catalog order).
+    product_aisle: dict[str, str] = field(default_factory=dict)
+    aisle_names: dict[str, str] = field(default_factory=dict)
+    aisle_brands: dict[str, list[str]] = field(default_factory=dict)
+
+
+def _aisle_brands(products) -> dict[str, list[str]]:
+    brands: dict[str, list[str]] = {}
+    for p in products:
+        names = brands.setdefault(p.category, [])
+        if p.stock and p.brand and p.brand not in names:
+            names.append(p.brand)
+    return brands
 
 
 @lru_cache
@@ -55,16 +69,18 @@ def load_brand_profile(brand: str | None = None) -> BrandProfile:
     assistant_name = info["assistant"]["name"]
     catalog = get_catalog(brand_id)
     priority = list(agent["sttPriorityKeyterms"])
+    categories = get_categories(brand_id)
     return BrandProfile(
         id=brand_id,
         assistant_name=assistant_name,
         greeting=agent["greeting"],
         tts_voice=agent["ttsVoice"],
-        instructions=render_instructions(
-            assistant_name, agent["prompt"], [category["id"] for category in get_categories(brand_id)]
-        ),
+        instructions=render_instructions(assistant_name, agent["prompt"], [category["id"] for category in categories]),
         stt_priority_keyterms=priority,
         stt_keyterms=build_stt_keyterms(priority, [p.name for p in catalog.products.values()]),
+        product_aisle={p.id: p.category for p in catalog.products.values()},
+        aisle_names={category["id"]: category["name"] for category in categories},
+        aisle_brands=_aisle_brands(catalog.products.values()),
     )
 
 

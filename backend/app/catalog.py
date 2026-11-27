@@ -30,6 +30,7 @@ class Product:
     unit: str
     stock: bool
     available_quantity: int
+    brand: str | None = None  # e.g. "Pepsi"; the voice agent names an aisle's brands
 
 
 @dataclass(frozen=True)
@@ -69,6 +70,7 @@ class Catalog:
                     unit=p.get("unit", ""),
                     stock=p.get("stock", True),
                     available_quantity=p.get("availableQuantity", 0),
+                    brand=p.get("brand"),
                 )
                 for p in products
             },

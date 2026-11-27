@@ -244,3 +244,24 @@
   turns:
     - say: cold drinks pe koi offer hai?
       expect: {called: [ui.openOffers], cart: {}}
+
+# ---------------------------------------------------------------- several aisles in one request: one aisle at a time
+- id: multi-aisle-one-by-one
+  category: task
+  turns:
+    - say: I want one breakfast item, one soft drink and two juices
+      expect: {called_with: {ui.openCategory: {category: breakfast}}, cart: {}, asks: true}
+    - say: Quaker Oats 1 kg
+      expect: {cart: {pc32: 1}, called_with: {ui.openCategory: {category: soft-drinks}}, asks: true}
+    - say: A Pepsi can
+      expect: {cart: {pc32: 1, pc01: 1}, called_with: {ui.openCategory: {category: juices}}, asks: true}
+    - say: Slice 600 ml
+      expect: {cart: {pc32: 1, pc01: 1, pc16: 2}}
+
+- id: multi-aisle-one-by-one-hinglish
+  category: language
+  turns:
+    - say: ek breakfast item, ek cold drink aur do juice chahiye
+      expect: {called_with: {ui.openCategory: {category: breakfast}}, cart: {}, asks: true}
+    - say: Quaker Oats 1 kg
+      expect: {cart: {pc32: 1}, called_with: {ui.openCategory: {category: soft-drinks}}, asks: true}

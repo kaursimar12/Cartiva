@@ -136,6 +136,8 @@ class CartivaAssistant(Agent):
         self._last_shopper_text = ""  # what the shopper said this turn (set by set_reply_language)
         # ★ Set by start_checkout; required by confirm_payment; cleared by cancel or any cart change.
         self._pending_checkout_total: str | None = None
+        # ★ shop_aisles_one_by_one: [category id, products still wanted] per aisle, the open one first.
+        self._aisle_tour: list[list] = []
 
     def _in_reply_language(self, result: dict | str) -> dict | str:
         """Adds this turn's reply-language rule to a tool result that tells the model what to say.
@@ -251,25 +253,119 @@ class CartivaAssistant(Agent):
         return self._in_reply_language(result)
 
     @function_tool
-    async def add_to_cart(self, context: RunContext, product_id: str, quantity: int = 1) -> dict | str:
+    async def add_to_cart(self, context: RunContext, product_id: str, quantity: int | None = None) -> dict | str:
         """Adds a product to the shopper's cart. The cart on screen updates too.
 
-        Only use a product_id that came from search_products results in this conversation.
-        If you don't have one yet, call search_products first. If several products could match
-        and it is not clear which one the shopper means, ask them before adding.
+        Only use a product_id that came from search_products results (or an aisle that is open) in this
+        conversation. If you don't have one yet, call search_products first. If several products could
+        match and it is not clear which one the shopper means, ask them before adding.
 
         Args:
             product_id: The productId from search_products, e.g. "p001".
             quantity: How many packs to add (a whole number, at least 1). Products are sold in
                 packs shown as "unit", e.g. "1 kg". "2 kg tomatoes" with a "1 kg" pack means
                 quantity 2. Hindi numbers count too: "do kilo" / "दो किलो" = 2 kg = quantity 2,
-                "teen" / "तीन" = 3. If the shopper gives no amount, use 1.
+                "teen" / "तीन" = 3. If the shopper gives no amount, leave it out (1, or the amount
+                they asked for from the aisle that is open in shop_aisles_one_by_one).
         """
         self._pending_checkout_total = None  # ★ cart changed → any old total is no longer valid
+        in_tour_aisle = bool(self._aisle_tour) and self._profile.product_aisle.get(product_id) == self._aisle_tour[0][0]
+        if quantity is None:
+            quantity = self._aisle_tour[0][1] if in_tour_aisle else 1
         try:
-            return await call_browser("cart.add", {"productId": product_id, "quantity": quantity})
+            result = await call_browser("cart.add", {"productId": product_id, "quantity": quantity})
         except BrowserRpcError:
             return "Adding to the cart failed right now. Apologise briefly and ask the shopper to try again."
+        if in_tour_aisle and isinstance(result, dict) and result.get("ok"):
+            return await self._next_tour_aisle(result, quantity)
+        return result
+
+    # ---------- several aisles in one request ("one breakfast item, one soft drink and two juices") ----------
+    # ★ Code keeps the aisles still to do, so none is forgotten and they open one at a time; the model only
+    # works out which product the shopper means in the aisle that is open.
+
+    @function_tool
+    async def shop_aisles_one_by_one(
+        self, context: RunContext, categories: list[str], quantities: list[int]
+    ) -> dict | str:
+        """For ONE request that asks for products from SEVERAL aisles without naming the products, e.g.
+        "one breakfast item, one dairy item and two fruits" or "ek cold drink aur do juice". Opens only the
+        first aisle and remembers the rest. When the shopper's choice from that aisle has been added with
+        add_to_cart, the next aisle opens by itself. Never open these aisles with navigate_category and
+        never ask about several aisles in one question.
+
+        Args:
+            categories: The aisles in the order the shopper said them, as category ids from your instructions.
+            quantities: How many products the shopper wants from each aisle, in the same order (1 when
+                they gave no number; "two juices" = 2).
+        """
+        unknown = [c for c in categories if c not in self._profile.aisle_names]
+        if not categories or unknown:
+            return (f"Unknown aisle ids {unknown}. Use only these category ids: "
+                    f"{', '.join(self._profile.aisle_names)}. Then call this tool again.")
+        counts = [max(1, int(q)) for q in quantities] + [1] * len(categories)
+        self._aisle_tour = [[c, n] for c, n in zip(categories, counts)]
+        return await self._open_tour_aisle()
+
+    async def _open_tour_aisle(self) -> dict | str:
+        """Opens the aisle at the front of the tour and says how to ask about it."""
+        category, wanted = self._aisle_tour[0]
+        try:
+            result = await call_browser("ui.openCategory", {"category": category})
+        except BrowserRpcError:
+            self._aisle_tour = []
+            return "Opening the aisle failed right now. Apologise briefly and ask the shopper to try again."
+        if not isinstance(result, dict) or not result.get("ok"):
+            self._aisle_tour = []
+            return result
+        name = self._profile.aisle_names[category]
+        products = [p for p in result.get("products") or [] if p.get("inStock")]
+        count = result.get("count", len(products))
+        if count <= 3:  # a small aisle: name each product (more would make the spoken reply too long)
+            options = ", ".join(f"{p['name']} {p['unit']}" for p in products)
+            what = f"Name these options: {options}."
+        else:
+            brands = self._profile.aisle_brands.get(category) or []
+            what = f"Name the brands ({', '.join(brands)}), not every product." if brands else "Name two or three of them."
+        if wanted == 1:
+            ask = "Ask which one they want."
+        else:
+            ask = (f"Ask which one they want; say you will add {wanted} of it. If they name ONE product, call "
+                   f"add_to_cart once and leave quantity out ({wanted} are added). Only if they name several "
+                   "different products, add one of each.")
+        later = [self._profile.aisle_names[c] for c, _ in self._aisle_tour[1:]]
+        return self._in_reply_language({
+            "ok": True,
+            "aisle": name,
+            "productCount": count,
+            "products": products,
+            "wanted": wanted,
+            "comingNext": later,
+            "say": (
+                f"The {name} aisle is open on screen. {what} {ask} "
+                "Ask only about this aisle; the next one opens after their choice is added. When they choose, "
+                "call add_to_cart right away with that productId (leave quantity out unless they said an amount)."
+            ),
+        })
+
+    async def _next_tour_aisle(self, added: dict, quantity: int) -> dict | str:
+        """After an add in the open tour aisle: stay if more are wanted there, else open the next aisle."""
+        self._aisle_tour[0][1] -= quantity
+        if self._aisle_tour[0][1] > 0:
+            added["say"] = (f"Confirm what was added in a few words, then ask which other product they want from "
+                            f"this aisle ({self._aisle_tour[0][1]} more).")
+            return self._in_reply_language(added)
+        self._aisle_tour.pop(0)
+        if not self._aisle_tour:
+            added["say"] = ("That was the last aisle the shopper asked for. Confirm briefly what was added and ask if "
+                            "they want anything else.")
+            return self._in_reply_language(added)
+        next_aisle = await self._open_tour_aisle()
+        if not isinstance(next_aisle, dict):
+            return next_aisle
+        next_aisle["added"] = added
+        next_aisle["say"] = "First confirm in a few words what was just added. Then: " + next_aisle["say"]
+        return next_aisle
 
     @function_tool
     async def remove_from_cart(self, context: RunContext, product_id: str) -> dict | str:
@@ -318,6 +414,7 @@ class CartivaAssistant(Agent):
         Args:
             category: The category id to open, one of this store's aisles listed in your instructions.
         """
+        self._aisle_tour = []  # the shopper went elsewhere: stop any one-by-one aisle tour
         try:
             result = await call_browser("ui.openCategory", {"category": category})
             if not isinstance(result, dict) or not result.get("ok"):
@@ -389,6 +486,7 @@ class CartivaAssistant(Agent):
         """
         if self._last_shopper_text and not OFFER_WORDS.search(self._last_shopper_text):
             return NOT_AN_OFFER_REQUEST
+        self._aisle_tour = []  # the shopper went to the offers: stop any one-by-one aisle tour
         try:
             result = await call_browser("ui.openOffers", {"category": category} if category else {})
             if not isinstance(result, dict) or not result.get("ok"):
