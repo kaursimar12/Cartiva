@@ -1,12 +1,13 @@
-"""Reads a photo of a grocery list (handwritten or printed) with an OpenAI vision model."""
+"""Reads a photo of a shopping list (handwritten or printed) with an OpenAI vision model."""
 
 import base64
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from openai import OpenAI, OpenAIError
 from pydantic import BaseModel
 
+from app.catalog import get_brand
 from app.config import Settings, get_settings
 
 router = APIRouter(prefix="/api/list", tags=["shopping list"])
@@ -15,16 +16,26 @@ MAX_IMAGE_BYTES = 5 * 1024 * 1024  # 5 MB
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 MAX_ITEMS = 50
 
-PROMPT = """You read photos of grocery shopping lists (handwritten or printed; English, Hindi or Hinglish).
-Return every grocery item on the list. For each item:
+PROMPT_TEMPLATE = """You read photos of {kind} shopping lists (handwritten or printed; English, Hindi or Hinglish).
+Return every {kind} item on the list. For each item:
 - name: the product in simple English, singular, as a shop would call it
-  (e.g. "tomato", "milk", "dishwashing liquid", "Surf Excel"). Translate Hindi,
-  e.g. "टमाटर" or "tamatar" → "tomato", "doodh" → "milk", "aloo" → "potato".
+  (e.g. {examples}). Translate Hindi,
+  e.g. {hindi}.
 - quantity: the number written for the item, or null if there is none.
 - unit: the unit written ("kg", "g", "l", "ml", "dozen", "pack", "piece"), or null.
 - original: the item text exactly as written.
-Ignore crossed-out items, prices, dates, totals and anything that is not a grocery item.
+Ignore crossed-out items, prices, dates, totals and anything that is not a {kind} item.
 If the image is not a shopping list, return an empty list."""
+
+
+def build_prompt(brand: dict) -> str:
+    """The vision prompt for one storefront: its kind of items and its own product examples (brand.json)."""
+    scan = brand["listScan"]
+    return PROMPT_TEMPLATE.format(
+        kind=scan["itemKind"],
+        examples=", ".join(f'"{name}"' for name in scan["examples"]),
+        hindi=scan["hindiExamples"],
+    )
 
 
 class ScannedItem(BaseModel):
@@ -51,8 +62,10 @@ def scan_list(
     image: Annotated[UploadFile, File(description="Photo of a grocery list (JPEG, PNG or WebP, max 5 MB)")],
     settings: Annotated[Settings, Depends(get_settings)],
     client: Annotated[OpenAI, Depends(get_openai_client)],
+    brand: Annotated[str | None, Form(description="Storefront the list is for; default brand when left out")] = None,
 ) -> ScannedList:
-    """Turns a photo of a grocery list into a structured list. Matching to products happens in the browser."""
+    """Turns a photo of a shopping list into a structured list. Matching to products happens in the browser."""
+    prompt = build_prompt(get_brand(brand))  # unknown brand → 400 before the photo is even read
     if image.content_type not in ALLOWED_TYPES:
         raise _error(415, "UNSUPPORTED_IMAGE", "Please upload a JPEG, PNG or WebP photo.")
 
@@ -70,7 +83,7 @@ def scan_list(
                 {
                     "role": "user",
                     "content": [
-                        {"type": "input_text", "text": PROMPT},
+                        {"type": "input_text", "text": prompt},
                         {"type": "input_image", "image_url": data_url},
                     ],
                 }

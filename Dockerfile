@@ -1,5 +1,5 @@
 # Cartiva voice agent (backend/agent/worker.py) for LiveKit Cloud: `lk agent deploy` from the repo root.
-# Built from the repo root so the catalog in frontend/data is copied in (the agent reads it via DATA_DIR).
+# Built from the repo root so every brand catalog in frontend/data/brands is copied in (read via BRANDS_DIR).
 FROM python:3.12-slim
 
 COPY --from=ghcr.io/astral-sh/uv:0.5.11 /uv /bin/uv
@@ -15,6 +15,6 @@ COPY backend/ ./
 COPY frontend/data /app/frontend/data
 
 # PYTHONPATH: worker.py imports `agent.*` and `app.*`, which live in /app/backend.
-ENV PATH="/app/backend/.venv/bin:$PATH" PYTHONPATH=/app/backend DATA_DIR=/app/frontend/data/brands/cartiva
+ENV PATH="/app/backend/.venv/bin:$PATH" PYTHONPATH=/app/backend BRANDS_DIR=/app/frontend/data/brands
 
 CMD ["python", "agent/worker.py", "start"]

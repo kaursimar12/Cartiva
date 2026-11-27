@@ -7,7 +7,7 @@ import razorpay
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.catalog import Catalog, get_catalog
+from app.catalog import get_catalog
 from app.config import Settings, get_settings
 from app.pricing import CartItem, quote
 
@@ -25,6 +25,7 @@ class OrderItem(BaseModel):
 
 class CreateOrderRequest(BaseModel):
     items: list[OrderItem] = Field(min_length=1, max_length=100)
+    brand: str | None = None  # which storefront's catalog and prices; None = the default brand
 
 
 class CreateOrderResponse(BaseModel):
@@ -48,10 +49,10 @@ def _error(status: int, code: str, message: str) -> HTTPException:
 def create_order(
     body: CreateOrderRequest,
     settings: Annotated[Settings, Depends(get_settings)],
-    catalog: Annotated[Catalog, Depends(get_catalog)],
     client: Annotated[razorpay.Client, Depends(get_razorpay_client)],
 ) -> CreateOrderResponse:
-    """Recomputes the total from the catalog and creates a Razorpay order for exactly that amount."""
+    """Recomputes the total from the brand's catalog and creates a Razorpay order for exactly that amount."""
+    catalog = get_catalog(body.brand)
     for item in body.items:
         product = catalog.products.get(item.product_id)
         if product is None:
@@ -91,6 +92,7 @@ class VerifyRequest(BaseModel):
     razorpay_payment_id: str
     razorpay_signature: str
     items: list[OrderItem] = Field(min_length=1, max_length=100)
+    brand: str | None = None  # must match the brand the order was created for
 
 
 class VerifyResponse(BaseModel):
@@ -103,10 +105,10 @@ class VerifyResponse(BaseModel):
 @router.post("/verify")
 def verify_payment(
     body: VerifyRequest,
-    catalog: Annotated[Catalog, Depends(get_catalog)],
     client: Annotated[razorpay.Client, Depends(get_razorpay_client)],
 ) -> VerifyResponse:
     """Only a valid Razorpay signature for an order of exactly this cart's total counts as paid."""
+    catalog = get_catalog(body.brand)
     # 1. Was this payment really approved by Razorpay? (HMAC-SHA256 with our secret)
     try:
         client.utility.verify_payment_signature(

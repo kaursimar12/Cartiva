@@ -98,12 +98,45 @@ def _read_json(data_dir: Path, name: str) -> Any:
     return json.loads((data_dir / name).read_text(encoding="utf-8"))
 
 
+class UnknownBrandError(ValueError):
+    """A request named a storefront that has no folder in BRANDS_DIR."""
+
+
 @lru_cache
-def get_catalog() -> Catalog:
-    """The real catalog from DATA_DIR (default: ../frontend/data/brands/cartiva), loaded once and reused."""
-    data_dir = get_settings().data_dir
+def known_brands() -> tuple[str, ...]:
+    """Every storefront in BRANDS_DIR: folders that contain a brand.json."""
+    root = get_settings().brands_dir
+    return tuple(sorted(p.parent.name for p in root.glob("*/brand.json")))
+
+
+def resolve_brand(brand: str | None) -> str:
+    """The brand to serve: the one asked for, or the default. Raises UnknownBrandError for anything else."""
+    brand_id = (brand or "").strip() or get_settings().default_brand
+    if brand_id not in known_brands():
+        raise UnknownBrandError(brand_id)
+    return brand_id
+
+
+@lru_cache
+def _load_catalog(brand_id: str) -> Catalog:
+    data_dir = get_settings().brands_dir / brand_id
     return Catalog.from_json(
         _read_json(data_dir, "products.json"),
         _read_json(data_dir, "offers.json"),
         _read_json(data_dir, "delivery.json"),
     )
+
+
+def get_catalog(brand: str | None = None) -> Catalog:
+    """A storefront's catalog (default brand when none is given), loaded once per brand and reused."""
+    return _load_catalog(resolve_brand(brand))
+
+
+@lru_cache
+def _load_brand(brand_id: str) -> dict[str, Any]:
+    return _read_json(get_settings().brands_dir / brand_id, "brand.json")
+
+
+def get_brand(brand: str | None = None) -> dict[str, Any]:
+    """A storefront's brand.json (names, copy, list-scan examples…), loaded once per brand."""
+    return _load_brand(resolve_brand(brand))

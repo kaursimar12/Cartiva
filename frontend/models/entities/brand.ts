@@ -50,6 +50,15 @@ export interface Brand {
   wholeOrderImageCategory: string;
   /** Example deal used on the help page, e.g. "20% off carrots". */
   dealExample: string;
+  /** Wording for the shopping-list photo reader (used by the API's vision prompt). */
+  listScan: {
+    /** What the list contains, e.g. "grocery" ("grocery shopping lists", "not a grocery item"). */
+    itemKind: string;
+    /** Product names in simple English, as the store would call them. */
+    examples: string[];
+    /** Hindi/Hinglish → English examples, written out, e.g. "\"doodh\" → \"milk\"". */
+    hindiExamples: string;
+  };
   /** Brand colours (light and dark theme). Null keeps the default green in app/globals.css. */
   palette: { light: BrandPalette; dark: BrandPalette } | null;
 }

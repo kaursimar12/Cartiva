@@ -1,17 +1,22 @@
 import type { ScannedItem } from "@/models/entities/shopping-list";
 
-/** Reads a photo of a grocery list. Interface, so tests or other providers can be swapped in. */
+/** Reads a photo of a shopping list. Interface, so tests or other providers can be swapped in. */
 export interface ListScanner {
   scan(image: File): Promise<ScannedItem[]>;
 }
 
 /** Sends the photo to FastAPI, which asks the OpenAI vision model. */
 export class HttpListScanner implements ListScanner {
-  constructor(private readonly backendUrl: string) {}
+  /** `brandId`: the storefront the list is for, so the reader uses that store's product examples. */
+  constructor(
+    private readonly backendUrl: string,
+    private readonly brandId: string,
+  ) {}
 
   async scan(image: File): Promise<ScannedItem[]> {
     const form = new FormData();
     form.append("image", image);
+    form.append("brand", this.brandId);
 
     let response: Response;
     try {

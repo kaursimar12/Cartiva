@@ -5,6 +5,7 @@ import { RazorpayPaymentGateway } from "@/services/payment/razorpay-payment-gate
 import { HttpListScanner } from "@/services/shopping-list/list-scanner";
 import { ShoppingListService } from "@/services/shopping-list/shopping-list-service";
 import { catalogService, pricingService, productRepository } from "./container";
+import { brand } from "@/lib/brand";
 
 /**
  * Composition root for browser-only services that own runtime state.
@@ -18,9 +19,13 @@ export const cartService = new CartService(productRepository, cartStorage, prici
 export const checkoutService = new CheckoutService(
   cartStorage,
   pricingService,
-  new RazorpayPaymentGateway(BACKEND_URL),
+  new RazorpayPaymentGateway(BACKEND_URL, brand.id, {
+    storeName: brand.storeName,
+    description: brand.orderDescription,
+    color: brand.palette?.light[600] ?? "#16a34a",
+  }),
   new ZustandOrderStorage(),
 );
 
 export const shoppingListService = new ShoppingListService(catalogService);
-export const listScanner = new HttpListScanner(BACKEND_URL);
+export const listScanner = new HttpListScanner(BACKEND_URL, brand.id);

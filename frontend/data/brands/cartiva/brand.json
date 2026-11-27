@@ -27,5 +27,10 @@
   "featuredAisle": { "categoryId": "vegetables", "label": "fresh vegetables" },
   "wholeOrderImageCategory": "breakfast",
   "dealExample": "20% off carrots",
+  "listScan": {
+    "itemKind": "grocery",
+    "examples": ["tomato", "milk", "dishwashing liquid", "Surf Excel"],
+    "hindiExamples": "\"टमाटर\" or \"tamatar\" → \"tomato\", \"doodh\" → \"milk\", \"aloo\" → \"potato\""
+  },
   "palette": null
 }

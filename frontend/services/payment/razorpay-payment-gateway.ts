@@ -1,5 +1,4 @@
 import type { PaymentGateway, PaymentRequest, PaymentResult } from "./payment-gateway";
-import { brand } from "@/lib/brand";
 
 const CHECKOUT_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -29,25 +28,40 @@ declare global {
   }
 }
 
+/** How the Razorpay popup presents the store (name, order description, accent colour). */
+export interface CheckoutDisplay {
+  storeName: string;
+  description: string;
+  color: string;
+}
+
 /**
  * Real payments with Razorpay Checkout (test mode while developing).
  * The server creates the order (it decides the amount) and verifies the signature;
  * only a verified payment returns ok: true (SRS FR-27).
  */
 export class RazorpayPaymentGateway implements PaymentGateway {
-  constructor(private readonly backendUrl: string) {}
+  /**
+   * `brandId`: the storefront whose catalog and prices the server must use (NEXT_PUBLIC_BRAND).
+   * `display`: how the payment popup names the store.
+   */
+  constructor(
+    private readonly backendUrl: string,
+    private readonly brandId: string,
+    private readonly display: CheckoutDisplay,
+  ) {}
 
   async pay(request: PaymentRequest): Promise<PaymentResult> {
     const items = request.items.map(({ productId, quantity }) => ({ productId, quantity }));
 
     try {
-      const order = await this.post<CreateOrderResponse>("/api/payment/create-order", { items });
+      const order = await this.post<CreateOrderResponse>("/api/payment/create-order", { items, brand: this.brandId });
       await loadCheckoutScript();
 
-      const outcome = await openCheckout(order);
+      const outcome = await openCheckout(order, this.display);
       if (!outcome.ok) return outcome;
 
-      await this.post("/api/payment/verify", { ...outcome.payment, items });
+      await this.post("/api/payment/verify", { ...outcome.payment, items, brand: this.brandId });
       return { ok: true, orderId: order.order_id, paymentId: outcome.payment.razorpay_payment_id };
     } catch (error) {
       return { ok: false, reason: error instanceof Error ? error.message : "The payment could not be completed." };
@@ -86,6 +100,7 @@ function loadCheckoutScript(): Promise<void> {
  */
 function openCheckout(
   order: CreateOrderResponse,
+  display: CheckoutDisplay,
 ): Promise<{ ok: true; payment: RazorpaySuccess } | { ok: false; reason: string }> {
   return new Promise((resolve) => {
     let lastFailure: string | null = null;
@@ -95,9 +110,9 @@ function openCheckout(
       amount: order.amount,
       currency: order.currency,
       order_id: order.order_id,
-      name: brand.storeName,
-      description: brand.orderDescription,
-      theme: { color: brand.palette?.light[600] ?? "#16a34a" },
+      name: display.storeName,
+      description: display.description,
+      theme: { color: display.color },
       handler: (payment: RazorpaySuccess) => resolve({ ok: true, payment }),
       modal: {
         ondismiss: () => resolve({ ok: false, reason: lastFailure ?? "Payment cancelled. No money was taken." }),
