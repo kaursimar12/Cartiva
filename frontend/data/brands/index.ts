@@ -11,6 +11,11 @@ import cocaColaCategories from "./coca-cola/categories.json";
 import cocaColaDelivery from "./coca-cola/delivery.json";
 import cocaColaOffers from "./coca-cola/offers.json";
 import cocaColaProducts from "./coca-cola/products.json";
+import pepsicoBrand from "./pepsico/brand.json";
+import pepsicoCategories from "./pepsico/categories.json";
+import pepsicoDelivery from "./pepsico/delivery.json";
+import pepsicoOffers from "./pepsico/offers.json";
+import pepsicoProducts from "./pepsico/products.json";
 
 /** One storefront's data: its brand settings and its catalog (all in data/brands/<id>/). */
 export interface BrandBundle {
@@ -39,6 +44,13 @@ export const BRANDS: Record<string, BrandBundle> = {
     categories: cocaColaCategories as Category[],
     offers: cocaColaOffers as OfferJson[],
     delivery: cocaColaDelivery as DeliveryJson,
+  },
+  pepsico: {
+    brand: pepsicoBrand as Brand,
+    products: pepsicoProducts as ProductJson[],
+    categories: pepsicoCategories as Category[],
+    offers: pepsicoOffers as OfferJson[],
+    delivery: pepsicoDelivery as DeliveryJson,
   },
 };
 

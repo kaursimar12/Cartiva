@@ -1,0 +1,113 @@
+[
+  {
+    "id": "pc-offer-drinks",
+    "title": "10% OFF Soft Drinks",
+    "description": "10% off on soft drinks when soft drinks in your cart total ₹250 or more.",
+    "category": "soft-drinks",
+    "minimumAmount": 250,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "pc-offer-order",
+    "title": "₹40 OFF",
+    "description": "Flat ₹40 off on orders of ₹599 or more.",
+    "category": null,
+    "minimumAmount": 599,
+    "discountType": "flat",
+    "discountValue": 40,
+    "active": true
+  },
+  {
+    "id": "pc-deal-01",
+    "title": "15% OFF Pepsi 2.25 L",
+    "description": "15% off Pepsi 2.25 L. No minimum order.",
+    "category": "soft-drinks",
+    "productIds": [
+      "pc04"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 15,
+    "active": true
+  },
+  {
+    "id": "pc-deal-02",
+    "title": "10% OFF Mountain Dew 1.25 L",
+    "description": "10% off Mountain Dew 1.25 L. No minimum order.",
+    "category": "soft-drinks",
+    "productIds": [
+      "pc12"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "pc-deal-03",
+    "title": "20% OFF Slice 1.2 L",
+    "description": "20% off Slice Mango Drink 1.2 L. No minimum order.",
+    "category": "juices",
+    "productIds": [
+      "pc17"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 20,
+    "active": true
+  },
+  {
+    "id": "pc-deal-04",
+    "title": "10% OFF Tropicana 1 L",
+    "description": "10% off Tropicana Orange 1 L. No minimum order.",
+    "category": "juices",
+    "productIds": [
+      "pc14"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "pc-deal-05",
+    "title": "15% OFF Doritos Sweet Chilli",
+    "description": "15% off Doritos Sweet Chilli 82 g. No minimum order.",
+    "category": "chips",
+    "productIds": [
+      "pc26"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 15,
+    "active": true
+  },
+  {
+    "id": "pc-deal-06",
+    "title": "10% OFF Lay's party pack",
+    "description": "10% off Lay's Classic Salted 90 g. No minimum order.",
+    "category": "chips",
+    "productIds": [
+      "pc23"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 10,
+    "active": true
+  },
+  {
+    "id": "pc-deal-07",
+    "title": "20% OFF Quaker Oats 1 kg",
+    "description": "20% off Quaker Oats 1 kg. No minimum order.",
+    "category": "breakfast",
+    "productIds": [
+      "pc32"
+    ],
+    "minimumAmount": 0,
+    "discountType": "percentage",
+    "discountValue": 20,
+    "active": true
+  }
+]

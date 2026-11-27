@@ -1,0 +1,38 @@
+[
+  {
+    "id": "soft-drinks",
+    "name": "Soft Drinks",
+    "description": "Pepsi, 7UP, Mirinda and Mountain Dew in cans and bottles.",
+    "image": "https://images.unsplash.com/photo-1629203851122-3726ecdf080e"
+  },
+  {
+    "id": "juices",
+    "name": "Juices",
+    "description": "Tropicana orange juice and Slice mango drink.",
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696"
+  },
+  {
+    "id": "sports-and-water",
+    "name": "Sports & Water",
+    "description": "Gatorade sports drinks and Aquafina water.",
+    "image": "https://images.unsplash.com/photo-1545334894-9c7a7ccefaf8"
+  },
+  {
+    "id": "chips",
+    "name": "Chips",
+    "description": "Lay's, Doritos and Uncle Chipps.",
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c"
+  },
+  {
+    "id": "namkeen",
+    "name": "Namkeen",
+    "description": "Kurkure in your favourite flavours.",
+    "image": "https://images.unsplash.com/photo-1754088605508-4148fefd8a43"
+  },
+  {
+    "id": "breakfast",
+    "name": "Breakfast",
+    "description": "Quaker oats and masala oats.",
+    "image": "https://images.unsplash.com/photo-1722882270575-f437c338a4de"
+  }
+]

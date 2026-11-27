@@ -1,0 +1,126 @@
+{
+  "id": "pepsico",
+  "storeName": "PepsiCo Store",
+  "wordmark": "pepsico store",
+  "conceptFor": "PepsiCo",
+  "meta": {
+    "title": "PepsiCo Store — shop drinks and snacks by voice (concept)",
+    "description": "A concept voice-shopping store for PepsiCo in India: Pepsi, 7UP, Mountain Dew, Slice, Tropicana, Lay's, Kurkure, Doritos, Quaker and more."
+  },
+  "tagline": "Pepsi, Mountain Dew, Lay's, Kurkure and more, delivered in about 10 minutes.",
+  "orderDescription": "Drinks and snacks order",
+  "deliveryTime": "10 minutes",
+  "deliveryAreas": [
+    "Sector 62, Noida",
+    "Sector 18, Noida",
+    "Indirapuram, Ghaziabad",
+    "Connaught Place, New Delhi",
+    "DLF Phase 3, Gurugram"
+  ],
+  "freshnessPromise": {
+    "title": "Factory sealed",
+    "text": "Every can, bottle and pack sealed and genuine"
+  },
+  "assistant": {
+    "name": "PepsiCoVoice",
+    "languages": "English, Hindi or Hinglish"
+  },
+  "voiceExamples": [
+    "“Add 2 Pepsi cans”",
+    "“Show only discounted chips”",
+    "“Do Kurkure add kar do”"
+  ],
+  "search": {
+    "placeholder": "Search \"Pepsi\", \"Lay's\", \"Kurkure\"…",
+    "suggestions": ["Pepsi", "Mountain Dew", "Lay's", "Kurkure", "Slice", "Quaker Oats"]
+  },
+  "featuredAisle": {
+    "categoryId": "chips",
+    "label": "chips"
+  },
+  "wholeOrderImageCategory": "chips",
+  "dealExample": "20% off Slice 1.2 L",
+  "listScan": {
+    "itemKind": "drinks and snacks",
+    "examples": ["Pepsi", "Lay's", "Kurkure", "oats"],
+    "hindiExamples": "\"thanda\" → \"cold drink\", \"paani\" → \"water\", \"aam ka juice\" → \"mango drink\", \"chips\" → \"chips\""
+  },
+  "palette": {
+    "light": {
+      "50": "#eef5ff",
+      "100": "#d9e8ff",
+      "200": "#b9d4fb",
+      "400": "#3d82d6",
+      "500": "#0a5fbf",
+      "600": "#004b93",
+      "700": "#003f7d",
+      "800": "#003366",
+      "900": "#002a52"
+    },
+    "dark": {
+      "50": "#0a1a2e",
+      "100": "#0e2440",
+      "200": "#143560",
+      "400": "#6aa6ec",
+      "500": "#3d8be0",
+      "600": "#0a5fbf",
+      "700": "#6aa6ec",
+      "800": "#93c0f3",
+      "900": "#d6e7fc"
+    }
+  },
+  "agent": {
+    "greeting": "Hi, I'm PepsiCoVoice from the PepsiCo Store! What drinks or snacks would you like today?",
+    "ttsVoice": "3b554273-4299-48b9-9aaf-eefd438e3941",
+    "sttPriorityKeyterms": [
+      "cart",
+      "checkout",
+      "PepsiCoVoice",
+      "Pepsi Co Voice",
+      "okay",
+      "bye",
+      "Pepsi",
+      "Pepsi Black",
+      "7UP",
+      "Mirinda",
+      "Mountain Dew",
+      "Slice",
+      "Tropicana",
+      "Gatorade",
+      "Aquafina",
+      "Lay's",
+      "Kurkure",
+      "Doritos",
+      "Uncle Chipps",
+      "Quaker",
+      "can",
+      "bottle",
+      "litre",
+      "thanda",
+      "paani",
+      "scan",
+      "shopping list"
+    ],
+    "prompt": {
+      "store_description": "the PepsiCo Store, a concept store in India that sells only PepsiCo's drinks and snacks",
+      "shop_for": "drinks and snacks",
+      "language_examples": "- Shopper: \"What can you do?\" → \"I can help you shop for PepsiCo drinks and snacks. What would you like today?\"\n- Shopper: \"आप क्या कर सकते हो?\" → \"मैं आपको PepsiCo के drinks और snacks खरीदने में मदद कर सकती हूँ। आपको क्या चाहिए?\"\n- Shopper: \"Mujhe Slice chahiye\" → (search first) \"मुझे Slice मिल गया, screen पर देखिए। कौन सा size चाहिए?\"",
+      "search_example": "\"I found three Slice bottles, they're on your\nscreen. Which one would you like?\"",
+      "current_page_example": "e.g. they are on Breakfast and say \"add 2 Pepsi cans\"",
+      "plain_product_example": "(for \"a Pepsi can\" choose \"Pepsi Can\", not \"Pepsi Black Can\")",
+      "pack_size_example": "(for \"750 ml\" choose the 750 ml bottle, for \"a can\" the 300 ml can, for \"52 g\" the 52 g pack)",
+      "ambiguous_example": "(for example \"Slice\" comes as 250 ml, 600 ml\nand 1.2 L bottles)",
+      "category_example": "(\"go to juices\")",
+      "offers_aisle_example": "(\"show only\ndiscounted chips\", \"juice offers\")",
+      "category_open_example": "\"Here are the juices,\nfive drinks on screen. What would you like?\"",
+      "tie_example": "\"7UP and Mirinda Orange both cost forty rupees. Which one should I add?\"",
+      "hindi_number_example": "\"do Pepsi can add kar do\" means 2 Pepsi cans: call add_to_cart with\nquantity 2, not 1. A \"do\" right before a product or pack is always the number 2.",
+      "highlight_example": "(\"the cheapest is Aquafina Water\")",
+      "list_readout_example": "(\"two Pepsi cans, a pack of Kurkure\")",
+      "list_choice_example": "(for example which size of Pepsi they want)",
+      "misheard_words": "(\"lace\" or \"lays\" for \"Lay's\", \"mountain do\" for \"Mountain Dew\",\n  \"partner\" for \"cart\")",
+      "misheard_remove_example": "\"Remove the spice\" with Slice in the cart →\n    \"Did you mean the Slice?\"",
+      "misheard_extra_word_example": "(\"add two Pepsi cans to\n    my partner\", where \"partner\" is \"cart\")"
+    }
+  }
+}

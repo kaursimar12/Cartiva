@@ -231,7 +231,8 @@ class CartivaAssistant(Agent):
                     result["plainMatch"] = plain
                     result["say"] = (
                         f'{plain["name"]} ({plain["productId"]}) is the plain product for "{query}". Add it '
-                        "(with the pack size the shopper said) unless they named a variant, brand or size "
+                        "(with the quantity and pack size the shopper said, e.g. Hindi \"do\" = 2) "
+                        "unless they named a variant, brand or size "
                         "that is a different product. Do not ask which one."
                     )
                 else:

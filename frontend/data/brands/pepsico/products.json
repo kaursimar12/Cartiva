@@ -1,0 +1,684 @@
+[
+  {
+    "id": "pc01",
+    "name": "Pepsi Can",
+    "category": "soft-drinks",
+    "description": "Bold, refreshing Pepsi in a chilled 300 ml can.",
+    "price": 40,
+    "unit": "300 ml",
+    "brand": "Pepsi",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1629203851122-3726ecdf080e",
+    "tags": [
+      "cola",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "can"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc02",
+    "name": "Pepsi",
+    "category": "soft-drinks",
+    "description": "Pepsi cola in a 750 ml bottle.",
+    "price": 40,
+    "unit": "750 ml",
+    "brand": "Pepsi",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1615182611773-f2fb2e6a6492",
+    "tags": [
+      "cola",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc03",
+    "name": "Pepsi",
+    "category": "soft-drinks",
+    "description": "Pepsi 1.25 L, made for sharing at meals.",
+    "price": 65,
+    "unit": "1.25 L",
+    "brand": "Pepsi",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1502389743708-d00f658638bd",
+    "tags": [
+      "cola",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc04",
+    "name": "Pepsi",
+    "category": "soft-drinks",
+    "description": "Party-size Pepsi 2.25 L bottle.",
+    "price": 95,
+    "unit": "2.25 L",
+    "brand": "Pepsi",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1646533683256-53282e601f63",
+    "tags": [
+      "cola",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle",
+      "party"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc05",
+    "name": "Pepsi Black Can",
+    "category": "soft-drinks",
+    "description": "Pepsi Black: maximum taste, zero sugar, 300 ml can.",
+    "price": 40,
+    "unit": "300 ml",
+    "brand": "Pepsi",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1629203851288-7ececa5f05c4",
+    "tags": [
+      "black",
+      "zero",
+      "sugar free",
+      "cola",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "can"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc06",
+    "name": "7UP Free Can",
+    "category": "soft-drinks",
+    "description": "7UP lemon-lime with zero sugar, 300 ml can.",
+    "price": 40,
+    "unit": "300 ml",
+    "brand": "7UP",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1624517286326-62fc932dffca",
+    "tags": [
+      "seven up",
+      "lemon",
+      "lime",
+      "nimbu",
+      "sugar free",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "can"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc07",
+    "name": "7UP",
+    "category": "soft-drinks",
+    "description": "Crisp 7UP lemon-lime drink, 750 ml bottle.",
+    "price": 40,
+    "unit": "750 ml",
+    "brand": "7UP",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1624517286326-62fc932dffca",
+    "tags": [
+      "seven up",
+      "lemon",
+      "lime",
+      "nimbu",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc08",
+    "name": "Mirinda Orange",
+    "category": "soft-drinks",
+    "description": "Fizzy, fruity Mirinda Orange, 750 ml bottle.",
+    "price": 40,
+    "unit": "750 ml",
+    "brand": "Mirinda",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba",
+    "tags": [
+      "orange",
+      "santra",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc09",
+    "name": "Mirinda Orange Can",
+    "category": "soft-drinks",
+    "description": "Mirinda Orange in a 300 ml can.",
+    "price": 40,
+    "unit": "300 ml",
+    "brand": "Mirinda",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba",
+    "tags": [
+      "orange",
+      "santra",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "can"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc10",
+    "name": "Mountain Dew Can",
+    "category": "soft-drinks",
+    "description": "Citrus-charged Mountain Dew, 300 ml can.",
+    "price": 40,
+    "unit": "300 ml",
+    "brand": "Mountain Dew",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1632134547266-ab2cb69602a1",
+    "tags": [
+      "dew",
+      "citrus",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "can"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc11",
+    "name": "Mountain Dew",
+    "category": "soft-drinks",
+    "description": "Mountain Dew in a 750 ml bottle.",
+    "price": 40,
+    "unit": "750 ml",
+    "brand": "Mountain Dew",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1579895989279-38560ff80a3e",
+    "tags": [
+      "dew",
+      "citrus",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc12",
+    "name": "Mountain Dew",
+    "category": "soft-drinks",
+    "description": "Mountain Dew 1.25 L bottle.",
+    "price": 65,
+    "unit": "1.25 L",
+    "brand": "Mountain Dew",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1579895989279-38560ff80a3e",
+    "tags": [
+      "dew",
+      "citrus",
+      "cold drink",
+      "thanda",
+      "soft drink",
+      "bottle"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc13",
+    "name": "Tropicana Orange",
+    "category": "juices",
+    "description": "Tropicana orange juice, 200 ml pack.",
+    "price": 25,
+    "unit": "200 ml",
+    "brand": "Tropicana",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba",
+    "tags": [
+      "orange",
+      "santra",
+      "juice",
+      "fruit juice"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc14",
+    "name": "Tropicana Orange",
+    "category": "juices",
+    "description": "Tropicana orange juice, 1 L pack.",
+    "price": 130,
+    "unit": "1 L",
+    "brand": "Tropicana",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1600271886742-f049cd451bba",
+    "tags": [
+      "orange",
+      "santra",
+      "juice",
+      "fruit juice"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc15",
+    "name": "Slice Mango Drink",
+    "category": "juices",
+    "description": "Thick, tasty Slice mango drink, 250 ml.",
+    "price": 20,
+    "unit": "250 ml",
+    "brand": "Slice",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696",
+    "tags": [
+      "mango",
+      "aam",
+      "juice",
+      "fruit drink"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc16",
+    "name": "Slice Mango Drink",
+    "category": "juices",
+    "description": "Slice mango drink, 600 ml bottle.",
+    "price": 42,
+    "unit": "600 ml",
+    "brand": "Slice",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696",
+    "tags": [
+      "mango",
+      "aam",
+      "juice",
+      "fruit drink"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc17",
+    "name": "Slice Mango Drink",
+    "category": "juices",
+    "description": "Slice mango drink, 1.2 L family bottle.",
+    "price": 70,
+    "unit": "1.2 L",
+    "brand": "Slice",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1546173159-315724a31696",
+    "tags": [
+      "mango",
+      "aam",
+      "juice",
+      "fruit drink"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc18",
+    "name": "Gatorade Blue Bolt",
+    "category": "sports-and-water",
+    "description": "Gatorade sports drink with electrolytes, Blue Bolt, 500 ml.",
+    "price": 50,
+    "unit": "500 ml",
+    "brand": "Gatorade",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1545334894-9c7a7ccefaf8",
+    "tags": [
+      "sports drink",
+      "electrolytes",
+      "energy",
+      "blue"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc19",
+    "name": "Gatorade Lime",
+    "category": "sports-and-water",
+    "description": "Gatorade sports drink with electrolytes, Lime, 500 ml.",
+    "price": 50,
+    "unit": "500 ml",
+    "brand": "Gatorade",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1525397053281-a37d8a2ff7ce",
+    "tags": [
+      "sports drink",
+      "electrolytes",
+      "energy",
+      "lime",
+      "nimbu"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc20",
+    "name": "Aquafina Water",
+    "category": "sports-and-water",
+    "description": "Aquafina packaged drinking water, 500 ml.",
+    "price": 10,
+    "unit": "500 ml",
+    "brand": "Aquafina",
+    "stock": true,
+    "availableQuantity": 60,
+    "image": "https://images.unsplash.com/photo-1616118132534-381148898bb4",
+    "tags": [
+      "water",
+      "paani",
+      "drinking water",
+      "mineral water"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc21",
+    "name": "Aquafina Water",
+    "category": "sports-and-water",
+    "description": "Aquafina packaged drinking water, 1 L.",
+    "price": 20,
+    "unit": "1 L",
+    "brand": "Aquafina",
+    "stock": true,
+    "availableQuantity": 60,
+    "image": "https://images.unsplash.com/photo-1616118132534-381148898bb4",
+    "tags": [
+      "water",
+      "paani",
+      "drinking water",
+      "mineral water"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc22",
+    "name": "Lay's Classic Salted",
+    "category": "chips",
+    "description": "Thin, crispy potato chips with just the right salt, 52 g.",
+    "price": 20,
+    "unit": "52 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
+    "tags": [
+      "lays",
+      "chips",
+      "potato chips",
+      "wafers",
+      "salted"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc23",
+    "name": "Lay's Classic Salted",
+    "category": "chips",
+    "description": "Lay's Classic Salted party pack, 90 g.",
+    "price": 40,
+    "unit": "90 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
+    "tags": [
+      "lays",
+      "chips",
+      "potato chips",
+      "wafers",
+      "salted",
+      "party"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc24",
+    "name": "Lay's India's Magic Masala",
+    "category": "chips",
+    "description": "Lay's chips with a tangy Indian masala, 52 g.",
+    "price": 20,
+    "unit": "52 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
+    "tags": [
+      "lays",
+      "chips",
+      "potato chips",
+      "wafers",
+      "masala",
+      "blue lays"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc25",
+    "name": "Lay's American Style Cream & Onion",
+    "category": "chips",
+    "description": "Lay's cream and onion chips, 52 g.",
+    "price": 20,
+    "unit": "52 g",
+    "brand": "Lay's",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1528751014936-863e6e7a319c",
+    "tags": [
+      "lays",
+      "chips",
+      "potato chips",
+      "wafers",
+      "cream and onion",
+      "green lays"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc26",
+    "name": "Doritos Sweet Chilli",
+    "category": "chips",
+    "description": "Crunchy Doritos nachos with sweet chilli, 82 g.",
+    "price": 50,
+    "unit": "82 g",
+    "brand": "Doritos",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1585557444334-1fb2db12d234",
+    "tags": [
+      "doritos",
+      "nachos",
+      "tortilla chips",
+      "chilli"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc27",
+    "name": "Doritos Nacho Cheese",
+    "category": "chips",
+    "description": "Doritos nachos with a cheesy kick, 82 g.",
+    "price": 50,
+    "unit": "82 g",
+    "brand": "Doritos",
+    "stock": true,
+    "availableQuantity": 3,
+    "image": "https://images.unsplash.com/photo-1585557444334-1fb2db12d234",
+    "tags": [
+      "doritos",
+      "nachos",
+      "tortilla chips",
+      "cheese"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc28",
+    "name": "Uncle Chipps Spicy Treat",
+    "category": "chips",
+    "description": "Uncle Chipps spicy potato chips, 55 g.",
+    "price": 20,
+    "unit": "55 g",
+    "brand": "Uncle Chipps",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1555041469-6b4032059d29",
+    "tags": [
+      "uncle chips",
+      "chips",
+      "potato chips",
+      "spicy"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc29",
+    "name": "Kurkure Masala Munch",
+    "category": "namkeen",
+    "description": "The classic crunchy, spicy Kurkure, 90 g.",
+    "price": 20,
+    "unit": "90 g",
+    "brand": "Kurkure",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1754088605508-4148fefd8a43",
+    "tags": [
+      "kurkure",
+      "namkeen",
+      "masala",
+      "snack"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc30",
+    "name": "Kurkure Chilli Chatka",
+    "category": "namkeen",
+    "description": "Kurkure with a tangy chilli kick, 90 g.",
+    "price": 20,
+    "unit": "90 g",
+    "brand": "Kurkure",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1754088605508-4148fefd8a43",
+    "tags": [
+      "kurkure",
+      "namkeen",
+      "chilli",
+      "snack"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc31",
+    "name": "Kurkure Green Chutney Style",
+    "category": "namkeen",
+    "description": "Kurkure with a green chutney twist, 90 g.",
+    "price": 20,
+    "unit": "90 g",
+    "brand": "Kurkure",
+    "stock": false,
+    "availableQuantity": 0,
+    "image": "https://images.unsplash.com/photo-1754088605508-4148fefd8a43",
+    "tags": [
+      "kurkure",
+      "namkeen",
+      "chutney",
+      "snack"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc32",
+    "name": "Quaker Oats",
+    "category": "breakfast",
+    "description": "Quaker whole-grain rolled oats, 1 kg.",
+    "price": 199,
+    "unit": "1 kg",
+    "brand": "Quaker",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1722882270575-f437c338a4de",
+    "tags": [
+      "oats",
+      "jai",
+      "breakfast",
+      "porridge"
+    ],
+    "featured": true
+  },
+  {
+    "id": "pc33",
+    "name": "Quaker Oats",
+    "category": "breakfast",
+    "description": "Quaker whole-grain rolled oats, 400 g.",
+    "price": 99,
+    "unit": "400 g",
+    "brand": "Quaker",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1722882270575-f437c338a4de",
+    "tags": [
+      "oats",
+      "jai",
+      "breakfast",
+      "porridge"
+    ],
+    "featured": false
+  },
+  {
+    "id": "pc34",
+    "name": "Quaker Masala Oats",
+    "category": "breakfast",
+    "description": "Ready in minutes: Quaker oats with Indian masala, 38 g.",
+    "price": 15,
+    "unit": "38 g",
+    "brand": "Quaker",
+    "stock": true,
+    "availableQuantity": 40,
+    "image": "https://images.unsplash.com/photo-1722882270575-f437c338a4de",
+    "tags": [
+      "oats",
+      "masala oats",
+      "breakfast",
+      "snack"
+    ],
+    "featured": false
+  }
+]
