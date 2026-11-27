@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LeafIcon, ShieldIcon, TruckIcon } from "@/components/common/icons";
+import { brand } from "@/lib/brand";
 import { pricingService } from "@/lib/container";
 import { DELIVERY_AREAS } from "@/lib/delivery-areas";
 import { formatPrice } from "@/lib/format";
@@ -10,7 +11,7 @@ const linkClass = "hover:text-zinc-900";
 /** Store footer. Every link goes to a real page or section of this site. */
 export function Footer({ categories }: { categories: Category[] }) {
   const promises = [
-    { icon: LeafIcon, title: "Fresh every morning", text: "Fruits and vegetables restocked daily" },
+    { icon: LeafIcon, title: brand.freshnessPromise.title, text: brand.freshnessPromise.text },
     { icon: TruckIcon, title: "Free delivery", text: `On orders above ${formatPrice(pricingService.delivery.freeAbove)}` },
     { icon: ShieldIcon, title: "Secure payments", text: "UPI, cards and netbanking via Razorpay" },
   ];
@@ -55,12 +56,11 @@ export function Footer({ categories }: { categories: Category[] }) {
       <div className="mx-auto grid max-w-[1920px] gap-8 px-4 py-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1.4fr_1fr_1fr_1.2fr] lg:px-10">
         <div>
           <p className="flex items-baseline gap-1">
-            <span className="text-xl font-semibold tracking-tight text-zinc-900">cartiva</span>
+            <span className="text-xl font-semibold tracking-tight text-zinc-900">{brand.wordmark}</span>
             <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden />
           </p>
           <p className="mt-2 max-w-xs text-sm text-zinc-500">
-            Groceries and daily essentials delivered in about 10 minutes. Shop by tapping, or just tell Cartiva what you
-            need.
+            {brand.tagline} Shop by tapping, or just tell {brand.assistant.name} what you need.
           </p>
         </div>
 
@@ -104,7 +104,10 @@ export function Footer({ categories }: { categories: Category[] }) {
 
       <div className="border-t border-hairline">
         <p className="mx-auto flex max-w-[1920px] flex-wrap justify-between gap-2 px-4 py-4 text-xs text-zinc-500 sm:px-6 lg:px-10">
-          <span>© {new Date().getFullYear()} Cartiva. All prices include taxes.</span>
+          <span>
+            © {new Date().getFullYear()} {brand.storeName}. All prices include taxes.
+            {brand.conceptFor && ` Concept demo by Cartiva, not affiliated with ${brand.conceptFor}; illustrative prices.`}
+          </span>
           <span>Payments run in Razorpay test mode; no real money is charged.</span>
         </p>
       </div>

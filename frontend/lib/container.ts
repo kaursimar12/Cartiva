@@ -1,3 +1,4 @@
+import { brandBundle } from "@/lib/brand";
 import { validateCatalog } from "@/models/repositories/catalog-validator";
 import {
   JsonCategoryRepository,
@@ -11,12 +12,13 @@ import { PricingService } from "@/services/pricing/pricing-service";
 
 /**
  * Composition root for server-safe services (catalog + pricing).
+ * The catalog comes from the deployment's brand (NEXT_PUBLIC_BRAND, see lib/brand.ts).
  * Swap a repository here (e.g. JSON → database) without touching services or views.
  */
-export const productRepository = new JsonProductRepository();
-const categoryRepository = new JsonCategoryRepository();
-const offerRepository = new JsonOfferRepository();
-const deliveryPolicyRepository = new JsonDeliveryPolicyRepository();
+export const productRepository = new JsonProductRepository(brandBundle.products);
+const categoryRepository = new JsonCategoryRepository(brandBundle.categories);
+const offerRepository = new JsonOfferRepository(brandBundle.offers);
+const deliveryPolicyRepository = new JsonDeliveryPolicyRepository(brandBundle.delivery);
 
 validateCatalog(productRepository, categoryRepository, offerRepository, deliveryPolicyRepository);
 

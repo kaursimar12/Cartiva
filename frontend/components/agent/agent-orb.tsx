@@ -10,13 +10,14 @@ import { useHeldFlag } from "@/hooks/use-held-flag";
 import { useVoiceActivityStore } from "@/store/voice-activity-store";
 import { useVoiceAgentStore } from "@/store/voice-agent-store";
 import { VoiceSphere, type SphereMode } from "./voice-sphere";
+import { brand } from "@/lib/brand";
 
 /** What the caption says when the agent isn't running an action. */
 const STATE_TEXT: Record<string, string> = {
   connecting: "Connecting…",
   "pre-connect-buffering": "Connecting…",
-  initializing: "Cartiva is joining…",
-  idle: "Cartiva is joining…",
+  initializing: `${brand.assistant.name} is joining…`,
+  idle: `${brand.assistant.name} is joining…`,
   listening: "Listening…",
   thinking: "Thinking…",
   speaking: "Speaking",
@@ -65,7 +66,7 @@ export function AgentOrb() {
   const joining = !greeted && agent.state !== "speaking";
   const caption =
     activity?.label ??
-    (joining ? "Cartiva is joining…" : userSpeaking ? "Go on, I'm listening…" : (STATE_TEXT[agent.state] ?? "Cartiva"));
+    (joining ? `${brand.assistant.name} is joining…` : userSpeaking ? "Go on, I'm listening…" : (STATE_TEXT[agent.state] ?? brand.assistant.name));
   const captionKey = activity ? `${activity.state}:${activity.label}` : joining ? "joining" : userSpeaking ? "user" : agent.state;
 
   // Leave room at the bottom of the page so the dock never covers the last buttons.
@@ -84,7 +85,7 @@ export function AgentOrb() {
         {active && (
           <motion.aside
             key="agent-orb"
-            aria-label="Cartiva voice assistant"
+            aria-label={`${brand.assistant.name} voice assistant`}
             className="flex flex-col items-center gap-3"
             exit={{ opacity: 0, y: 30, scale: 0.8 }}
             transition={{ duration: 0.3 }}

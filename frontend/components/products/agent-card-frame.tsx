@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useAnimate, type DOMKeyframesDefinition } from
 import { useEffect, useState, type ReactNode } from "react";
 import { useAgentFocus, useAgentReveal } from "@/hooks/use-agent-focus";
 import type { AgentFocusKind } from "@/store/agent-event-store";
+import { brand } from "@/lib/brand";
 
 /** How the card itself moves for each kind of agent focus. */
 const CARD_MOTION: Partial<Record<AgentFocusKind, { keyframes: DOMKeyframesDefinition; duration: number }>> = {
@@ -100,10 +101,10 @@ export function AgentCardFrame({
             {focus.kind === "options"
               ? `Option ${focus.index + 1}`
               : focus.kind === "added"
-                ? "Added by Cartiva"
+                ? `Added by ${brand.assistant.name}`
                 : focus.kind === "error"
                   ? "Can't add"
-                  : "Cartiva's pick"}
+                  : `${brand.assistant.name}'s pick`}
           </motion.span>
         )}
       </AnimatePresence>

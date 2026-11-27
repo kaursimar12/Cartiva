@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CameraIcon } from "@/components/common/icons";
+import { brand } from "@/lib/brand";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { VoiceButton } from "@/components/voice/voice-button";
 import type { Category } from "@/models/entities/product";
@@ -13,8 +14,8 @@ export function Header({ categories }: { categories: Category[] }) {
   return (
     <HeaderShell>
       <div className="mx-auto flex max-w-[1920px] items-center gap-3 px-4 py-3 transition-[padding] duration-300 ease-luxe group-data-[scrolled=true]:py-2 sm:gap-6 sm:px-6 lg:px-10">
-        <Link href="/" className="flex shrink-0 items-baseline gap-1" aria-label="Cartiva home">
-          <span className="font-display text-[26px] leading-none text-zinc-900">cartiva</span>
+        <Link href="/" className="flex shrink-0 items-baseline gap-1" aria-label={`${brand.storeName} home`}>
+          <span className="font-display text-[26px] leading-none text-zinc-900">{brand.wordmark}</span>
           <span className="h-2 w-2 rounded-full bg-brand-500" aria-hidden />
         </Link>
 

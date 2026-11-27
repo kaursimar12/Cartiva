@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 import { useAgentEventStore } from "@/store/agent-event-store";
+import { brand } from "@/lib/brand";
 
 type Point = { x: number; y: number };
 
@@ -113,7 +114,7 @@ export function AgentPointer() {
             />
           )}
           <span className="absolute top-6 left-4 rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap text-background shadow-lg">
-            Cartiva
+            {brand.assistant.name}
           </span>
         </motion.div>
       )}

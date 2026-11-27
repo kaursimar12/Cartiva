@@ -13,6 +13,7 @@ import { formatPrice } from "@/lib/format";
 import { CartHints } from "./cart-hints";
 import { CartLineRow } from "./cart-line-row";
 import { PricingSummary } from "./pricing-summary";
+import { brand } from "@/lib/brand";
 
 export function CartView() {
   const { hydrated, lines, pricing, offerHints, freeDeliveryRemaining } = useCart();
@@ -47,7 +48,7 @@ export function CartView() {
         <span className="h-1 w-1 rounded-full bg-zinc-300" aria-hidden />
         <span className="flex items-center gap-1 text-brand-700">
           <BoltIcon className="h-4 w-4" />
-          Arrives in about 10 minutes
+          Arrives in about {brand.deliveryTime}
         </span>
       </p>
 

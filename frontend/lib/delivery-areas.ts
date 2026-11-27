@@ -1,12 +1,8 @@
-/** Areas the store delivers to (shown in the header picker, footer and help page). */
-export const DELIVERY_AREAS = [
-  "Sector 62, Noida",
-  "Sector 18, Noida",
-  "Indirapuram, Ghaziabad",
-  "Connaught Place, New Delhi",
-  "DLF Phase 3, Gurugram",
-] as const;
+import { brand } from "@/lib/brand";
 
-export type DeliveryArea = (typeof DELIVERY_AREAS)[number];
+/** Areas the store delivers to (header picker, footer, help page), from the brand's brand.json. */
+export const DELIVERY_AREAS: readonly string[] = brand.deliveryAreas;
+
+export type DeliveryArea = string;
 
 export const DEFAULT_DELIVERY_AREA: DeliveryArea = DELIVERY_AREAS[0];

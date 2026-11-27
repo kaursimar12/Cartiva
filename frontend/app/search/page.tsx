@@ -4,8 +4,9 @@ import { EmptyState } from "@/components/common/empty-state";
 import { formatPrice, rupeesToPaise } from "@/models/entities/money";
 import { ProductBrowser } from "@/components/products/product-browser";
 import { catalogService } from "@/lib/container";
+import { brand } from "@/lib/brand";
 
-const suggestions = ["tomato", "milk", "Surf Excel", "dishwashing liquid", "chips", "shampoo"];
+const suggestions = brand.search.suggestions;
 
 /** Reads an optional rupee amount from the URL, e.g. ?max=200 → 20000 paise. */
 function rupeesParam(value: string | string[] | undefined): number | undefined {

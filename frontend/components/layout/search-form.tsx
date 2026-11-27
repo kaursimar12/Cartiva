@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { SearchIcon } from "@/components/common/icons";
+import { brand } from "@/lib/brand";
 
 /** `id` must be unique per page: the header renders one form for desktop and one for mobile. */
 export function SearchForm({ id, className = "" }: { id: string; className?: string }) {
@@ -26,7 +27,7 @@ export function SearchForm({ id, className = "" }: { id: string; className?: str
         id={id}
         name="q"
         type="search"
-        placeholder='Search "tomato", "milk", "Surf Excel"…'
+        placeholder={brand.search.placeholder}
         autoComplete="off"
         className="h-11 w-full rounded-full border border-hairline bg-surface-muted pr-4 pl-11 text-sm text-zinc-900 transition placeholder:text-zinc-500 focus:border-brand-500/50 focus:bg-surface focus:ring-4 focus:ring-brand-500/10 focus:outline-none"
       />

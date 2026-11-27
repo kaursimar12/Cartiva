@@ -5,6 +5,7 @@ import { PromoBanners } from "@/components/home/promo-banners";
 import { OfferList } from "@/components/offers/offer-list";
 import { ProductRail } from "@/components/products/product-grid";
 import { catalogService } from "@/lib/container";
+import { brand } from "@/lib/brand";
 
 /**
  * Store front, laid out like a real quick-commerce app: the voice and scan-list features, aisles,
@@ -17,7 +18,7 @@ export default function HomePage() {
 
   return (
     <div className="space-y-10 sm:space-y-12">
-      <h1 className="sr-only">Cartiva: groceries delivered in 10 minutes</h1>
+      <h1 className="sr-only">{`${brand.storeName}: ${brand.tagline}`}</h1>
 
       <PromoBanners />
 

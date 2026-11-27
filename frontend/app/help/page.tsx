@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DELIVERY_AREAS } from "@/lib/delivery-areas";
 import { pricingService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
+import { brand } from "@/lib/brand";
 
 export const metadata: Metadata = { title: "Help" };
 
@@ -17,7 +18,7 @@ export default function HelpPage() {
       items: [
         {
           q: "How long does delivery take?",
-          a: "Most orders arrive in about 10 minutes, packed when you order.",
+          a: `Most orders arrive in about ${brand.deliveryTime}, packed when you order.`,
         },
         {
           q: "How much is delivery?",
@@ -39,7 +40,7 @@ export default function HelpPage() {
         },
         {
           q: "Can offers be combined?",
-          a: "Yes. A product deal (for example 20% off carrots) and a category or whole-order offer can apply to the same order.",
+          a: `Yes. A product deal (for example ${brand.dealExample}) and a category or whole-order offer can apply to the same order.`,
         },
         {
           q: "Are prices inclusive of taxes?",
@@ -67,7 +68,7 @@ export default function HelpPage() {
       items: [
         {
           q: "How do I shop by voice?",
-          a: "Tap “Ask Cartiva” at the top, allow the microphone, and say what you need, for example “Add 2 kg potatoes” or “Show me today’s offers”.",
+          a: `Tap “Ask ${brand.assistant.name}” at the top, allow the microphone, and say what you need, for example ${brand.voiceExamples[0]} or “Show me today’s offers”.`,
         },
         {
           q: "Which languages does it understand?",

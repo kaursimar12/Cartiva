@@ -16,6 +16,7 @@ import { useAgentEventStore } from "@/store/agent-event-store";
 import { useCheckoutStore } from "@/store/checkout-store";
 import { CheckoutSteps } from "./checkout-steps";
 import { PayPanel } from "./pay-panel";
+import { brand } from "@/lib/brand";
 
 const PAYMENT_METHODS = ["UPI", "Cards", "Netbanking", "Wallets"];
 
@@ -120,7 +121,7 @@ export function CheckoutView() {
                 <BoltIcon className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-sm font-semibold text-zinc-900">Arrives in about 10 minutes</p>
+                <p className="text-sm font-semibold text-zinc-900">Arrives in about {brand.deliveryTime}</p>
                 <p className="text-xs text-zinc-500">
                   {freeDeliveryRemaining === null
                     ? "Free delivery on this order"

@@ -1,0 +1,31 @@
+{
+  "id": "cartiva",
+  "storeName": "Cartiva",
+  "wordmark": "cartiva",
+  "conceptFor": null,
+  "meta": {
+    "title": "Cartiva — Intelligent Grocery Shopping",
+    "description": "Shop groceries by browsing or by voice. Fresh vegetables, fruits, dairy, essentials and more."
+  },
+  "tagline": "Groceries and daily essentials delivered in about 10 minutes.",
+  "orderDescription": "Grocery order",
+  "deliveryTime": "10 minutes",
+  "deliveryAreas": [
+    "Sector 62, Noida",
+    "Sector 18, Noida",
+    "Indirapuram, Ghaziabad",
+    "Connaught Place, New Delhi",
+    "DLF Phase 3, Gurugram"
+  ],
+  "freshnessPromise": { "title": "Fresh every morning", "text": "Fruits and vegetables restocked daily" },
+  "assistant": { "name": "Cartiva", "languages": "English, Hindi or Hinglish" },
+  "voiceExamples": ["“Add 2 kg potatoes”", "“Show only discounted vegetables”", "“Do kilo pyaaz add kar do”"],
+  "search": {
+    "placeholder": "Search \"tomato\", \"milk\", \"Surf Excel\"…",
+    "suggestions": ["tomato", "milk", "Surf Excel", "dishwashing liquid", "chips", "shampoo"]
+  },
+  "featuredAisle": { "categoryId": "vegetables", "label": "fresh vegetables" },
+  "wholeOrderImageCategory": "breakfast",
+  "dealExample": "20% off carrots",
+  "palette": null
+}

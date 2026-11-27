@@ -1,4 +1,5 @@
 import type { PaymentGateway, PaymentRequest, PaymentResult } from "./payment-gateway";
+import { brand } from "@/lib/brand";
 
 const CHECKOUT_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 
@@ -94,9 +95,9 @@ function openCheckout(
       amount: order.amount,
       currency: order.currency,
       order_id: order.order_id,
-      name: "Cartiva",
-      description: "Grocery order",
-      theme: { color: "#16a34a" },
+      name: brand.storeName,
+      description: brand.orderDescription,
+      theme: { color: brand.palette?.light[600] ?? "#16a34a" },
       handler: (payment: RazorpaySuccess) => resolve({ ok: true, payment }),
       modal: {
         ondismiss: () => resolve({ ok: false, reason: lastFailure ?? "Payment cancelled. No money was taken." }),

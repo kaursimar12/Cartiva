@@ -1,25 +1,31 @@
 import Image from "next/image";
 import Link from "next/link";
+import { brand } from "@/lib/brand";
+import { catalogService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
 import type { Offer } from "@/models/entities/offer";
 import type { Category } from "@/models/entities/product";
 
 /**
- * Ad colours per offer scope. Fixed colours with fixed text (not theme tokens), so every
- * banner reads the same in light and dark mode.
+ * Ad colours, handed out in the order of the brand's offers.json (so each offer keeps one colour on every
+ * page, filtered or not). Fixed colours with fixed text (not theme tokens), so banners read the same in
+ * light and dark mode.
  */
-const THEMES: Record<string, { bg: string; accent: string; button: string }> = {
-  vegetables: { bg: "bg-[#14532d]", accent: "text-[#bbf7d0]", button: "bg-[#bbf7d0] text-[#14532d]" },
-  laundry: { bg: "bg-[#1e3a8a]", accent: "text-[#bfdbfe]", button: "bg-[#bfdbfe] text-[#1e3a8a]" },
-  all: { bg: "bg-[#9a3412]", accent: "text-[#fed7aa]", button: "bg-[#fed7aa] text-[#9a3412]" },
-};
-const FALLBACK = [
+const THEMES = [
+  { bg: "bg-[#14532d]", accent: "text-[#bbf7d0]", button: "bg-[#bbf7d0] text-[#14532d]" },
+  { bg: "bg-[#1e3a8a]", accent: "text-[#bfdbfe]", button: "bg-[#bfdbfe] text-[#1e3a8a]" },
+  { bg: "bg-[#9a3412]", accent: "text-[#fed7aa]", button: "bg-[#fed7aa] text-[#9a3412]" },
   { bg: "bg-[#3b0764]", accent: "text-[#e9d5ff]", button: "bg-[#e9d5ff] text-[#3b0764]" },
   { bg: "bg-[#134e4a]", accent: "text-[#99f6e4]", button: "bg-[#99f6e4] text-[#134e4a]" },
 ];
 
-/** Photo for a whole-order offer (a spread of groceries). */
-const WHOLE_ORDER_IMAGE_CATEGORY = "breakfast";
+function themeFor(offer: Offer) {
+  const position = catalogService.getStoreOffers().findIndex((o) => o.id === offer.id);
+  return THEMES[Math.max(position, 0) % THEMES.length];
+}
+
+/** Photo for a whole-order offer (a spread of the store's products). */
+const WHOLE_ORDER_IMAGE_CATEGORY = brand.wholeOrderImageCategory;
 
 /** "10%" or "₹50": the big number on the banner. */
 function bigNumber(offer: Offer): string {
@@ -32,9 +38,9 @@ export function OfferList({ offers, categories }: { offers: Offer[]; categories:
 
   return (
     <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {offers.map((offer, i) => {
+      {offers.map((offer) => {
         const category = byId(offer.category);
-        const theme = THEMES[offer.category ?? "all"] ?? FALLBACK[i % FALLBACK.length];
+        const theme = themeFor(offer);
         const image = (category ?? byId(WHOLE_ORDER_IMAGE_CATEGORY))?.image;
         const scope = category ? `On ${category.name.toLowerCase()}` : "On your whole order";
 

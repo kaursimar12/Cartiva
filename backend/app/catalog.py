@@ -1,4 +1,4 @@
-"""Read-only access to the JSON catalog in frontend/data (the backend never writes to it).
+"""Read-only access to the JSON catalog in frontend/data/brands/<brand> (the backend never writes to it).
 
 JSON stores money in rupees; everything here uses integer paise, exactly like the frontend
 (frontend/models/repositories/json-catalog-repository.ts).
@@ -100,7 +100,7 @@ def _read_json(data_dir: Path, name: str) -> Any:
 
 @lru_cache
 def get_catalog() -> Catalog:
-    """The real catalog from DATA_DIR (default: ../frontend/data), loaded once and reused."""
+    """The real catalog from DATA_DIR (default: ../frontend/data/brands/cartiva), loaded once and reused."""
     data_dir = get_settings().data_dir
     return Catalog.from_json(
         _read_json(data_dir, "products.json"),

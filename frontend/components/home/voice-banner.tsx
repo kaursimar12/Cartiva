@@ -3,11 +3,12 @@
 import { VoiceSphere } from "@/components/agent/voice-sphere";
 import { MicIcon } from "@/components/common/icons";
 import { useVoiceSession } from "@/hooks/use-voice-session";
+import { brand } from "@/lib/brand";
 
-const EXAMPLES = ["“Add 2 kg potatoes”", "“Show only discounted vegetables”", "“Do kilo pyaaz add kar do”"];
+const EXAMPLES = brand.voiceExamples;
 
 const STEPS = [
-  { n: "1", title: "Say what you need", text: "In English, Hindi or Hinglish" },
+  { n: "1", title: "Say what you need", text: `In ${brand.assistant.languages}` },
   { n: "2", title: "Watch it shop", text: "Products are found and added on screen" },
   { n: "3", title: "Confirm and pay", text: "It only pays after you say yes" },
 ];
@@ -25,13 +26,13 @@ export function VoiceBanner() {
         <div className="max-w-xl">
           <p className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
             <MicIcon className="h-3.5 w-3.5" />
-            Cartiva Voice
+            {brand.assistant.name} Voice
           </p>
           <h2 id="voice-heading" className="mt-4 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
             Just say what you need.
           </h2>
           <p className="mt-3 text-base text-white/70">
-            Cartiva finds the products, fills your cart and checks out with you, right on this screen.
+            {brand.assistant.name} finds the products, fills your cart and checks out with you, right on this screen.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
@@ -39,7 +40,7 @@ export function VoiceBanner() {
               type="button"
               onClick={() => void toggle()}
               aria-pressed={active}
-              aria-label={active ? "Stop Cartiva voice assistant" : "Start talking to Cartiva"}
+              aria-label={active ? `Stop ${brand.assistant.name} voice assistant` : `Start talking to ${brand.assistant.name}`}
               className={`inline-flex h-12 items-center gap-2 rounded-full px-6 text-base font-semibold transition-colors ${
                 active ? "bg-white/15 text-white hover:bg-white/20" : "bg-white text-[#16150f] hover:bg-white/90" // fixed dark text: zinc-900 turns light in dark mode
               }`}

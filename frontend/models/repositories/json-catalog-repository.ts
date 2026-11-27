@@ -1,7 +1,3 @@
-import categoriesData from "@/data/categories.json";
-import deliveryData from "@/data/delivery.json";
-import offersData from "@/data/offers.json";
-import productsData from "@/data/products.json";
 import type { DeliveryPolicy } from "@/models/entities/delivery";
 import { rupeesToPaise } from "@/models/entities/money";
 import type { Offer } from "@/models/entities/offer";
@@ -35,7 +31,7 @@ export class JsonProductRepository implements ProductRepository {
   private readonly products: Product[];
   private readonly byId: Map<string, Product>;
 
-  constructor(raw: ProductJson[] = productsData as ProductJson[]) {
+  constructor(raw: ProductJson[]) {
     this.products = raw.map(productFromJson);
     this.byId = new Map(this.products.map((p) => [p.id, p]));
   }
@@ -52,7 +48,7 @@ export class JsonProductRepository implements ProductRepository {
 export class JsonCategoryRepository implements CategoryRepository {
   private readonly byId: Map<string, Category>;
 
-  constructor(private readonly categories: Category[] = categoriesData as Category[]) {
+  constructor(private readonly categories: Category[]) {
     this.byId = new Map(categories.map((c) => [c.id, c]));
   }
 
@@ -68,7 +64,7 @@ export class JsonCategoryRepository implements CategoryRepository {
 export class JsonOfferRepository implements OfferRepository {
   private readonly offers: Offer[];
 
-  constructor(raw: OfferJson[] = offersData as OfferJson[]) {
+  constructor(raw: OfferJson[]) {
     this.offers = raw.map(offerFromJson);
   }
 
@@ -84,7 +80,7 @@ export class JsonOfferRepository implements OfferRepository {
 export class JsonDeliveryPolicyRepository implements DeliveryPolicyRepository {
   private readonly policy: DeliveryPolicy;
 
-  constructor(raw: DeliveryJson = deliveryData) {
+  constructor(raw: DeliveryJson) {
     this.policy = deliveryFromJson(raw);
   }
 

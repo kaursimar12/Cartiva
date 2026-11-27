@@ -11,6 +11,7 @@ import { DealBadge } from "@/components/products/deal-badge";
 import { isDeal } from "@/models/entities/offer";
 import { formatPrice } from "@/lib/format";
 import { catalogService, pricingService } from "@/lib/container";
+import { brand } from "@/lib/brand";
 
 export function generateStaticParams() {
   return catalogService.getAllProducts().map((p) => ({ id: p.id }));
@@ -38,7 +39,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
   const inStock = catalogService.getStockStatus(product) !== "out-of-stock";
 
   const perks = [
-    { icon: BoltIcon, title: "Arrives in about 10 minutes", text: "Packed fresh when you order" },
+    { icon: BoltIcon, title: `Arrives in about ${brand.deliveryTime}`, text: "Packed fresh when you order" },
     { icon: TruckIcon, title: "Free delivery", text: `On orders above ${formatPrice(pricingService.delivery.freeAbove)}` },
     { icon: ShieldIcon, title: "Secure payment", text: "UPI, cards and netbanking via Razorpay" },
   ];
@@ -65,7 +66,7 @@ export default async function ProductPage(props: PageProps<"/product/[id]">) {
             <div className="absolute top-4 left-4 flex flex-col items-start gap-2">
               <span className="flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-[#16150f] uppercase shadow-sm backdrop-blur">
                 <BoltIcon className="h-3.5 w-3.5 text-brand-600" />
-                10 mins
+                {brand.deliveryTime.replace("minutes", "mins")}
               </span>
               <StockBadge product={product} />
             </div>

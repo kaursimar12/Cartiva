@@ -11,7 +11,9 @@ All code must follow an **MVC structure** and the **SOLID principles**. Specs: `
 | `frontend/` | Next.js app (catalog, cart, pricing, UI). Next.js docs: `frontend/node_modules/next/dist/docs/` | `npm run dev`, `npm run build` |
 | `backend/` | Python FastAPI (LiveKit token, Razorpay) + LiveKit agent worker | `uv run fastapi dev app/main.py` |
 
-JSON catalog data lives in `frontend/data/`; the backend reads it read-only via `DATA_DIR`.
+JSON catalog data lives per brand in `frontend/data/brands/<brand>/` (catalog files + `brand.json`); a website build
+picks its brand with `NEXT_PUBLIC_BRAND` (default `cartiva`, see `frontend/lib/brand.ts`). The backend reads it
+read-only via `DATA_DIR`.
 
 ## MVC layers (frontend — paths relative to `frontend/`)
 

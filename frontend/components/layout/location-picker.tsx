@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { BoltIcon } from "@/components/common/icons";
+import { brand } from "@/lib/brand";
 import { DEFAULT_DELIVERY_AREA, DELIVERY_AREAS, type DeliveryArea } from "@/lib/delivery-areas";
 
 const STORAGE_KEY = "cartiva-delivery-area";
@@ -70,7 +71,7 @@ export function LocationPicker() {
       >
         <span className="flex items-center gap-1 text-sm font-semibold text-zinc-900">
           <BoltIcon className="h-4 w-4 text-brand-600" />
-          Delivery in 10 minutes
+          Delivery in {brand.deliveryTime}
         </span>
         <span className="flex max-w-[13rem] items-center gap-1 text-xs text-zinc-600">
           <span className="truncate">{area}</span>

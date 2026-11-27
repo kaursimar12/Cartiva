@@ -1,15 +1,10 @@
 import type { Paise } from "./money";
 
-export type CategoryId =
-  | "vegetables"
-  | "fruits"
-  | "dairy"
-  | "beverages"
-  | "snacks"
-  | "breakfast"
-  | "cleaning"
-  | "laundry"
-  | "personal-care";
+/**
+ * A category id from the brand's categories.json (e.g. "vegetables", "colas"). Each brand has its own
+ * aisles, so this is a string; catalog-validator.ts checks every reference against the loaded categories.
+ */
+export type CategoryId = string;
 
 export interface Category {
   id: CategoryId;

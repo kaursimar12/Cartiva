@@ -14,6 +14,7 @@ import { catalogService } from "@/lib/container";
 import { formatPrice } from "@/lib/format";
 import type { ListLine } from "@/models/entities/shopping-list";
 import { useShoppingListStore } from "@/store/shopping-list-store";
+import { brand } from "@/lib/brand";
 
 /** Upload → review (found / choose / not available) → add all to cart. */
 export function ScanListView() {
@@ -99,7 +100,7 @@ export function ScanListView() {
             <Section title={`Not available (${missing.length})`}>
               {missing.map((line) => (
                 <Row key={line.id} line={line}>
-                  <span className="text-sm text-red-700">{line.status === "unavailable" ? "Out of stock" : "Not sold at Cartiva"}</span>
+                  <span className="text-sm text-red-700">{line.status === "unavailable" ? "Out of stock" : `Not sold at ${brand.storeName}`}</span>
                 </Row>
               ))}
             </Section>
@@ -233,7 +234,7 @@ function ChooseRow({ line, asking }: { line: ListLine; asking: boolean }) {
           {asking ? (
             <span className="ml-2 inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-2 py-0.5 text-[11px] font-semibold text-white">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" aria-hidden />
-              Cartiva is asking: which one?
+              {brand.assistant.name} is asking: which one?
             </span>
           ) : (
             <span className="ml-2 text-xs text-zinc-500">Which one?</span>

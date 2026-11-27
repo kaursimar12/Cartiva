@@ -5,7 +5,9 @@ import { Toaster } from "@/components/common/toaster";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { VoiceProvider } from "@/components/voice/voice-provider"; // ★ CHANGE 1: new import
+import { brand } from "@/lib/brand";
 import { catalogService } from "@/lib/container";
+import type { BrandPalette } from "@/models/entities/brand";
 import { THEME_STORAGE_KEY } from "@/store/theme-store";
 import "./globals.css";
 
@@ -21,17 +23,27 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Cartiva — Intelligent Grocery Shopping",
-    template: "%s · Cartiva",
+    default: brand.meta.title,
+    template: `%s · ${brand.storeName}`,
   },
-  description: "Shop groceries by browsing or by voice. Fresh vegetables, fruits, dairy, essentials and more.",
+  description: brand.meta.description,
 };
+
+/** The brand's colours as CSS variables (overriding the default green `brand-*` scale), or null for the default. */
+function paletteCss(): string | null {
+  if (!brand.palette) return null;
+  const vars = (scale: BrandPalette) =>
+    (Object.entries(scale) as [string, string][]).map(([step, hex]) => `--color-brand-${step}:${hex};`).join("");
+  // `html:root` outranks the default :root / :root[data-theme="dark"] rules in globals.css.
+  return `html:root{${vars(brand.palette.light)}}html:root[data-theme="dark"]{${vars(brand.palette.dark)}}`;
+}
 
 /** Applies the saved theme before first paint (dark is the default), so there is no flash. */
 const themeScript = `try{var t=JSON.parse(localStorage.getItem("${THEME_STORAGE_KEY}")||"null");t=t&&t.state&&t.state.theme;if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const categories = catalogService.getCategories();
+  const brandColours = paletteCss();
 
   return (
     <html
@@ -42,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        {brandColours && <style dangerouslySetInnerHTML={{ __html: brandColours }} />}
       </head>
       <body className="flex min-h-full flex-col font-sans">
         <a

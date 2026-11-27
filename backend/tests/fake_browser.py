@@ -12,7 +12,7 @@ from typing import Any
 from app.catalog import Catalog
 from app.pricing import CartItem, quote
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "frontend" / "data"
+DATA_DIR = Path(__file__).resolve().parents[2] / "frontend" / "data" / "brands" / "cartiva"
 
 
 def _load(name: str) -> Any:

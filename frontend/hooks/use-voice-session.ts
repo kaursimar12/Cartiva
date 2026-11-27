@@ -4,10 +4,11 @@ import { useSessionContext } from "@livekit/components-react";
 import { voiceSessionController } from "@/controllers/voice-session-controller";
 import { startProblem } from "@/lib/voice/voice-errors";
 import { useVoiceAgentStore } from "@/store/voice-agent-store";
+import { brand } from "@/lib/brand";
 
 /** What a voice control says for each agent state (SRS FR-12). */
 const STATUS_LABELS: Record<string, string> = {
-  disconnected: "Ask Cartiva",
+  disconnected: `Ask ${brand.assistant.name}`,
   connecting: "Connecting…",
   "pre-connect-buffering": "Connecting…",
   initializing: "Agent joining…",
@@ -36,8 +37,8 @@ export function useVoiceSession() {
   const label = reconnecting
     ? STATUS_LABELS.reconnecting
     : joining
-      ? "Cartiva is joining…"
-      : (STATUS_LABELS[state] ?? "Ask Cartiva");
+      ? `${brand.assistant.name} is joining…`
+      : (STATUS_LABELS[state] ?? `Ask ${brand.assistant.name}`);
 
   async function start() {
     if (active) return;
