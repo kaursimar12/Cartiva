@@ -133,6 +133,16 @@ def get_catalog(brand: str | None = None) -> Catalog:
 
 
 @lru_cache
+def _load_categories(brand_id: str) -> tuple[dict[str, Any], ...]:
+    return tuple(_read_json(get_settings().brands_dir / brand_id, "categories.json"))
+
+
+def get_categories(brand: str | None = None) -> tuple[dict[str, Any], ...]:
+    """A storefront's aisles from categories.json (id, name, description, image), in display order."""
+    return _load_categories(resolve_brand(brand))
+
+
+@lru_cache
 def _load_brand(brand_id: str) -> dict[str, Any]:
     return _read_json(get_settings().brands_dir / brand_id, "brand.json")
 

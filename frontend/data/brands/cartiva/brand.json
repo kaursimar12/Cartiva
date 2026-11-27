@@ -17,20 +17,93 @@
     "Connaught Place, New Delhi",
     "DLF Phase 3, Gurugram"
   ],
-  "freshnessPromise": { "title": "Fresh every morning", "text": "Fruits and vegetables restocked daily" },
-  "assistant": { "name": "Cartiva", "languages": "English, Hindi or Hinglish" },
-  "voiceExamples": ["“Add 2 kg potatoes”", "“Show only discounted vegetables”", "“Do kilo pyaaz add kar do”"],
+  "freshnessPromise": {
+    "title": "Fresh every morning",
+    "text": "Fruits and vegetables restocked daily"
+  },
+  "assistant": {
+    "name": "Cartiva",
+    "languages": "English, Hindi or Hinglish"
+  },
+  "voiceExamples": [
+    "“Add 2 kg potatoes”",
+    "“Show only discounted vegetables”",
+    "“Do kilo pyaaz add kar do”"
+  ],
   "search": {
     "placeholder": "Search \"tomato\", \"milk\", \"Surf Excel\"…",
-    "suggestions": ["tomato", "milk", "Surf Excel", "dishwashing liquid", "chips", "shampoo"]
+    "suggestions": [
+      "tomato",
+      "milk",
+      "Surf Excel",
+      "dishwashing liquid",
+      "chips",
+      "shampoo"
+    ]
   },
-  "featuredAisle": { "categoryId": "vegetables", "label": "fresh vegetables" },
+  "featuredAisle": {
+    "categoryId": "vegetables",
+    "label": "fresh vegetables"
+  },
   "wholeOrderImageCategory": "breakfast",
   "dealExample": "20% off carrots",
   "listScan": {
     "itemKind": "grocery",
-    "examples": ["tomato", "milk", "dishwashing liquid", "Surf Excel"],
+    "examples": [
+      "tomato",
+      "milk",
+      "dishwashing liquid",
+      "Surf Excel"
+    ],
     "hindiExamples": "\"टमाटर\" or \"tamatar\" → \"tomato\", \"doodh\" → \"milk\", \"aloo\" → \"potato\""
   },
-  "palette": null
+  "palette": null,
+  "agent": {
+    "greeting": "Hi, I'm Cartiva! What would you like to buy today?",
+    "ttsVoice": "3b554273-4299-48b9-9aaf-eefd438e3941",
+    "sttPriorityKeyterms": [
+      "cart",
+      "checkout",
+      "kg",
+      "kilo",
+      "litre",
+      "dozen",
+      "Cartiva",
+      "okay",
+      "bye",
+      "tomatoes",
+      "potatoes",
+      "onions",
+      "bananas",
+      "apples",
+      "eggs",
+      "aloo",
+      "tamatar",
+      "pyaaz",
+      "doodh",
+      "scan",
+      "shopping list"
+    ],
+    "prompt": {
+      "store_description": "an Indian online grocery store",
+      "shop_for": "groceries",
+      "language_examples": "- Shopper: \"What can you do?\" → \"I can help you shop for groceries. What do you need today?\"\n- Shopper: \"आप क्या कर सकते हो?\" → \"मैं आपको groceries खरीदने में मदद कर सकती हूँ। आपको क्या चाहिए?\"\n- Shopper: \"Mujhe tomatoes chahiye\" → (search first) \"मुझे tomatoes मिल गए, screen पर देखिए। Tomato एक kilo चालीस रुपये का है।\"",
+      "search_example": "\"I found four dishwashing liquids, they're on your\nscreen. Which one would you like?\"",
+      "current_page_example": "e.g. they are on Vegetables and say \"add 2 kg onions\"",
+      "plain_product_example": "(for \"tomatoes\" choose \"Tomato\", not \"Tomato Cherry\" or \"Tomato Puree\")",
+      "pack_size_example": "(for \"1 kg\" choose the 1 kg pack)",
+      "ambiguous_example": "(for example \"dishwash\" matches Vim, Pril and\nExo in several sizes)",
+      "category_example": "(\"go to fruits\")",
+      "offers_aisle_example": "(\"show only\ndiscounted vegetables\", \"dairy offers\")",
+      "category_open_example": "\"Here are the vegetables,\neleven products on screen. What would you like?\"",
+      "tie_example": "\"Banana and Guava both cost forty rupees. Which one should I add?\"",
+      "hindi_number_example": "\"do kilo pyaaz\" means 2 kg of onions (quantity 2 of the 1 kg pack),\nnot 1.",
+      "highlight_example": "(\"the cheapest is Vim\")",
+      "list_readout_example": "(\"two kilos of tomatoes, a pack of Amul butter\")",
+      "list_choice_example": "(for example which size of Vim they want)",
+      "misheard_words": "(\"tools\" for \"tomatoes\",\n  \"partner\" for \"cart\")",
+      "misheard_remove_example": "\"Remove the tools\" with tomatoes in the cart →\n    \"Did you mean the tomatoes?\"",
+      "misheard_extra_word_example": "(\"add two kg potatoes to\n    my partner\", where \"partner\" is \"cart\")"
+    }
+  }
 }

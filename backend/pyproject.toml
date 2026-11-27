@@ -19,6 +19,7 @@ entrypoint = "app.main:app"
 
 [dependency-groups]
 dev = [
+    "livekit-plugins-openai~=1.8",
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
 ]

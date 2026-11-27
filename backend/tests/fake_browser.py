@@ -1,54 +1,23 @@
 """A stand-in for the shopper's browser, so agent conversations can be tested without a website.
 
-It answers the same RPC methods as frontend/lib/voice/rpc.ts, with the same result shapes, using
-the real catalog (frontend/data/products.json). Tests read its cart / screen / payments afterwards.
+It answers the same RPC methods as frontend/lib/voice/rpc.ts, with the same result shapes, using a
+real brand catalog (frontend/data/brands/<brand>/). Tests read its cart / screen / payments afterwards.
 """
 
 import json
 import re
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from app.catalog import Catalog
 from app.pricing import CartItem, quote
 
-DATA_DIR = Path(__file__).resolve().parents[2] / "frontend" / "data" / "brands" / "cartiva"
-
-
-def _load(name: str) -> Any:
-    return json.loads((DATA_DIR / name).read_text(encoding="utf-8"))
-
-
-PRODUCTS: list[dict[str, Any]] = _load("products.json")
-OFFERS: list[dict[str, Any]] = _load("offers.json")
-DELIVERY: dict[str, Any] = _load("delivery.json")
-BY_ID = {p["id"]: p for p in PRODUCTS}
-# Real pricing (the server's copy of the website's rules), so cart totals match the app.
-CATALOG = Catalog.from_json(PRODUCTS, OFFERS, DELIVERY)
-DEALS = {pid: o for o in OFFERS if o["active"] and o.get("productIds") for pid in o["productIds"]}
-CATEGORIES = {
-    "vegetables": "Vegetables", "fruits": "Fruits", "dairy": "Dairy", "beverages": "Beverages",
-    "snacks": "Snacks", "breakfast": "Breakfast", "cleaning": "Cleaning", "laundry": "Laundry",
-    "personal-care": "Personal Care",
-}
+BRANDS_DIR = Path(__file__).resolve().parents[2] / "frontend" / "data" / "brands"
 
 
 def rupees(amount: float) -> str:
     return f"₹{amount:,.0f}" if amount == int(amount) else f"₹{amount:,.2f}"
-
-
-def agent_product(p: dict[str, Any]) -> dict[str, Any]:
-    out = {
-        "productId": p["id"], "name": p["name"], "brand": p["brand"], "unit": p["unit"],
-        "price": rupees(p["price"]), "priceRupees": p["price"], "inStock": p["stock"],
-    }
-    deal = DEALS.get(p["id"])
-    if deal:  # same extra fields as toAgentProduct in voice-controller.ts
-        out["deal"] = deal["title"]
-        if deal["discountType"] == "percentage" and deal["minimumAmount"] == 0:
-            paise = round(p["price"] * 100)
-            out["dealPrice"] = rupees((paise - paise * deal["discountValue"] // 100) / 100)
-    return out
 
 
 def _variants(term: str) -> list[str]:
@@ -60,21 +29,66 @@ def _variants(term: str) -> list[str]:
     return out
 
 
-def search(query: str) -> list[dict[str, Any]]:
-    """Same idea as CatalogService.search: every query word must match name/brand/category/tags."""
-    terms = re.sub(r"[^a-z0-9\s-]", " ", query.lower()).split()
-    if not terms:
-        return []
+class StoreData:
+    """One brand's catalog as the browser sees it: products, aisles, deals and real pricing."""
 
-    def haystack(p: dict[str, Any]) -> str:
-        return " ".join([p["name"], p["brand"] or "", CATEGORIES[p["category"]], *p["tags"]]).lower()
+    def __init__(self, brand: str) -> None:
+        folder = BRANDS_DIR / brand
 
-    hits = [p for p in PRODUCTS if all(any(v in haystack(p) for v in _variants(t)) for t in terms)]
-    return sorted(hits, key=lambda p: p["price"])
+        def load(name: str) -> Any:
+            return json.loads((folder / name).read_text(encoding="utf-8"))
+
+        self.brand = brand
+        self.products: list[dict[str, Any]] = load("products.json")
+        self.offers: list[dict[str, Any]] = load("offers.json")
+        self.delivery: dict[str, Any] = load("delivery.json")
+        self.by_id = {p["id"]: p for p in self.products}
+        # Real pricing (the server's copy of the website's rules), so cart totals match the app.
+        self.catalog = Catalog.from_json(self.products, self.offers, self.delivery)
+        self.deals = {pid: o for o in self.offers if o["active"] and o.get("productIds") for pid in o["productIds"]}
+        self.categories = {c["id"]: c["name"] for c in load("categories.json")}
+
+    def agent_product(self, p: dict[str, Any]) -> dict[str, Any]:
+        out = {
+            "productId": p["id"], "name": p["name"], "brand": p.get("brand"), "unit": p["unit"],
+            "price": rupees(p["price"]), "priceRupees": p["price"], "inStock": p["stock"],
+        }
+        deal = self.deals.get(p["id"])
+        if deal:  # same extra fields as toAgentProduct in voice-controller.ts
+            out["deal"] = deal["title"]
+            if deal["discountType"] == "percentage" and deal["minimumAmount"] == 0:
+                paise = round(p["price"] * 100)
+                out["dealPrice"] = rupees((paise - paise * deal["discountValue"] // 100) / 100)
+        return out
+
+    def search(self, query: str) -> list[dict[str, Any]]:
+        """Same idea as CatalogService.search: every query word must match name/brand/category/tags."""
+        terms = re.sub(r"[^a-z0-9\s-]", " ", query.lower()).split()
+        if not terms:
+            return []
+
+        def haystack(p: dict[str, Any]) -> str:
+            return " ".join([p["name"], p.get("brand") or "", self.categories[p["category"]], *p.get("tags", [])]).lower()
+
+        hits = [p for p in self.products if all(any(v in haystack(p) for v in _variants(t)) for t in terms)]
+        return sorted(hits, key=lambda p: p["price"])
+
+
+@lru_cache
+def store(brand: str = "cartiva") -> StoreData:
+    return StoreData(brand)
+
+
+# The default (Cartiva) store's data, for tests that look products up directly.
+_DEFAULT = store()
+PRODUCTS = _DEFAULT.products
+BY_ID = _DEFAULT.by_id
+CATEGORIES = _DEFAULT.categories
 
 
 class FakeBrowser:
-    def __init__(self) -> None:
+    def __init__(self, brand: str = "cartiva") -> None:
+        self.store = store(brand)
         self.cart: dict[str, int] = {}
         self.screen: tuple[str, list[str]] = ("", [])  # (title, productIds in on-screen order)
         self.calls: list[tuple[str, dict[str, Any]]] = []
@@ -91,12 +105,12 @@ class FakeBrowser:
         ]
 
     def _list_line(self, line: dict[str, Any]) -> dict[str, Any]:
-        product = BY_ID.get(line["productId"]) if line["productId"] else None
+        product = self.store.by_id.get(line["productId"]) if line["productId"] else None
         return {
             "lineId": line["lineId"], "written": line["written"], "status": line["status"],
             "packs": line["packs"], "limited": False,
-            "product": agent_product(product) if product else None,
-            "options": [agent_product(BY_ID[o]) for o in line["options"]] if line["status"] == "choose" else [],
+            "product": self.store.agent_product(product) if product else None,
+            "options": [self.store.agent_product(self.store.by_id[o]) for o in line["options"]] if line["status"] == "choose" else [],
         }
 
     def _find_list_line(self, line_id: Any) -> dict[str, Any] | None:
@@ -105,10 +119,10 @@ class FakeBrowser:
     # ---- test helpers (simulate the shopper clicking) ----
     def click_category(self, category: str, sort_by_price_desc: bool = False) -> None:
         items = sorted(
-            (p for p in PRODUCTS if p["category"] == category),
+            (p for p in self.store.products if p["category"] == category),
             key=lambda p: p["price"], reverse=sort_by_price_desc,
         )
-        self.screen = (CATEGORIES[category], [p["id"] for p in items])
+        self.screen = (self.store.categories[category], [p["id"] for p in items])
 
     def called(self, method: str) -> list[dict[str, Any]]:
         return [payload for name, payload in self.calls if name == method]
@@ -121,17 +135,17 @@ class FakeBrowser:
 
     def _cart_get(self, _: dict[str, Any]) -> dict[str, Any]:
         items = [
-            {"productId": pid, "name": BY_ID[pid]["name"], "unit": BY_ID[pid]["unit"], "quantity": q,
-             "lineTotal": rupees(BY_ID[pid]["price"] * q)}
+            {"productId": pid, "name": self.store.by_id[pid]["name"], "unit": self.store.by_id[pid]["unit"], "quantity": q,
+             "lineTotal": rupees(self.store.by_id[pid]["price"] * q)}
             for pid, q in self.cart.items()
         ]
-        price = quote(CATALOG, [CartItem(product_id=pid, quantity=q) for pid, q in self.cart.items()])
+        price = quote(self.store.catalog, [CartItem(product_id=pid, quantity=q) for pid, q in self.cart.items()])
         return {"ok": True, "items": items, "subtotal": rupees(price.subtotal / 100),
                 "discount": rupees(price.discount / 100), "deliveryFee": rupees(price.delivery_fee / 100),
                 "total": rupees(price.total / 100)}
 
     def _catalog_search(self, p: dict[str, Any]) -> dict[str, Any]:
-        results = search(str(p.get("query") or ""))
+        results = self.store.search(str(p.get("query") or ""))
         if isinstance(p.get("maxPrice"), (int, float)):
             results = [r for r in results if r["price"] <= p["maxPrice"]]
         if isinstance(p.get("minPrice"), (int, float)):
@@ -140,11 +154,11 @@ class FakeBrowser:
         if show:
             self.screen = (f'Search results for "{p.get("query")}"', [r["id"] for r in results])
         return {"ok": True, "count": len(results), "shownOnScreen": show,
-                "products": [agent_product(r) for r in results[:8]]}
+                "products": [self.store.agent_product(r) for r in results[:8]]}
 
     def _cart_add(self, p: dict[str, Any]) -> dict[str, Any]:
         pid, qty = p.get("productId"), p.get("quantity", 1)
-        product = BY_ID.get(pid)
+        product = self.store.by_id.get(pid)
         if product is None:
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That product couldn't be found."}}
         if not isinstance(qty, int) or qty < 1:
@@ -165,7 +179,7 @@ class FakeBrowser:
         if pid not in self.cart:
             return {"ok": False, "error": {"code": "NOT_IN_CART", "message": "That item isn't in your cart."}}
         del self.cart[pid]
-        return {"ok": True, "message": f"Removed {BY_ID[pid]['name']} from your cart."}
+        return {"ok": True, "message": f"Removed {self.store.by_id[pid]['name']} from your cart."}
 
     def _cart_update(self, p: dict[str, Any]) -> dict[str, Any]:
         pid, qty = p.get("productId"), p.get("quantity")
@@ -174,23 +188,23 @@ class FakeBrowser:
         if qty == 0:
             return self._cart_remove(p)
         self.cart[pid] = qty
-        return {"ok": True, "message": f"Updated {BY_ID[pid]['name']} to {qty}.", "quantityInCart": qty}
+        return {"ok": True, "message": f"Updated {self.store.by_id[pid]['name']} to {qty}.", "quantityInCart": qty}
 
     def _ui_openCategory(self, p: dict[str, Any]) -> dict[str, Any]:
         cat = p.get("category")
-        if cat not in CATEGORIES:
+        if cat not in self.store.categories:
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That category doesn't exist."}}
         self.click_category(cat)
         ids = self.screen[1]
-        return {"ok": True, "shownOnScreen": True, "category": CATEGORIES[cat], "count": len(ids),
-                "products": [agent_product(BY_ID[i]) for i in ids[:8]]}
+        return {"ok": True, "shownOnScreen": True, "category": self.store.categories[cat], "count": len(ids),
+                "products": [self.store.agent_product(self.store.by_id[i]) for i in ids[:8]]}
 
     def _ui_openProduct(self, p: dict[str, Any]) -> dict[str, Any]:
-        product = BY_ID.get(p.get("productId"))
+        product = self.store.by_id.get(p.get("productId"))
         if product is None:
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": "That product couldn't be found."}}
         self.screen = (product["name"], [product["id"]])
-        return {"ok": True, "shownOnScreen": True, "product": agent_product(product)}
+        return {"ok": True, "shownOnScreen": True, "product": self.store.agent_product(product)}
 
     def _ui_openPage(self, p: dict[str, Any]) -> dict[str, Any]:
         page = p.get("page")
@@ -204,27 +218,27 @@ class FakeBrowser:
     def _ui_openOffers(self, p: dict[str, Any]) -> dict[str, Any]:
         # Same shape as voiceController.openOffers.
         category = p.get("category") or None
-        if category is not None and category not in CATEGORIES:
+        if category is not None and category not in self.store.categories:
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": f"There's no {category} section."}}
-        deal_ids = [pid for pid in BY_ID if pid in DEALS and (category is None or BY_ID[pid]["category"] == category)]
-        self.screen = (f"Discounted {CATEGORIES[category]}" if category else "Offers", deal_ids)
-        return {"ok": True, "shownOnScreen": True, "category": CATEGORIES.get(category or ""),
-                "delivery": f"Free delivery above {rupees(DELIVERY['freeAbove'])}, otherwise {rupees(DELIVERY['fee'])}",
-                "storeOffers": [{"title": o["title"], "description": o["description"]} for o in OFFERS
+        deal_ids = [pid for pid in self.store.by_id if pid in self.store.deals and (category is None or self.store.by_id[pid]["category"] == category)]
+        self.screen = (f"Discounted {self.store.categories[category]}" if category else "Offers", deal_ids)
+        return {"ok": True, "shownOnScreen": True, "category": self.store.categories.get(category or ""),
+                "delivery": f"Free delivery above {rupees(self.store.delivery['freeAbove'])}, otherwise {rupees(self.store.delivery['fee'])}",
+                "storeOffers": [{"title": o["title"], "description": o["description"]} for o in self.store.offers
                                 if o["active"] and not o.get("productIds")
                                 and (category is None or o["category"] in (None, category))],
                 "dealCount": len(deal_ids),
-                "deals": [agent_product(BY_ID[pid]) for pid in deal_ids[:8]],
+                "deals": [self.store.agent_product(self.store.by_id[pid]) for pid in deal_ids[:8]],
                 "products": [{"productId": pid} for pid in deal_ids]}
 
     def _ui_getScreen(self, _: dict[str, Any]) -> dict[str, Any]:
         title, ids = self.screen
         return {"ok": True, "page": "/", "title": title, "productCount": len(ids),
-                "products": [{"position": i + 1, **agent_product(BY_ID[pid])} for i, pid in enumerate(ids[:20])]}
+                "products": [{"position": i + 1, **self.store.agent_product(self.store.by_id[pid])} for i, pid in enumerate(ids[:20])]}
 
     def _ui_highlight(self, p: dict[str, Any]) -> dict[str, Any]:
         # Same shape as voiceController.highlightProducts: only makes cards glow, never changes the cart.
-        ids = [pid for pid in p.get("productIds") or [] if pid in BY_ID]
+        ids = [pid for pid in p.get("productIds") or [] if pid in self.store.by_id]
         if not ids:
             return {"ok": False, "error": {"code": "NOT_FOUND", "message": "None of those products exist."}}
         on_screen = set(self.screen[1])
@@ -262,7 +276,7 @@ class FakeBrowser:
         name = str(p.get("name") or "").strip()
         if not name:
             return {"ok": False, "error": {"code": "INVALID_QUERY", "message": "No item name was given."}}
-        hits = search(name)
+        hits = self.store.search(name)
         product = hits[0] if hits else None
         status = "not-found" if product is None else ("found" if product["stock"] else "unavailable")
         packs = max(1, int(p.get("quantity") or 1)) if status == "found" else 0

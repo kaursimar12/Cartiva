@@ -1,6 +1,8 @@
 """Unit tests for the helpers that do work the LLM is unreliable at (no LLM calls)."""
 
-from agent.worker import plain_match, price_extremes
+import pytest
+
+from agent.worker import OFFER_WORDS, plain_match, price_extremes
 
 
 def product(pid: str, name: str, price: float, in_stock: bool = True) -> dict:
@@ -33,3 +35,21 @@ def test_price_extremes_ignores_out_of_stock() -> None:
 
 def test_price_extremes_empty_screen() -> None:
     assert price_extremes([]) == {}
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["Show me things on offer", "any deals today?", "Show only discounted vegetables", "koi sale hai",
+     "sabzi pe kya offer hai?", "सब्ज़ी पर छूट है?", "ऑफर दिखाओ"],
+)
+def test_offer_requests_are_recognised(said: str) -> None:
+    assert OFFER_WORDS.search(said)
+
+
+@pytest.mark.parametrize(
+    "said",
+    ["Show me dishwashing liquids under 200 rupees", "Add the cheapest one", "wholesale price", "do kilo pyaaz"],
+)
+def test_other_requests_never_open_offers(said: str) -> None:
+    # A price limit or "cheapest" is a search, not an offer request (the model kept confusing them).
+    assert not OFFER_WORDS.search(said)

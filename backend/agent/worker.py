@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import logging
+import re
 from typing import Literal
 
 from dotenv import load_dotenv
@@ -31,8 +32,8 @@ from livekit import rtc
 
 from agent.greeting_audio import load_greeting, play_frames
 from agent.language import REPLY_RULES, VOICE_LANGUAGE, Language, detect_language, language_instructions
+from agent.brand_profile import STT_KEYTERM_BUDGET, BrandProfile, load_brand_profile, profile_for_job
 from agent.rpc import BrowserRpcError, call_browser
-from app.catalog import get_catalog
 
 logger = logging.getLogger("cartiva-agent")
 
@@ -46,7 +47,6 @@ TIME_WARNING_SECONDS = 30      # heads-up this long before the limit
 AWAY_AFTER_SECONDS = 30        # silence before "are you still there?"
 GRACE_SECONDS = 15             # extra silence before hanging up
 LIST_SIGNAL_WAIT_SECONDS = 0.8 # how long to wait for "a list is coming" before the normal greeting
-GREETING = "Hi, I'm Cartiva! What would you like to buy today?"
 GREETING_TAKE_WAIT_SECONDS = 2.0  # longest wait for the saved greeting take before speaking it live
 
 # Tool-call rounds allowed in one reply. "Add tomatoes and potatoes" can take 4
@@ -57,39 +57,16 @@ MAX_TOOL_STEPS = 8
 # tests/test_conversation.py import this, so the tests always check the model the app uses.
 LLM_MODEL = "openai/gpt-4.1-mini"
 
-# Cartesia voice ID (Indian-accent). Browse others at https://play.cartesia.ai and paste the ID here.
-TTS_VOICE = "3b554273-4299-48b9-9aaf-eefd438e3941"
+# The Cartesia voice ID is per brand (brand.json → agent.ttsVoice); browse voices at https://play.cartesia.ai.
 TTS_MODEL = "cartesia/sonic-3"
 # A fixed pace: left unset, the voice picks its own speed and sounds faster or slower from call to call.
 TTS_SPEED = "normal"
 
-# Words Deepgram should expect, so accented speech maps to them ("cart", not "partner").
-# Deepgram refuses the whole connection (error 2006, the agent hears nothing) when the list is too
-# long. The limit has shrunk over time: ~1,240 characters failed in Oct 2026, and by Nov 2026 684
-# already failed while 642 worked. So the most useful words go first and we stop well under that.
-STT_KEYTERM_BUDGET = 500  # total characters of all keyterms
-STT_PRIORITY_KEYTERMS = [
-    "cart", "checkout", "kg", "kilo", "litre", "dozen", "Cartiva", "okay", "bye",
-    "tomatoes", "potatoes", "onions", "bananas", "apples", "eggs",  # plurals shoppers say
-    "aloo", "tamatar", "pyaaz", "doodh",                           # Hindi names in Latin letters
-    "scan", "shopping list",                                       # "I want to scan a list"
-]
-
-
-def build_stt_keyterms(budget: int = STT_KEYTERM_BUDGET) -> list[str]:
-    """Priority words first, then catalog product names (shortest first, so more products fit)."""
-    names = sorted({product.name for product in get_catalog().products.values()}, key=len)
-    terms: list[str] = []
-    used = 0
-    for term in [*STT_PRIORITY_KEYTERMS, *names]:
-        if used + len(term) > budget:
-            break
-        terms.append(term)
-        used += len(term)
-    return terms
-
-
-STT_KEYTERMS = build_stt_keyterms()
+# The default brand's profile. Each call builds its own from the job metadata (see entrypoint);
+# these module-level names stay for the tests and for anything that only needs the default store.
+DEFAULT_PROFILE = load_brand_profile()
+STT_PRIORITY_KEYTERMS = DEFAULT_PROFILE.stt_priority_keyterms
+STT_KEYTERMS = DEFAULT_PROFILE.stt_keyterms
 
 
 def _forms(name: str) -> set[str]:
@@ -108,6 +85,18 @@ def plain_match(query: str, products: list[dict]) -> dict | None:
     wanted = _forms(query)
     hits = [p for p in products if _forms(str(p.get("name", ""))) & wanted]
     return hits[0] if len(hits) == 1 else None
+
+
+
+
+# Words that mean the shopper is asking about offers (English, Hindi, Hinglish). show_offers only runs
+# when the shopper's message has one: the model kept opening offers for "liquids under 200 rupees".
+OFFER_WORDS = re.compile(r"offer|deal|discount|\bsale|ऑफ़र|ऑफर|डील|डिस्काउंट|सेल|छूट|chhoot|chhut", re.IGNORECASE)
+
+NOT_AN_OFFER_REQUEST = (
+    "The shopper did not ask about offers, deals, discounts or sales, so the offers page was not opened. "
+    "If they gave a price limit, call search_products with max_price (or min_price) instead."
+)
 
 
 def price_extremes(products: list[dict]) -> dict:
@@ -133,171 +122,47 @@ def price_extremes(products: list[dict]) -> dict:
         ),
     }
 
-INSTRUCTIONS = """
-You are Cartiva, a friendly voice assistant for an Indian online grocery store.
-You help people find groceries, manage their cart and check out.
-
-# MOST IMPORTANT RULE: answer in the shopper's language (English by default)
-Speak English unless the shopper speaks Hindi or Hinglish. The exact language for right now is given
-at the end of these instructions under "Reply language right now"; always follow it.
-Look at the language of the shopper's LAST message and reply in exactly that language:
-- English → reply in English.
-- Hindi → reply in Hindi.
-- Hinglish (Hindi and English mixed) → reply in Hinglish.
-Decide again for every message, so if they switch language, you switch too.
-Write Hindi words in Devanagari and English words, brand and product names in English letters,
-because this helps the voice pronounce both correctly.
-
-Examples:
-- Shopper: "What can you do?" → "I can help you shop for groceries. What do you need today?"
-- Shopper: "आप क्या कर सकते हो?" → "मैं आपको groceries खरीदने में मदद कर सकती हूँ। आपको क्या चाहिए?"
-- Shopper: "Mujhe tomatoes chahiye" → (search first) "मुझे tomatoes मिल गए, screen पर देखिए। Tomato एक kilo चालीस रुपये का है।"
-
-# What you can do right now
-You can search the catalog with the search_products tool. The results also appear on the
-shopper's screen. After a search that is shown on screen, say only how many products you found
-and ask which one they want, for example "I found four dishwashing liquids, they're on your
-screen. Which one would you like?" Do not read out product names or prices unless the shopper
-asks (for example "which is cheapest?" or "what are they?"). If nothing is found, say so and suggest
-another word. Remember the productIds from the results for later, but never read IDs aloud.
-You can add products with the add_to_cart tool, using a productId from search_products.
-If the shopper names a product you have not searched for yet, search first with show_on_screen false
-(so their current page stays, e.g. they are on Vegetables and say "add 2 kg onions"), then add it.
-Pick the product yourself when the shopper's words point to one product: prefer the plain
-product over variants (for "tomatoes" choose "Tomato", not "Tomato Cherry" or "Tomato Puree"),
-and use the pack size they said (for "1 kg" choose the 1 kg pack). Ask which one only when it is
-still unclear, for example two brands or two pack sizes of the same product and no size was
-given. After adding, confirm briefly what was added.
-Only say a product was added, removed or changed after the tool for it returned ok in this turn.
-If you did not call the tool, or it returned an error, never say it was done: ask or explain instead.
-When several products match what they asked to add (for example "dishwash" matches Vim, Pril and
-Exo in several sizes), ask which one first; do not add any of them yet.
-If the tool says a product is out of stock or only some units are available, explain that and
-offer the available amount.
-You can read the shopper's cart with the get_cart tool. Use it whenever they ask about their
-cart or total, and answer only from what the tool returns.
-Say amounts in words, for example "two hundred forty-five rupees".
-Tool messages are in English; always say them in the shopper's language.
-You can remove items with remove_from_cart and change quantities with update_cart. For these,
-call get_cart first to find the right productId and the current quantity. If more than one cart
-item could match what the shopper said, ask which one. Confirm briefly after each change.
-You can open pages on the shopper's screen: navigate_category for a category ("go to fruits"),
-open_product for one product ("show me that one"), and open_page for the cart, home or scan list
-pages ("take me to the cart").
-Offers: whenever the shopper asks about offers, deals, discounts or things on sale ("show me things
-on offer", "any offers?", "kya offer hai?"), call show_offers. If they name an aisle ("show only
-discounted vegetables", "dairy offers"), pass that category so only those products are shown.
-Then answer in one or two sentences: how many are on screen and at most two deals. A product with
-a "deal" field is discounted; its "dealPrice" is the price after the deal, and the discount is
-applied automatically at checkout. Never add a deal product unless the shopper asks for it. After opening a category, say only that it is open and how many
-products are on screen, then ask what they would like, for example "Here are the vegetables,
-eleven products on screen. What would you like?" Do not name the products; the screen shows them.
-Name products only if the shopper asks what is there.
-The shopper can also browse, filter and sort by tapping, so the screen may show products you
-never searched for. Whenever they refer to a product without naming it ("the cheapest one",
-"the most expensive one", "the second one", "this one", "add that"), your FIRST step is always
-get_screen. Never ask "which product?" before you have looked at the screen. Pick the product
-from it; position 1 is the first product on screen. For cheapest or most expensive, use the
-cheapestInStock / mostExpensiveInStock lists it returns. Only if the screen has no products, ask
-what they mean.
-If two or more products have the same price for what the shopper asked (for example several
-are the cheapest, or several are the most expensive), never pick one yourself. Say their names,
-tell the shopper they cost the same, and ask which one to add.
-For example: "Banana and Guava both cost forty rupees. Which one should I add?"
-Only add after the shopper chooses.
-When the shopper answers a question you asked (which product, which size, "did you mean…?"),
-do the action they originally asked for right away with their answer: add it, remove it or
-change it. Do not search again or ask again when you already know the productId.
-
-# Hindi numbers
-Shoppers often say amounts in Hindi, also in English letters: ek / एक = 1, do / दो = 2,
-teen / तीन = 3, chaar / चार = 4, paanch / पाँच = 5, chhe / छह = 6, saat / सात = 7, aath / आठ = 8,
-nau / नौ = 9, das / दस = 10. "do kilo pyaaz" means 2 kg of onions (quantity 2 of the 1 kg pack),
-not 1. In "add kar do" the last "do" means "please do"; in "do kilo" it is the number 2.
-Point at products on screen with highlight_products whenever you name one specific product
-("the cheapest is Vim") or ask the shopper to choose between several (reason "options"),
-so they can see what you mean. Call it before you speak about them. It changes nothing in the cart.
-Never invent products, brands, varieties, prices or options; only use what the tools return.
-
-# Checkout and payment
-When the shopper wants to check out or pay, call start_checkout. Then read out the total and
-ask clearly whether to pay now. Only call confirm_payment if their answer is a clear yes.
-If they say no, wait, or change their mind, call cancel_pending_action. If the cart changes,
-checkout must be started again. After confirm_payment, tell the shopper to complete the payment
-in the window on screen. You will then receive the result; never say a payment succeeded before that.
-If it failed and the shopper wants to try again, call start_checkout again.
-
-# Shopping lists (scanned from a photo)
-When the shopper wants to scan, upload or photograph a shopping list, or says they have a list
-("I want to scan a list", "I have a list", "scan karna hai"), call open_page with page "scan-list"
-right away, then tell them to tap the upload box and choose a photo of their list. Do not search
-for products called "list" or "scan".
-When you are told a list was scanned, or the shopper asks about their list, call get_shopping_list.
-Go through it in this order:
-1. The ready items, briefly, with their amounts said naturally ("two kilos of tomatoes, a pack of Amul butter").
-   If one has fewer packs than asked because of stock, say how many you could add.
-2. The items that need a choice, ONE AT A TIME: name the options with their sizes, ask which one, and wait
-   for the answer. Call choose_list_item with the choice before asking about the next item.
-   Its result lists stillToChoose and says what to do next: ask about every item in stillToChoose, in
-   that order, before moving on. The item you are asking about is highlighted on the shopper's screen
-   with its options, so they can also tap one.
-3. When no choices are left: the items that are not available (which are out of stock, which are not sold here).
-4. Then ask whether to add everything to the cart.
-The shopper can remove items (remove_list_item), add items (add_list_item), change amounts
-(update_list_item) or pick an option (choose_list_item). Use the lineId from get_shopping_list and never
-read lineIds aloud. Only say an option was chosen, an item removed or the list added to the cart after
-that tool returned ok. If it returned an error, nothing changed: retry with the exact ids it gives, or
-ask the shopper (for example which size of Vim they want). Nothing is in the cart until confirm_shopping_list; call it only after the shopper
-clearly agrees. Afterwards, say how many items were added and which ones were not available.
-
-# Ending the call
-When the shopper says goodbye or that they are done (for example "bye", "that's all",
-"thank you, I'm done", "बस", "धन्यवाद, हो गया"), call the end_call tool and pass a short
-goodbye in their language. Do not say the goodbye yourself; the tool speaks it.
-Do not end the call if they only pause or say "wait" or "रुको".
-
-# Voice rules
-- Speak in plain sentences. No lists, markdown, emojis or symbols.
-- Keep replies short: one or two sentences. Ask one question at a time.
-- If you did not understand the shopper or the request is unclear, ask one short question to
-  clarify. Never guess an action, and never add, remove or pay for anything you are unsure about.
-- The shopper's words come from speech recognition and can be misheard, especially with an
-  Indian accent: a product can turn into a similar-sounding word ("tools" for "tomatoes",
-  "partner" for "cart"). Never answer a strange word literally (never say "I can't remove tools").
-  - If the misheard word is the PRODUCT, ask one short question with your best guess and act
-    only after the shopper confirms. To guess for remove or change, call get_cart first and pick
-    the cart item that sounds most like it: "Remove the tools" with tomatoes in the cart →
-    "Did you mean the tomatoes?". When they say yes, call remove_from_cart for it at once.
-  - If the product and amount are clear and only an extra word is odd ("add two kg potatoes to
-    my partner", where "partner" is "cart"), just do it without asking.
-- Say prices in rupees, in words, in the shopper's language, for example "forty rupees"
-  or "चालीस रुपये".
-- The very first greeting is in English with "Hi" or "Hello", never "Namaste". After that,
-  follow the shopper's language.
-- Reading a just-scanned shopping list (and the "reading your list" sentence before it) is always in
-  English. From the shopper's next reply on, follow their language as usual.
-"""
+# The default brand's instructions (agent/instructions.py renders them per brand).
+INSTRUCTIONS = DEFAULT_PROFILE.instructions
 
 
 class CartivaAssistant(Agent):
     """The agent's personality and its shopping tools."""
 
-    def __init__(self) -> None:
-        super().__init__(instructions=INSTRUCTIONS + language_instructions("english"))
+    def __init__(self, profile: BrandProfile | None = None) -> None:
+        self._profile = profile or DEFAULT_PROFILE  # which storefront this call is for
+        super().__init__(instructions=self._profile.instructions + language_instructions("english"))
         self._language: Language = "english"  # English until the shopper speaks Hindi or Hinglish
+        self._last_shopper_text = ""  # what the shopper said this turn (set by set_reply_language)
         # ★ Set by start_checkout; required by confirm_payment; cleared by cancel or any cart change.
         self._pending_checkout_total: str | None = None
 
-    async def on_user_turn_completed(self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage) -> None:
-        """Before every reply: set the reply language from what the shopper actually said this turn.
-        It goes into the agent's standing instructions (so the sentence after a tool call keeps it too)
-        and into the voice (so an English reply reads "2 kg" as "two kg", not "do kilo")."""
-        language = detect_language(new_message.text_content or "")
+    def _in_reply_language(self, result: dict | str) -> dict | str:
+        """Adds this turn's reply-language rule to a tool result that tells the model what to say.
+        Those English "say" instructions arrive after the turn's language rule, so without it the
+        model answered a Hindi request in English after a search (found by the evals)."""
+        if isinstance(result, dict) and "say" in result:
+            result["say"] = f"{result['say']} {REPLY_RULES[self._language]}"
+        return result
+
+    async def set_reply_language(self, shopper_text: str) -> Language:
+        """Sets the reply language from what the shopper just said: into the standing instructions (so the
+        sentence after a tool call keeps it too), the tools' "say" hints, and the voice (so an English reply
+        reads "2 kg" as "two kg", not "do kilo"). Called before every reply; the evals call it too, because
+        text-mode sessions skip on_user_turn_completed."""
+        self._last_shopper_text = shopper_text
+        language = detect_language(shopper_text)
         logger.info("reply language: %s", language)
         if language != self._language:
             self._language = language
-            await self.update_instructions(INSTRUCTIONS + language_instructions(language))
-            self.session.tts.update_options(language=VOICE_LANGUAGE[language])
+            await self.update_instructions(self._profile.instructions + language_instructions(language))
+            if self.session.tts is not None:  # text-only sessions (tests, evals) have no voice
+                self.session.tts.update_options(language=VOICE_LANGUAGE[language])
+        return language
+
+    async def on_user_turn_completed(self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage) -> None:
+        """Before every reply: set the reply language from what the shopper actually said this turn."""
+        language = await self.set_reply_language(new_message.text_content or "")
         turn_ctx.add_message(role="system", content=REPLY_RULES[language])  # this reply, right away
 
     @function_tool
@@ -321,12 +186,15 @@ class CartivaAssistant(Agent):
         min_price: float | None = None,
         show_on_screen: bool = True,
     ) -> dict | str:
-        """Searches the Cartiva catalog. Results open on the shopper's screen unless show_on_screen is false.
+        """Searches the store's catalog. Results open on the shopper's screen unless show_on_screen is false.
 
         Call this whenever the shopper wants to find, see or browse products, or before adding
         something to the cart (you need the productId from the results).
         When you only need a productId to add, remove or change a product ("add 2 kg onions"),
         set show_on_screen to false: the shopper stays on the page they are looking at.
+
+        A price limit ("under 200 rupees", "below 100", "less than fifty") is part of the search:
+        pass it as max_price / min_price here. It is not a request for offers.
 
         Search for ONE product at a time. If the shopper asks for several products
         ("tomatoes and potatoes"), call this once per product: query "tomato", then query "potato".
@@ -377,7 +245,7 @@ class CartivaAssistant(Agent):
                 "several products, search each one separately. Otherwise tell the shopper it was "
                 "not found and suggest another word."
             )
-        return result
+        return self._in_reply_language(result)
 
     @function_tool
     async def add_to_cart(self, context: RunContext, product_id: str, quantity: int = 1) -> dict | str:
@@ -437,16 +305,13 @@ class CartivaAssistant(Agent):
     async def navigate_category(
         self,
         context: RunContext,
-        category: Literal[
-            "vegetables", "fruits", "dairy", "beverages", "snacks",
-            "breakfast", "cleaning", "laundry", "personal-care",
-        ],
+        category: str,
     ) -> dict | str:
         """Opens a category page on the shopper's screen, e.g. "go to fruits", "show me dairy",
         "डेयरी दिखाओ". Returns the category name and how many products are on screen.
 
         Args:
-            category: The category to open.
+            category: The category id to open, one of this store's aisles listed in your instructions.
         """
         try:
             result = await call_browser("ui.openCategory", {"category": category})
@@ -454,13 +319,15 @@ class CartivaAssistant(Agent):
                 return result
             # Only the count reaches the model, so it can't start reading the products out.
             # If the shopper asks what's there, or says "the cheapest one", it calls get_screen.
-            return {
+            return self._in_reply_language({
                 "ok": True,
                 "category": result.get("category"),
                 "productCount": result.get("count"),
-                "say": "Say only that the category is open and how many products are on screen, then ask "
-                "what they would like. Do not name products. If they ask what is there, call get_screen.",
-            }
+                "say": (
+                    "Say only that the category is open and how many products are on screen, then ask "
+                    "what they would like. Do not name products. If they ask what is there, call get_screen."
+                ),
+            })
         except BrowserRpcError:
             return "Opening the category failed right now. Apologise briefly and ask the shopper to try again."
 
@@ -500,23 +367,23 @@ class CartivaAssistant(Agent):
     async def show_offers(
         self,
         context: RunContext,
-        category: Literal[
-            "vegetables", "fruits", "dairy", "beverages", "snacks",
-            "breakfast", "cleaning", "laundry", "personal-care",
-        ] | None = None,
+        category: str | None = None,
     ) -> dict | str:
         """Opens the offers page on the shopper's screen: discounted products, store offers and the
-        free-delivery rule. Use it whenever they ask about offers, deals, discounts, sales or what's
-        cheaper today: "show me things on offer", "any offers?", "what's on sale", "kya offer hai",
+        free-delivery rule. Use it whenever they ask about offers, deals, discounts or sales:
+        "show me things on offer", "any offers?", "what's on sale", "kya offer hai",
         "discount wali cheezein dikhao".
 
         Pass a category to show ONLY that aisle's discounted products: "show only discounted
         vegetables" → category "vegetables", "dairy offers" → "dairy", "sabzi pe offer" → "vegetables".
-        Never use search_products or navigate_category for discounted items.
+        Never use search_products or navigate_category for discounted items. Only use this when the
+        shopper says offer, deal, discount or sale; a price limit alone is a search, not an offer.
 
         Args:
-            category: The aisle to filter to, or leave it out for all offers.
+            category: The aisle (category id from your instructions) to filter to, or leave it out for all offers.
         """
+        if self._last_shopper_text and not OFFER_WORDS.search(self._last_shopper_text):
+            return NOT_AN_OFFER_REQUEST
         try:
             result = await call_browser("ui.openOffers", {"category": category} if category else {})
             if not isinstance(result, dict) or not result.get("ok"):
@@ -527,7 +394,7 @@ class CartivaAssistant(Agent):
                 "two deals with their deal price. Mention the free-delivery rule only if they asked about "
                 "delivery or this is the full offers page. Do not add anything to the cart."
             )
-            return result
+            return self._in_reply_language(result)
         except BrowserRpcError:
             return "Opening the offers failed right now. Apologise briefly and ask the shopper to try again."
 
@@ -548,7 +415,7 @@ class CartivaAssistant(Agent):
             return "The screen could not be read right now. Ask the shopper which product they mean."
         if isinstance(result, dict) and result.get("ok"):
             result.update(price_extremes(result.get("products") or []))
-        return result
+        return self._in_reply_language(result)
 
     @function_tool
     async def highlight_products(
@@ -624,7 +491,7 @@ class CartivaAssistant(Agent):
     async def get_shopping_list(self, context: RunContext) -> dict | str:
         """Gets the shopping list the shopper scanned from a photo, line by line: what was written,
         the status ("found" = product and packs ready, "choose" = pick one of the options,
-        "unavailable" = out of stock, "not-found" = not sold at Cartiva), and the lineId of each line.
+        "unavailable" = out of stock, "not-found" = not sold in this store), and the lineId of each line.
         Nothing on this list is in the cart until confirm_shopping_list is called.
         """
         try:
@@ -711,8 +578,8 @@ class CartivaAssistant(Agent):
 
         Args:
             goodbye: A short, warm goodbye in the shopper's current language (English, Hindi or
-                Hinglish), for example "Thanks for shopping with Cartiva, bye!" or
-                "Cartiva के साथ shopping करने के लिए धन्यवाद, फिर मिलेंगे!"
+                Hinglish), for example "Thanks for shopping with us, bye!" or
+                "हमारे साथ shopping करने के लिए धन्यवाद, फिर मिलेंगे!"
         """
         context.disallow_interruptions()
         await context.wait_for_playout()  # finish anything said before this tool was called
@@ -738,7 +605,9 @@ server = AgentServer(
 @server.rtc_session(agent_name=os.getenv("CARTIVA_AGENT_NAME", "cartiva-agent"))
 async def entrypoint(ctx: JobContext) -> None:
     """Runs once for every voice session (room) LiveKit gives us."""
-    logger.info("starting voice session in room %s", ctx.room.name)
+    # Which storefront this call is for: the token endpoint wrote {"brand": ...} into the job metadata.
+    profile = profile_for_job(ctx.job.metadata)
+    logger.info("starting voice session in room %s for brand %s", ctx.room.name, profile.id)
 
     session = AgentSession(
         # "multi" = automatic language detection, including Hindi and English mixed in one sentence
@@ -747,7 +616,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # Cartesia Sonic 3 speaks Hindi, English and Hinglish. Voice: an Indian-accent female voice.
         # Starts in English; switched to Hindi only when the shopper speaks Hindi or Hinglish.
         tts=inference.TTS(
-            model=TTS_MODEL, voice=TTS_VOICE, language=VOICE_LANGUAGE["english"], extra_kwargs={"speed": TTS_SPEED}
+            model=TTS_MODEL, voice=profile.tts_voice, language=VOICE_LANGUAGE["english"], extra_kwargs={"speed": TTS_SPEED}
         ),
         turn_handling=TurnHandlingOptions(
             turn_detection=inference.TurnDetector(),
@@ -761,7 +630,7 @@ async def entrypoint(ctx: JobContext) -> None:
         max_tool_steps=MAX_TOOL_STEPS,
         # Start preparing the reply while the shopper is still finishing their sentence: faster answers.
         preemptive_generation=True,
-        stt_context_options={"keyterms": STT_KEYTERMS},  # bias Deepgram toward our words
+        stt_context_options={"keyterms": profile.stt_keyterms},  # bias Deepgram toward our words
     )
 
     # Timings of every step (end of turn, speech-to-text, LLM first token, first audio), to find lag.
@@ -857,7 +726,7 @@ async def entrypoint(ctx: JobContext) -> None:
     list_coming = asyncio.Event()
 
     # The greeting's saved take (same tone and pace every call); loaded while the call connects.
-    greeting_audio = asyncio.create_task(load_greeting(session.tts, GREETING, TTS_VOICE, TTS_MODEL, TTS_SPEED))
+    greeting_audio = asyncio.create_task(load_greeting(session.tts, profile.greeting, profile.tts_voice, TTS_MODEL, TTS_SPEED))
 
     # Open the voice and model connections now, so the first sentence ("Hi, I'm Cartiva")
     # doesn't stutter while they connect.
@@ -865,7 +734,7 @@ async def entrypoint(ctx: JobContext) -> None:
         if model is not None:
             model.prewarm()
 
-    await session.start(agent=CartivaAssistant(), room=ctx.room)
+    await session.start(agent=CartivaAssistant(profile), room=ctx.room)
     # Don't listen until Cartiva has introduced itself (the greeting or the list readout turns it on).
     session.input.set_audio_enabled(False)
     await ctx.connect()
@@ -917,7 +786,7 @@ async def entrypoint(ctx: JobContext) -> None:
         if not introduced["done"]:
             introduced["done"] = True
             await speak_uninterrupted(
-                "In English, in one short sentence, say hello, that you are Cartiva, and that you are reading "
+                f"In English, in one short sentence, say hello, that you are {profile.assistant_name}, and that you are reading "
                 "their shopping list now. Do not call any tools."
             )
         if not list_review["pending"]:  # the readout already finished meanwhile
@@ -1017,9 +886,9 @@ async def entrypoint(ctx: JobContext) -> None:
             except asyncio.TimeoutError:
                 audio = None
             if audio is not None:  # the saved take: identical every call
-                greeting = session.say(GREETING, audio=play_frames(audio), allow_interruptions=False)
+                greeting = session.say(profile.greeting, audio=play_frames(audio), allow_interruptions=False)
             else:  # no take (first recording failed): speak it live
-                greeting = session.say(GREETING, allow_interruptions=False)
+                greeting = session.say(profile.greeting, allow_interruptions=False)
             await greeting.wait_for_playout()
         finally:
             session.input.set_audio_enabled(True)  # always listen afterwards, even if the greeting failed

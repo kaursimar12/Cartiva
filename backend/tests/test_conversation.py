@@ -38,9 +38,12 @@ async def chat(browser: FakeBrowser):
         inference.LLM(model=LLM_MODEL) as llm,
         AgentSession(llm=llm, max_tool_steps=worker.MAX_TOOL_STEPS) as session,
     ):
-        await session.start(worker.CartivaAssistant())
+        assistant = worker.CartivaAssistant()
+        await session.start(assistant)
 
         async def say(text: str):
+            # Text-mode sessions skip on_user_turn_completed; run its language step like a voice call does.
+            await assistant.set_reply_language(text)
             return await session.run(user_input=text)
 
         yield say
