@@ -26,7 +26,8 @@ export function VoiceBanner() {
         <div className="max-w-xl">
           <p className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-white/80">
             <MicIcon className="h-3.5 w-3.5" />
-            {brand.assistant.name} Voice
+            {/* "Cartiva Voice", but "CocaVoice" rather than "CocaVoice Voice". */}
+            {/voice$/i.test(brand.assistant.name) ? brand.assistant.name : `${brand.assistant.name} Voice`}
           </p>
           <h2 id="voice-heading" className="mt-4 text-3xl leading-tight font-semibold tracking-tight sm:text-4xl">
             Just say what you need.

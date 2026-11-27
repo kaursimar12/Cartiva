@@ -22,7 +22,7 @@
     "text": "Every can and bottle sealed and genuine"
   },
   "assistant": {
-    "name": "Meera",
+    "name": "CocaVoice",
     "languages": "English, Hindi or Hinglish"
   },
   "voiceExamples": [
@@ -70,12 +70,13 @@
     }
   },
   "agent": {
-    "greeting": "Hi, I'm Meera from the Coca-Cola Store! What would you like to drink today?",
+    "greeting": "Hi, I'm CocaVoice from the Coca-Cola Store! What would you like to drink today?",
     "ttsVoice": "3b554273-4299-48b9-9aaf-eefd438e3941",
     "sttPriorityKeyterms": [
       "cart",
       "checkout",
-      "Meera",
+      "CocaVoice",
+      "Coca Voice",
       "okay",
       "bye",
       "Coca-Cola",
