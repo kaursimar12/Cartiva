@@ -26,6 +26,7 @@ from livekit.agents import (
     inference,
     llm,
     metrics,
+    text_transforms,
 )
 
 from livekit import rtc
@@ -124,6 +125,16 @@ def price_extremes(products: list[dict]) -> dict:
 
 # The default brand's instructions (agent/instructions.py renders them per brand).
 INSTRUCTIONS = DEFAULT_PROFILE.instructions
+
+
+def tts_text_transforms(profile: BrandProfile) -> list:
+    """What happens to a reply's text before the voice speaks it: LiveKit's default clean-up (no Markdown, no
+    emoji), then the brand's pronunciations ("7UP" → "Seven Up"). replace() also catches a word that arrives
+    split across streamed chunks ("7U" + "P")."""
+    transforms: list = ["filter_markdown", "filter_emoji"]
+    if profile.tts_pronunciations:
+        transforms.append(text_transforms.replace(profile.tts_pronunciations))
+    return transforms
 
 
 class CartivaAssistant(Agent):
@@ -750,6 +761,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # Start preparing the reply while the shopper is still finishing their sentence: faster answers.
         preemptive_generation=True,
         stt_context_options={"keyterms": profile.stt_keyterms},  # bias Deepgram toward our words
+        tts_text_transforms=tts_text_transforms(profile),
     )
 
     # Timings of every step (end of turn, speech-to-text, LLM first token, first audio), to find lag.

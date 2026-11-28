@@ -72,6 +72,9 @@
   "agent": {
     "greeting": "Hi, I'm PepsiCoVoice from the PepsiCo Store! What drinks or snacks would you like today?",
     "ttsVoice": "3b554273-4299-48b9-9aaf-eefd438e3941",
+    "ttsPronunciations": {
+      "7UP": "Seven Up"
+    },
     "sttPriorityKeyterms": [
       "cart",
       "checkout",

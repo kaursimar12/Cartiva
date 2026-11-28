@@ -114,6 +114,32 @@ def test_the_assistant_takes_the_calls_profile(with_teststore) -> None:
     assert "You are Fizzy" in assistant.instructions
 
 
+# ---------------------------------------------------------------- pronunciation
+
+
+async def _speak(transforms: list, chunks: list[str]) -> str:
+    """Runs streamed reply chunks through the brand's callable text transforms (as the voice receives them)."""
+    async def stream():
+        for chunk in chunks:
+            yield chunk
+
+    text = stream()
+    for transform in transforms:
+        if callable(transform):
+            text = transform(text)
+    return "".join([part async for part in text])
+
+
+async def test_pepsico_says_seven_up_even_when_the_word_arrives_in_pieces() -> None:
+    transforms = worker.tts_text_transforms(load_brand_profile("pepsico"))
+    spoken = await _speak(transforms, ["I added two 7U", "P Free cans and one 7", "UP bottle."])
+    assert spoken == "I added two Seven Up Free cans and one Seven Up bottle."
+
+
+def test_brands_without_pronunciations_keep_the_default_clean_up() -> None:
+    assert worker.tts_text_transforms(load_brand_profile("cartiva")) == ["filter_markdown", "filter_emoji"]
+
+
 # ---------------------------------------------------------------- job metadata
 
 

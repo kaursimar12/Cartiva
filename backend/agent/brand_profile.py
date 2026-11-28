@@ -49,6 +49,9 @@ class BrandProfile:
     product_aisle: dict[str, str] = field(default_factory=dict)
     aisle_names: dict[str, str] = field(default_factory=dict)
     aisle_brands: dict[str, list[str]] = field(default_factory=dict)
+    # Words the voice should say differently from how they're written (brand.json → agent.ttsPronunciations),
+    # e.g. "7UP" → "Seven Up" (the voice read it as "seven U P"). The screen keeps the written name.
+    tts_pronunciations: dict[str, str] = field(default_factory=dict)
 
 
 def _aisle_brands(products) -> dict[str, list[str]]:
@@ -81,6 +84,7 @@ def load_brand_profile(brand: str | None = None) -> BrandProfile:
         product_aisle={p.id: p.category for p in catalog.products.values()},
         aisle_names={category["id"]: category["name"] for category in categories},
         aisle_brands=_aisle_brands(catalog.products.values()),
+        tts_pronunciations=dict(agent.get("ttsPronunciations") or {}),
     )
 
 
